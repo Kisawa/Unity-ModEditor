@@ -108,6 +108,8 @@ namespace ModEditor
             {
                 tabs[tabIndex].Draw();
             }
+            if (GUI.changed)
+                EditorUtility.SetDirty(Manager);
         }
 
         private void OnSelectionChange()

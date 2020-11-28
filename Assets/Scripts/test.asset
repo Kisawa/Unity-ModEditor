@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a8f7a03b77f142489169cc1989693f8, type: 3}
   m_Name: test
   m_EditorClassIdentifier: 
-  res: 1
-  t1: {fileID: -1049903994145838037, guid: 09d52bee95f5c5d4aa772d2c5f41b20f, type: 2}
+  target:
+    exposedName: 78711f6631f0c2b4f81f84d25fc352d0
+    defaultValue: {fileID: 0}

@@ -12,10 +12,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 452e47ba08746704e8fda6167da66445, type: 3}
   m_Name: ModEditorDefaultManager
   m_EditorClassIdentifier: 
-  lockTarget: 0
+  lockTarget: 1
   target: {fileID: 0}
-  TargetChildren: []
+  TargetChildren:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   actionableDic:
     parent: {fileID: 11400000}
-    keyList: []
-    valList: 
+    keyList:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    valList: 0001010101010101
