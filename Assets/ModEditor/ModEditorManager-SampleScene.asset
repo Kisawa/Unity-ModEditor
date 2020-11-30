@@ -10,28 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 452e47ba08746704e8fda6167da66445, type: 3}
-  m_Name: ModEditorDefaultManager
+  m_Name: ModEditorManager-SampleScene
   m_EditorClassIdentifier: 
   lockTarget: 1
-  target: {fileID: 0}
-  TargetChildren:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  target:
+    exposedName: '#UNKNOWN:1'
+    defaultValue: {fileID: 0}
   actionableDic:
     parent: {fileID: 11400000}
     keyList:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    valList: 0001010101010101
+    - '#UNKNOWN:10'
+    - '#UNKNOWN:2'
+    - '#UNKNOWN:3'
+    - '#UNKNOWN:4'
+    - '#UNKNOWN:5'
+    - '#UNKNOWN:6'
+    - '#UNKNOWN:7'
+    - '#UNKNOWN:8'
+    - '#UNKNOWN:9'
+    - '#UNKNOWN:1'
+    valList: 01000101010101010101

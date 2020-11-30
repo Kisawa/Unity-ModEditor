@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace ModEditor
 {
     public class ModEditorWindow : EditorWindow
     {
-        const string ManagerPath = "Assets/ModEditor/ModEditorDefaultManager.asset";
+        const string managerPath = "Assets/ModEditor/";
+        public static ExposedManagement ExposedManagement { get; private set; }
         public ModEditorManager Manager { get; private set; }
 
         [MenuItem("Tools/Mod Editor")]
@@ -16,6 +18,8 @@ namespace ModEditor
         {
             GetWindow<ModEditorWindow>("Mod Editor");
         }
+
+        Scene currentScene;
 
         int _tabIndex = -1;
         int tabIndex
@@ -58,35 +62,30 @@ namespace ModEditor
                 hiddenContent = EditorGUIUtility.IconContent("d_scenevis_hidden-mixed");
             if (viewContent == null)
                 viewContent = EditorGUIUtility.IconContent("d_scenevis_visible-mixed");
-            if (Manager == null)
-            {
-                Manager = AssetDatabase.LoadAssetAtPath<ModEditorManager>(ManagerPath);
-                if (Manager == null)
-                {
-                    Manager = CreateInstance<ModEditorManager>();
-                    AssetDatabase.CreateAsset(Manager, ManagerPath);
-                    AssetDatabase.ImportAsset(ManagerPath);
-                }
-            }
+            refreshWindow();
+            Undo.undoRedoPerformed += Manager.RefreshObjDic;
         }
 
         private void OnEnable()
         {
             Manager.Target = Selection.activeGameObject;
-            EditorApplication.hierarchyChanged += Repaint;
+            EditorApplication.hierarchyChanged += hierarchyChanged;
         }
 
         private void OnDisable()
         {
-            EditorApplication.hierarchyChanged -= Repaint;
+            EditorApplication.hierarchyChanged -= hierarchyChanged;
+        }
+
+        private void OnDestroy()
+        {
+            Undo.undoRedoPerformed -= Manager.RefreshObjDic;
         }
 
         private void OnFocus()
         {
             Manager.Target = Selection.activeGameObject;
         }
-
-        public ExposedReference<Transform> exposedReference;
 
         private void OnGUI()
         {
@@ -116,6 +115,40 @@ namespace ModEditor
         {
             Manager.Target = Selection.activeGameObject;
             Repaint();
+        }
+
+        void hierarchyChanged()
+        {
+            if (currentScene != SceneManager.GetActiveScene())
+                refreshWindow();
+            Repaint();
+        }
+
+        void refreshWindow()
+        {
+            currentScene = SceneManager.GetActiveScene();
+            
+            GameObject ExposedManagementObj = GameObject.Find("ExposedManagement");
+            if (ExposedManagementObj == null)
+            {
+                ExposedManagementObj = new GameObject("ExposedManagement");
+                ExposedManagementObj.hideFlags = HideFlags.HideInHierarchy;
+                ExposedManagement = ExposedManagementObj.AddComponent<ExposedManagement>();
+                AssetDatabase.DeleteAsset($"{managerPath}ModEditorManager-{currentScene.name}.asset");
+            }
+            else
+            {
+                ExposedManagement = ExposedManagementObj.GetComponent<ExposedManagement>();
+                Manager = AssetDatabase.LoadAssetAtPath<ModEditorManager>($"{managerPath}ModEditorManager-{currentScene.name}.asset");
+            }
+            if (Manager == null)
+            {
+                Manager = CreateInstance<ModEditorManager>();
+                AssetDatabase.CreateAsset(Manager, $"{managerPath}ModEditorManager-{currentScene.name}.asset");
+                AssetDatabase.ImportAsset($"{managerPath}ModEditorManager-{currentScene.name}.asset");
+            }
+
+            Manager.RefreshObjDic();
         }
     }
 }
