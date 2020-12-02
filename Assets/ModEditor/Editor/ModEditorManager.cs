@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -8,6 +9,12 @@ namespace ModEditor
 {
     public class ModEditorManager : ScriptableObject
     {
+        public event Action onRefreshTargetDic;
+        public event Action onNormalViewChanged;
+        public event Action onTangentViewChanged;
+        public event Action onGridViewChanged;
+        public event Action onUVViewChanged;
+
         [SerializeField]
         bool lockTarget;
         public bool LockTarget 
@@ -52,6 +59,7 @@ namespace ModEditor
             {
                 Undo.RecordObject(this, "ModEditor NormalView");
                 normalView = value;
+                onNormalViewChanged?.Invoke();
             }
         }
 
@@ -102,6 +110,7 @@ namespace ModEditor
             {
                 Undo.RecordObject(this, "ModEditor TangentView");
                 tangentView = value;
+                onTangentViewChanged?.Invoke();
             }
         }
 
@@ -176,6 +185,7 @@ namespace ModEditor
             {
                 Undo.RecordObject(this, "ModEditor GridView");
                 gridView = value;
+                onGridViewChanged?.Invoke();
             }
         }
 
@@ -214,6 +224,7 @@ namespace ModEditor
             {
                 Undo.RecordObject(this, "ModEditor UVView");
                 uvView = value;
+                onUVViewChanged?.Invoke();
             }
         }
 
@@ -252,17 +263,20 @@ namespace ModEditor
         {
             if (Target == null)
             {
-                if(TargetChildren != null)
+                if (TargetChildren != null)
                     TargetChildren.Clear();
-                return;
             }
-            TargetChildren = Target.GetComponentsInChildren<Renderer>().Select(x => x.gameObject).ToList();
-            for (int i = 0; i < TargetChildren.Count; i++)
+            else
             {
-                GameObject obj = TargetChildren[i];
-                if (!ActionableDic.ContainsKey(obj))
-                    ActionableDic.Add(obj, true);
+                TargetChildren = Target.GetComponentsInChildren<Renderer>().Select(x => x.gameObject).ToList();
+                for (int i = 0; i < TargetChildren.Count; i++)
+                {
+                    GameObject obj = TargetChildren[i];
+                    if (!ActionableDic.ContainsKey(obj))
+                        ActionableDic.Add(obj, true);
+                }
             }
+            onRefreshTargetDic?.Invoke();
         }
 
         public void CheckAndClearExposed()

@@ -91,6 +91,8 @@ namespace ModEditor
             if (dropdownRightContent == null)
                 dropdownRightContent = EditorGUIUtility.IconContent("d_scrollright");
             refreshWindow();
+            for (int i = 0; i < tabs.Count; i++)
+                tabs[i].OnEnable();
             Selection.selectionChanged += selectionChanged;
             EditorApplication.hierarchyChanged += hierarchyChanged;
             Undo.undoRedoPerformed += undoRedoPerformed;
@@ -100,6 +102,8 @@ namespace ModEditor
 
         private void OnDisable()
         {
+            for (int i = 0; i < tabs.Count; i++)
+                tabs[i].OnDiable();
             Selection.selectionChanged -= selectionChanged;
             EditorApplication.hierarchyChanged -= hierarchyChanged;
             Undo.undoRedoPerformed -= undoRedoPerformed;
@@ -134,10 +138,10 @@ namespace ModEditor
             }
         }
 
-        private void OnInspectorUpdate()
+        private void Update()
         {
             for (int i = 0; i < tabs.Count; i++)
-                tabs[i].OnInspectorUpdate();
+                tabs[i].Update();
         }
 
         void selectionChanged()

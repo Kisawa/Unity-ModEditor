@@ -14,14 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lockTarget: 0
   target:
-    exposedName: 
+    exposedName: '#UNKNOWN:2'
     defaultValue: {fileID: 0}
   actionableDic:
     parent: {fileID: 11400000}
     keyList:
-    - '#UNKNOWN:1'
     - '#UNKNOWN:2'
-    - '#UNKNOWN:3'
     - '#UNKNOWN:5'
     - '#UNKNOWN:6'
     - '#UNKNOWN:7'
@@ -30,20 +28,21 @@ MonoBehaviour:
     - '#UNKNOWN:10'
     - '#UNKNOWN:11'
     - '#UNKNOWN:12'
-    valList: 0100000001010101010101
+    - '#UNKNOWN:13'
+    valList: 00000101010101010101
   normalView: 1
   normalViewUnfold: 1
   normalColor: {r: 1, g: 0, b: 0, a: 0}
   normalLength: 0.34
-  tangentView: 1
+  tangentView: 0
   tangentViewUnfold: 1
-  tangentColor: {r: 0.44115734, g: 1, b: 0.11792451, a: 0}
-  tangentLength: 0.63
-  arrowLength: 0
-  arrowSize: 0
-  gridView: 1
+  tangentColor: {r: 0.3644445, g: 1, b: 0, a: 0}
+  tangentLength: 0.62
+  arrowLength: 0.4
+  arrowSize: 0.4
+  gridView: 0
   gridViewUnfold: 1
   gridColor: {r: 1, g: 1, b: 1, a: 0}
-  uvView: 1
+  uvView: 0
   uvViewUnfold: 1
-  uvAlpha: 0.32
+  uvAlpha: 1

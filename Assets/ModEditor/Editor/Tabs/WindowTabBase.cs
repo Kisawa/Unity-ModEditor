@@ -14,13 +14,17 @@ namespace ModEditor
             this.window = window;
         }
 
+        public virtual void OnEnable() { }
+
+        public virtual void OnDiable() { }
+
         public virtual void OnFocus() { }
 
         public virtual void OnLostFocus() { }
 
         public abstract void Draw();
 
-        public virtual void OnInspectorUpdate() { }
+        public virtual void Update() { }
 
         protected void Repaint()
         {
