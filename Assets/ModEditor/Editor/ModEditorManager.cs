@@ -14,7 +14,7 @@ namespace ModEditor
         {
             get => lockTarget;
             set {
-                Undo.RecordObject(this, "ModEditor Change LockTarget");
+                Undo.RecordObject(this, "ModEditor LockTarget");
                 lockTarget = value;
             }
         }
@@ -31,7 +31,6 @@ namespace ModEditor
             {
                 if (LockTarget)
                     return;
-                Undo.RecordObject(this, "ModEditor Change Target");
                 target = ModEditorWindow.ExposedManagement.LinkExposedReference(value);
                 RefreshObjDic();
             }
@@ -43,21 +42,210 @@ namespace ModEditor
 
         public List<GameObject> TargetChildren { get; private set; }
 
+        #region Normal Shading
+        [SerializeField]
+        bool normalView;
+        public bool NormalView 
+        {
+            get => normalView;
+            set 
+            {
+                Undo.RecordObject(this, "ModEditor NormalView");
+                normalView = value;
+            }
+        }
+
+        [SerializeField]
+        bool normalViewUnfold = true;
+        public bool NormalViewUnfold
+        {
+            get => normalViewUnfold;
+            set
+            {
+                Undo.RecordObject(this, "ModEditor NormalViewUnfold");
+                normalViewUnfold = value;
+            }
+        }
+
+        [SerializeField]
+        Color normalColor = Color.red;
+        public Color NormalColor
+        {
+            get => normalColor;
+            set
+            {
+                Undo.RecordObject(this, "ModEditor NormalColor");
+                normalColor = value;
+            }
+        }
+
+        [SerializeField]
+        float normalLength = 0.5f;
+        public float NormalLength
+        {
+            get => normalLength;
+            set
+            {
+                Undo.RecordObject(this, "ModEditor NormalLength");
+                normalLength = value;
+            }
+        }
+        #endregion
+
+        #region Tangent Shading
+        [SerializeField]
+        bool tangentView;
+        public bool TangentView
+        {
+            get => tangentView;
+            set
+            {
+                Undo.RecordObject(this, "ModEditor TangentView");
+                tangentView = value;
+            }
+        }
+
+        [SerializeField]
+        bool tangentViewUnfold = true;
+        public bool TangentViewUnfold
+        {
+            get => tangentViewUnfold;
+            set
+            {
+                Undo.RecordObject(this, "ModEditor TangentViewUnfold");
+                tangentViewUnfold = value;
+            }
+        }
+
+        [SerializeField]
+        Color tangentColor = Color.green;
+        public Color TangentColor
+        {
+            get => tangentColor;
+            set
+            {
+                Undo.RecordObject(this, "ModEditor TangentColor");
+                tangentColor = value;
+            }
+        }
+
+        [SerializeField]
+        float tangentLength = 0.5f;
+        public float TangentLength
+        {
+            get => tangentLength;
+            set
+            {
+                Undo.RecordObject(this, "ModEditor TangentLength");
+                tangentLength = value;
+            }
+        }
+
+        [SerializeField]
+        float arrowLength = 0.2f;
+        public float ArrowLength
+        {
+            get => arrowLength;
+            set
+            {
+                Undo.RecordObject(this, "ModEditor ArrowLength");
+                arrowLength = value;
+            }
+        }
+
+        [SerializeField]
+        float arrowSize = 0.1f;
+        public float ArrowSize
+        {
+            get => arrowSize;
+            set
+            {
+                Undo.RecordObject(this, "ModEditor ArrowSize");
+                arrowSize = value;
+            }
+        }
+        #endregion
+
+        #region Grid Shading
+        [SerializeField]
+        bool gridView;
+        public bool GridView
+        {
+            get => gridView;
+            set
+            {
+                Undo.RecordObject(this, "ModEditor GridView");
+                gridView = value;
+            }
+        }
+
+        [SerializeField]
+        bool gridViewUnfold = true;
+        public bool GridViewUnfold
+        {
+            get => gridViewUnfold;
+            set
+            {
+                Undo.RecordObject(this, "ModEditor GridViewUnfold");
+                gridViewUnfold = value;
+            }
+        }
+
+        [SerializeField]
+        Color gridColor = Color.white;
+        public Color GridColor
+        {
+            get => gridColor;
+            set
+            {
+                Undo.RecordObject(this, "ModEditor GridColor");
+                gridColor = value;
+            }
+        }
+        #endregion
+
+        #region UV Shading
+        [SerializeField]
+        bool uvView;
+        public bool UVView
+        {
+            get => uvView;
+            set
+            {
+                Undo.RecordObject(this, "ModEditor UVView");
+                uvView = value;
+            }
+        }
+
+        [SerializeField]
+        bool uvViewUnfold = true;
+        public bool UVViewUnfold
+        {
+            get => uvViewUnfold;
+            set
+            {
+                Undo.RecordObject(this, "ModEditor UVViewUnfold");
+                uvViewUnfold = value;
+            }
+        }
+
+        [SerializeField]
+        float uvAlpha = 1;
+        public float UVAlpha
+        {
+            get => uvAlpha;
+            set
+            {
+                Undo.RecordObject(this, "ModEditor UVAlpha");
+                uvAlpha = value;
+            }
+        }
+        #endregion
+
         private void Awake()
         {
             if (actionableDic == null)
                 actionableDic = new UndoClass.Dictionary_Obj_Bool(this);
-        }
-
-        private void OnEnable()
-        {
-            RefreshObjDic();
-            EditorApplication.hierarchyChanged += RefreshObjDic;
-        }
-
-        private void OnDisable()
-        {
-            EditorApplication.hierarchyChanged -= RefreshObjDic;
         }
 
         public void RefreshObjDic()
@@ -75,6 +263,14 @@ namespace ModEditor
                 if (!ActionableDic.ContainsKey(obj))
                     ActionableDic.Add(obj, true);
             }
+        }
+
+        public void CheckAndClearExposed()
+        {
+            if (ModEditorWindow.ExposedManagement.CheckAndClearExposed(target.exposedName))
+                target = default;
+            ActionableDic.CheckAndClearExposed();
+            EditorUtility.SetDirty(this);
         }
     }
 }

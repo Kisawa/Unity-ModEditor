@@ -18,23 +18,28 @@ public class GUIStyleViewer : EditorWindow
         int count = (int)(position.width / innerWidth); ;
         for (int i = 0; i < GUI.skin.customStyles.Length; i++)
         {
-            if (i % count == 0)
-                EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.BeginFadeGroup(1);
             GUIStyle style = GUI.skin.customStyles[i];
+            //if (i % count == 0)
+            //    EditorGUILayout.BeginHorizontal();
+            //EditorGUILayout.BeginFadeGroup(1);
+            //EditorGUILayout.BeginVertical();
 
-            EditorGUILayout.BeginVertical();
-            GUILayout.Toolbar(0, new string[] { "0", "1", "2" }, style.name);
-            if (GUILayout.Button(style.name))
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Binormal", style, GUILayout.Width(200));
+
+            if (GUILayout.Button(style.name, GUILayout.Width(200)))
                 GUIUtility.systemCopyBuffer = style.name;
-            EditorGUILayout.EndVertical();
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.Space(10);
 
-            EditorGUILayout.EndFadeGroup();
-            if (i % count == count - 1 || i == GUI.skin.customStyles.Length - 1)
-            {
-                EditorGUILayout.EndHorizontal();
-                EditorGUILayout.Space(50);
-            }
+            //EditorGUILayout.EndVertical();
+
+            //EditorGUILayout.EndFadeGroup();
+            //if (i % count == count - 1 || i == GUI.skin.customStyles.Length - 1)
+            //{
+            //    EditorGUILayout.EndHorizontal();
+            //    EditorGUILayout.Space(50);
+            //}
         }
         GUILayout.EndScrollView();
     }

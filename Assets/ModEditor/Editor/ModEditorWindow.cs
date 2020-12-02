@@ -10,13 +10,35 @@ namespace ModEditor
     public class ModEditorWindow : EditorWindow
     {
         const string managerPath = "Assets/ModEditor/";
-        public static ExposedManagement ExposedManagement { get; private set; }
+
+        static ExposedManagement exposedManagement;
+        public static ExposedManagement ExposedManagement 
+        {
+            get
+            {
+                GameObject ExposedManagementObj = GameObject.Find("ExposedManagement");
+                if (ExposedManagementObj == null)
+                {
+                    ExposedManagementObj = new GameObject("ExposedManagement");
+                    ExposedManagementObj.hideFlags = HideFlags.HideInHierarchy;
+                    exposedManagement = ExposedManagementObj.AddComponent<ExposedManagement>();
+                }
+                else
+                {
+                    exposedManagement = ExposedManagementObj.GetComponent<ExposedManagement>();
+                }
+                return exposedManagement;
+            }
+        }
+
         public ModEditorManager Manager { get; private set; }
 
         [MenuItem("Tools/Mod Editor")]
         static void Open()
         {
-            GetWindow<ModEditorWindow>("Mod Editor");
+            ModEditorWindow window = GetWindow<ModEditorWindow>("Mod Editor");
+            window.Manager.Target = Selection.activeGameObject;
+            window.minSize = new Vector2(330, 700);
         }
 
         Scene currentScene;
@@ -48,8 +70,10 @@ namespace ModEditor
         public GUIContent unlockContent { get; private set; }
         public GUIContent hiddenContent { get; private set; }
         public GUIContent viewContent { get; private set; }
+        public GUIContent dropdownContent { get; private set; }
+        public GUIContent dropdownRightContent { get; private set; }
 
-        private void Awake()
+        private void OnEnable()
         {
             tabs = new List<WindowTabBase>();
             tabs.Add(new SceneCollectionTab(this));
@@ -62,29 +86,25 @@ namespace ModEditor
                 hiddenContent = EditorGUIUtility.IconContent("d_scenevis_hidden-mixed");
             if (viewContent == null)
                 viewContent = EditorGUIUtility.IconContent("d_scenevis_visible-mixed");
+            if (dropdownContent == null)
+                dropdownContent = EditorGUIUtility.IconContent("d_dropdown");
+            if (dropdownRightContent == null)
+                dropdownRightContent = EditorGUIUtility.IconContent("d_scrollright");
             refreshWindow();
-            Undo.undoRedoPerformed += Manager.RefreshObjDic;
-        }
-
-        private void OnEnable()
-        {
-            Manager.Target = Selection.activeGameObject;
+            Selection.selectionChanged += selectionChanged;
             EditorApplication.hierarchyChanged += hierarchyChanged;
+            Undo.undoRedoPerformed += undoRedoPerformed;
+            EditorApplication.playModeStateChanged += playModeStateChanged;
+            AssetModificationManagement.onWillSaveAssets += onWillSaveAssets;
         }
 
         private void OnDisable()
         {
+            Selection.selectionChanged -= selectionChanged;
             EditorApplication.hierarchyChanged -= hierarchyChanged;
-        }
-
-        private void OnDestroy()
-        {
-            Undo.undoRedoPerformed -= Manager.RefreshObjDic;
-        }
-
-        private void OnFocus()
-        {
-            Manager.Target = Selection.activeGameObject;
+            Undo.undoRedoPerformed -= undoRedoPerformed;
+            EditorApplication.playModeStateChanged -= playModeStateChanged;
+            AssetModificationManagement.onWillSaveAssets -= onWillSaveAssets;
         }
 
         private void OnGUI()
@@ -94,7 +114,8 @@ namespace ModEditor
             if (GUILayout.Button(Manager.LockTarget ? lockContent : unlockContent, "ObjectPickerTab"))
             {
                 Manager.LockTarget = !Manager.LockTarget;
-                Manager.Target = Selection.activeGameObject;
+                if (!Manager.LockTarget)
+                    Manager.Target = Selection.activeGameObject;
             }
             EditorGUI.BeginDisabledGroup(true);
             EditorGUILayout.ObjectField(Manager.Target, typeof(GameObject), true);
@@ -108,10 +129,18 @@ namespace ModEditor
                 tabs[tabIndex].Draw();
             }
             if (GUI.changed)
+            {
                 EditorUtility.SetDirty(Manager);
+            }
         }
 
-        private void OnSelectionChange()
+        private void OnInspectorUpdate()
+        {
+            for (int i = 0; i < tabs.Count; i++)
+                tabs[i].OnInspectorUpdate();
+        }
+
+        void selectionChanged()
         {
             Manager.Target = Selection.activeGameObject;
             Repaint();
@@ -121,33 +150,54 @@ namespace ModEditor
         {
             if (currentScene != SceneManager.GetActiveScene())
                 refreshWindow();
+            Manager.RefreshObjDic();
             Repaint();
+        }
+
+        void undoRedoPerformed()
+        {
+            Manager.RefreshObjDic();
+            Repaint();
+        }
+
+        private void onWillSaveAssets(string[] path)
+        {
+            if (path.Contains(currentScene.path))
+            {
+                Manager.CheckAndClearExposed();
+                ExposedManagement.CheckAndClearExposed();
+            }
+        }
+
+        private void playModeStateChanged(PlayModeStateChange obj)
+        {
+            switch (obj)
+            {
+                case PlayModeStateChange.EnteredEditMode:
+                    break;
+                case PlayModeStateChange.ExitingEditMode:
+                    Manager.CheckAndClearExposed();
+                    ExposedManagement.CheckAndClearExposed();
+                    break;
+                case PlayModeStateChange.EnteredPlayMode:
+                    break;
+                case PlayModeStateChange.ExitingPlayMode:
+                    break;
+                default:
+                    break;
+            }
         }
 
         void refreshWindow()
         {
             currentScene = SceneManager.GetActiveScene();
-            
-            GameObject ExposedManagementObj = GameObject.Find("ExposedManagement");
-            if (ExposedManagementObj == null)
-            {
-                ExposedManagementObj = new GameObject("ExposedManagement");
-                ExposedManagementObj.hideFlags = HideFlags.HideInHierarchy;
-                ExposedManagement = ExposedManagementObj.AddComponent<ExposedManagement>();
-                AssetDatabase.DeleteAsset($"{managerPath}ModEditorManager-{currentScene.name}.asset");
-            }
-            else
-            {
-                ExposedManagement = ExposedManagementObj.GetComponent<ExposedManagement>();
-                Manager = AssetDatabase.LoadAssetAtPath<ModEditorManager>($"{managerPath}ModEditorManager-{currentScene.name}.asset");
-            }
+            Manager = AssetDatabase.LoadAssetAtPath<ModEditorManager>($"{managerPath}ModEditorManager-{currentScene.name}.asset");
             if (Manager == null)
             {
                 Manager = CreateInstance<ModEditorManager>();
                 AssetDatabase.CreateAsset(Manager, $"{managerPath}ModEditorManager-{currentScene.name}.asset");
                 AssetDatabase.ImportAsset($"{managerPath}ModEditorManager-{currentScene.name}.asset");
             }
-
             Manager.RefreshObjDic();
         }
     }

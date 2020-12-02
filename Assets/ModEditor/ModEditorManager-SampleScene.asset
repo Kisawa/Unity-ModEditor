@@ -12,21 +12,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 452e47ba08746704e8fda6167da66445, type: 3}
   m_Name: ModEditorManager-SampleScene
   m_EditorClassIdentifier: 
-  lockTarget: 1
+  lockTarget: 0
   target:
-    exposedName: '#UNKNOWN:1'
+    exposedName: 
     defaultValue: {fileID: 0}
   actionableDic:
     parent: {fileID: 11400000}
     keyList:
-    - '#UNKNOWN:10'
+    - '#UNKNOWN:1'
     - '#UNKNOWN:2'
     - '#UNKNOWN:3'
-    - '#UNKNOWN:4'
     - '#UNKNOWN:5'
     - '#UNKNOWN:6'
     - '#UNKNOWN:7'
     - '#UNKNOWN:8'
     - '#UNKNOWN:9'
-    - '#UNKNOWN:1'
-    valList: 01000101010101010101
+    - '#UNKNOWN:10'
+    - '#UNKNOWN:11'
+    - '#UNKNOWN:12'
+    valList: 0100000001010101010101
+  normalView: 1
+  normalViewUnfold: 1
+  normalColor: {r: 1, g: 0, b: 0, a: 0}
+  normalLength: 0.34
+  tangentView: 1
+  tangentViewUnfold: 1
+  tangentColor: {r: 0.44115734, g: 1, b: 0.11792451, a: 0}
+  tangentLength: 0.63
+  arrowLength: 0
+  arrowSize: 0
+  gridView: 1
+  gridViewUnfold: 1
+  gridColor: {r: 1, g: 1, b: 1, a: 0}
+  uvView: 1
+  uvViewUnfold: 1
+  uvAlpha: 0.32

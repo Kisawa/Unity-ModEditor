@@ -20,6 +20,8 @@ namespace ModEditor
 
         public abstract void Draw();
 
+        public virtual void OnInspectorUpdate() { }
+
         protected void Repaint()
         {
             window.Repaint();

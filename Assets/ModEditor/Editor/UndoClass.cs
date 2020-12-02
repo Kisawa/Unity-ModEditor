@@ -57,8 +57,6 @@ namespace ModEditor
             {
                 if (keyList.Contains(ModEditorWindow.ExposedManagement.GetKey(key)))
                     throw new Exception("UndoClass.Dictionary: This key already exists.");
-                if (parent != null)
-                    Undo.RecordObject(parent, "UndoDic Add");
                 keyList.Add(ModEditorWindow.ExposedManagement.GetKey(key));
                 valList.Add(val);
             }
@@ -79,6 +77,19 @@ namespace ModEditor
             public bool ContainsKey(GameObject key)
             {
                 return keyList.Contains(ModEditorWindow.ExposedManagement.GetKey(key));
+            }
+
+            public void CheckAndClearExposed()
+            {
+                for (int i = 0; i < keyList.Count; i++)
+                {
+                    if (ModEditorWindow.ExposedManagement.CheckAndClearExposed(keyList[i]))
+                    {
+                        keyList.RemoveAt(i);
+                        valList.RemoveAt(i);
+                        i--;
+                    }
+                }
             }
         }
     }
