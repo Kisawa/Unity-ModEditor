@@ -25,9 +25,9 @@ public class GUIStyleViewer : EditorWindow
             //EditorGUILayout.BeginVertical();
 
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Binormal", style, GUILayout.Width(200));
+            //EditorGUILayout.LabelField("Binormal", style, GUILayout.Width(200));
 
-            if (GUILayout.Button(style.name, GUILayout.Width(200)))
+            if (GUILayout.Button(style.name, style, GUILayout.Width(50)))
                 GUIUtility.systemCopyBuffer = style.name;
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.Space(10);

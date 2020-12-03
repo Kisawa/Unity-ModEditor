@@ -45,16 +45,20 @@
                 return o;
             }
 
-			[maxvertexcount(2)]
-			void geom(point v2g input[1], inout LineStream<g2f> tristream)
+			[maxvertexcount(6)]
+			void geom(triangle v2g input[3], inout LineStream<g2f> tristream)
 			{
-				g2f o1;
-				o1.pos = mul(UNITY_MATRIX_VP, input[0].worldPos);
-				tristream.Append(o1);
-				g2f o2;
-				float4 underlapPos = input[0].worldPos + float4(input[0].worldNormal, 0) * _NormalLength;
-				o2.pos = mul(UNITY_MATRIX_VP, underlapPos);
-				tristream.Append(o2);
+				for(int i = 0; i < 3; i++)
+				{
+					g2f o1;
+					o1.pos = mul(UNITY_MATRIX_VP, input[i].worldPos);
+					tristream.Append(o1);
+					g2f o2;
+					float4 underlapPos = input[i].worldPos + float4(input[i].worldNormal, 0) * _NormalLength;
+					o2.pos = mul(UNITY_MATRIX_VP, underlapPos);
+					tristream.Append(o2);
+					tristream.RestartStrip();
+				}
 			}
 
             fixed4 frag(g2f i) : SV_Target

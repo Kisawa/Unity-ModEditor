@@ -54,25 +54,29 @@
                 return o;
             }
 
-			[maxvertexcount(4)]
-			void geom(point v2g input[1], inout LineStream<g2f> tristream)
+			[maxvertexcount(12)]
+			void geom(triangle v2g input[3], inout LineStream<g2f> tristream)
 			{
-				g2f o1;
-				o1.pos = mul(UNITY_MATRIX_VP, input[0].worldPos);
-				tristream.Append(o1);
-				g2f o2;
-				float4 underlapPos = input[0].worldPos + float4(input[0].worldTangent.xyz, 0) * _TangentLength;
-				o2.pos = mul(UNITY_MATRIX_VP, underlapPos);
-				tristream.Append(o2);
-				float4 arrowOffset = float4(cross(input[0].worldNormal, input[0].worldTangent.xyz) * input[0].worldTangent.w * _TangentLength * _ArrowSize * 0.5, 0);
-				g2f o3;
-				float4 dirPos1 =  underlapPos - float4(input[0].worldTangent.xyz, 0) * _TangentLength * _ArrowLength + arrowOffset;
-				o3.pos = mul(UNITY_MATRIX_VP, dirPos1);
-				tristream.Append(o3);
-				g2f o4;
-				float4 dirPos2 =  dirPos1 - arrowOffset;
-				o4.pos = mul(UNITY_MATRIX_VP, dirPos2);
-				tristream.Append(o4);
+				for(int i = 0; i < 3; i++)
+				{
+					g2f o1;
+					o1.pos = mul(UNITY_MATRIX_VP, input[i].worldPos);
+					tristream.Append(o1);
+					g2f o2;
+					float4 underlapPos = input[i].worldPos + float4(input[i].worldTangent.xyz, 0) * _TangentLength;
+					o2.pos = mul(UNITY_MATRIX_VP, underlapPos);
+					tristream.Append(o2);
+					float4 arrowOffset = float4(cross(input[i].worldNormal, input[i].worldTangent.xyz) * input[i].worldTangent.w * _TangentLength * _ArrowSize * 0.5, 0);
+					g2f o3;
+					float4 dirPos1 =  underlapPos - float4(input[i].worldTangent.xyz, 0) * _TangentLength * _ArrowLength + arrowOffset;
+					o3.pos = mul(UNITY_MATRIX_VP, dirPos1);
+					tristream.Append(o3);
+					g2f o4;
+					float4 dirPos2 =  dirPos1 - arrowOffset;
+					o4.pos = mul(UNITY_MATRIX_VP, dirPos2);
+					tristream.Append(o4);
+					tristream.RestartStrip();
+				}
 			}
 
             fixed4 frag(g2f i) : SV_Target

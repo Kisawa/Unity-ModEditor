@@ -18,21 +18,15 @@ namespace ModEditor
         public override void OnEnable()
         {
             base.OnEnable();
-            window.Manager.onRefreshTargetDic += refreshBuffer;
-            window.Manager.onNormalViewChanged += refreshBuffer;
-            window.Manager.onTangentViewChanged += refreshBuffer;
-            window.Manager.onGridViewChanged += refreshBuffer;
-            window.Manager.onUVViewChanged += refreshBuffer;
+            window.onRefreshTargetDic += refreshBuffer;
         }
 
         public override void OnDiable()
         {
             base.OnDiable();
-            window.Manager.onRefreshTargetDic -= refreshBuffer;
-            window.Manager.onNormalViewChanged -= refreshBuffer;
-            window.Manager.onTangentViewChanged -= refreshBuffer;
-            window.Manager.onGridViewChanged -= refreshBuffer;
-            window.Manager.onUVViewChanged -= refreshBuffer;
+            window.onRefreshTargetDic -= refreshBuffer;
+            if (camera != null && buffer != null)
+                camera.RemoveCommandBuffer(cameraEvent, buffer);
         }
 
         public override void Draw()
@@ -53,49 +47,41 @@ namespace ModEditor
         CameraEvent cameraEvent = CameraEvent.AfterForwardAlpha;
 
         Material _mat_normal;
-        Material _mat_tangent;
-        Material _mat_grid;
-        Material _mat_uv;
-        Material mat_normal 
-        {
-            get 
-            {
-                if (_mat_normal == null)
+        Material mat_normal {
+            get { 
+                if(_mat_normal == null)
                     _mat_normal = new Material(Shader.Find("ModEditor/ShowNormal"));
                 return _mat_normal;
             }
         }
-        Material mat_tangent
-        {
-            get
-            {
-                if (_mat_tangent == null)
+        Material _mat_tangent;
+        Material mat_tangent {
+            get { 
+                if(_mat_tangent == null)
                     _mat_tangent = new Material(Shader.Find("ModEditor/ShowTangent"));
                 return _mat_tangent;
             }
         }
-        Material mat_grid
-        {
-            get
-            {
-                if (_mat_grid == null)
+        Material _mat_grid;
+        Material mat_grid {
+            get { 
+                if(_mat_grid == null)
                     _mat_grid = new Material(Shader.Find("ModEditor/ShowGrid"));
                 return _mat_grid;
             }
         }
-        Material mat_uv
-        {
-            get
-            {
-                if (_mat_uv == null)
+        Material _mat_uv;
+        Material mat_uv {
+            get { 
+                if(_mat_uv == null)
                     _mat_uv = new Material(Shader.Find("ModEditor/ShowUV"));
                 return _mat_uv;
             }
         }
 
-        public override void Update()
+        public override void OnInspectorUpdate()
         {
-            base.Update();
+            base.OnInspectorUpdate();
             Camera cam = SceneView.lastActiveSceneView.camera;
             if (cam != camera)
             {
@@ -113,7 +99,12 @@ namespace ModEditor
                     refreshBuffer();
                 }
             }
-            checkMaterial();
+        }
+
+        public override void OnValidate()
+        {
+            base.OnValidate();
+            updateMaterial();
         }
 
         void drawCollection()
@@ -124,7 +115,10 @@ namespace ModEditor
             {
                 bool activeable = window.Manager.ActionableDic[window.Manager.Target];
                 if (GUILayout.Button(activeable ? window.viewContent : window.hiddenContent, "ObjectPickerTab"))
+                {
                     window.Manager.ActionableDic[window.Manager.Target] = !activeable;
+                    refreshBuffer();
+                }
             }
             EditorGUI.BeginDisabledGroup(true);
             EditorGUILayout.ObjectField(window.Manager.Target, typeof(GameObject), true);
@@ -148,7 +142,10 @@ namespace ModEditor
                     EditorGUILayout.BeginHorizontal();
                     bool actionable = window.Manager.ActionableDic[obj];
                     if (GUILayout.Button(actionable ? window.viewContent : window.hiddenContent, "ObjectPickerTab"))
+                    {
                         window.Manager.ActionableDic[obj] = !actionable;
+                        refreshBuffer();
+                    }
                     EditorGUI.BeginDisabledGroup(true);
                     EditorGUILayout.ObjectField(obj, typeof(GameObject), true);
                     EditorGUI.EndDisabledGroup();
@@ -163,7 +160,11 @@ namespace ModEditor
         {
             EditorGUILayout.BeginVertical("AnimationEventTooltip");
             EditorGUILayout.BeginHorizontal();
-            window.Manager.NormalView = EditorGUILayout.Toggle(window.Manager.NormalView, "OL ToggleWhite", GUILayout.Width(20));
+            if (GUILayout.Button(window.Manager.NormalView ? window.olToggleOnContent : window.olToggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(20)))
+            {
+                window.Manager.NormalView = !window.Manager.NormalView;
+                refreshBuffer();
+            }
             if (GUILayout.Button("Normal View", "AboutWIndowLicenseLabel", GUILayout.Width(150)) ||
                 GUILayout.Button(window.Manager.NormalViewUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 195)))
                 window.Manager.NormalViewUnfold = !window.Manager.NormalViewUnfold;
@@ -191,7 +192,11 @@ namespace ModEditor
         {
             EditorGUILayout.BeginVertical("AnimationEventTooltip");
             EditorGUILayout.BeginHorizontal();
-            window.Manager.TangentView = EditorGUILayout.Toggle(window.Manager.TangentView, "OL ToggleWhite", GUILayout.Width(20));
+            if (GUILayout.Button(window.Manager.TangentView ? window.olToggleOnContent : window.olToggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(20)))
+            {
+                window.Manager.TangentView = !window.Manager.TangentView;
+                refreshBuffer();
+            }
             if (GUILayout.Button("Tangent View", "AboutWIndowLicenseLabel", GUILayout.Width(150)) ||
                 GUILayout.Button(window.Manager.TangentViewUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 195)))
                 window.Manager.TangentViewUnfold = !window.Manager.TangentViewUnfold;
@@ -228,7 +233,11 @@ namespace ModEditor
         {
             EditorGUILayout.BeginVertical("AnimationEventTooltip");
             EditorGUILayout.BeginHorizontal();
-            window.Manager.GridView = EditorGUILayout.Toggle(window.Manager.GridView, "OL ToggleWhite", GUILayout.Width(20));
+            if (GUILayout.Button(window.Manager.GridView ? window.olToggleOnContent : window.olToggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(20)))
+            {
+                window.Manager.GridView = !window.Manager.GridView;
+                refreshBuffer();
+            }
             if (GUILayout.Button("Grid View", "AboutWIndowLicenseLabel", GUILayout.Width(150)) ||
                 GUILayout.Button(window.Manager.GridViewUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 195)))
                 window.Manager.GridViewUnfold = !window.Manager.GridViewUnfold;
@@ -252,7 +261,11 @@ namespace ModEditor
         {
             EditorGUILayout.BeginVertical("AnimationEventTooltip");
             EditorGUILayout.BeginHorizontal();
-            window.Manager.UVView = EditorGUILayout.Toggle(window.Manager.UVView, "OL ToggleWhite", GUILayout.Width(20));
+            if (GUILayout.Button(window.Manager.UVView ? window.olToggleOnContent : window.olToggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(20)))
+            {
+                window.Manager.UVView = !window.Manager.UVView;
+                refreshBuffer();
+            }
             if (GUILayout.Button("UV View", "AboutWIndowLicenseLabel", GUILayout.Width(150)) ||
                 GUILayout.Button(window.Manager.UVViewUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 195)))
                 window.Manager.UVViewUnfold = !window.Manager.UVViewUnfold;
@@ -278,10 +291,13 @@ namespace ModEditor
                 buffer.Clear();
             if (camera == null || window.Manager.Target == null || window.Manager.TargetChildren.Count == 0)
                 return;
+            updateMaterial();
             for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
             {
                 GameObject target = window.Manager.TargetChildren[i];
                 if (target == null)
+                    continue;
+                if (!window.Manager.ActionableDic[target])
                     continue;
                 Renderer renderer = target.GetComponent<Renderer>();
                 if (renderer == null)
@@ -297,7 +313,7 @@ namespace ModEditor
             }
         }
 
-        void checkMaterial()
+        void updateMaterial()
         {
             mat_normal.SetColor("_NormalColor", window.Manager.NormalColor);
             mat_normal.SetFloat("_NormalLength", window.Manager.NormalLength);

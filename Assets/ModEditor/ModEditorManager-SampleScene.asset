@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 452e47ba08746704e8fda6167da66445, type: 3}
   m_Name: ModEditorManager-SampleScene
   m_EditorClassIdentifier: 
-  lockTarget: 0
+  lockTarget: 1
   target:
-    exposedName: '#UNKNOWN:2'
+    exposedName: '#UNKNOWN:19'
     defaultValue: {fileID: 0}
   actionableDic:
     parent: {fileID: 11400000}
@@ -28,17 +28,20 @@ MonoBehaviour:
     - '#UNKNOWN:10'
     - '#UNKNOWN:11'
     - '#UNKNOWN:12'
-    - '#UNKNOWN:13'
-    valList: 00000101010101010101
+    - '#UNKNOWN:14'
+    - '#UNKNOWN:15'
+    - '#UNKNOWN:17'
+    - '#UNKNOWN:19'
+    valList: 01010000000000000001010101
   normalView: 1
   normalViewUnfold: 1
   normalColor: {r: 1, g: 0, b: 0, a: 0}
-  normalLength: 0.34
-  tangentView: 0
+  normalLength: 0.3
+  tangentView: 1
   tangentViewUnfold: 1
   tangentColor: {r: 0.3644445, g: 1, b: 0, a: 0}
-  tangentLength: 0.62
-  arrowLength: 0.4
+  tangentLength: 0.35
+  arrowLength: 0.44
   arrowSize: 0.4
   gridView: 0
   gridViewUnfold: 1

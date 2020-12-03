@@ -39,7 +39,7 @@
                 return o;
             }
 
-			[maxvertexcount(3)]
+			[maxvertexcount(4)]
 			void geom(triangle v2g input[3], inout LineStream<g2f> tristream)
 			{
 				g2f o1;
@@ -51,6 +51,7 @@
 				tristream.Append(o1);
 				tristream.Append(o2);
 				tristream.Append(o3);
+				tristream.Append(o1);
 			}
 
             fixed4 frag (g2f i) : SV_Target

@@ -9,18 +9,14 @@ namespace ModEditor
 {
     public class ModEditorManager : ScriptableObject
     {
-        public event Action onRefreshTargetDic;
-        public event Action onNormalViewChanged;
-        public event Action onTangentViewChanged;
-        public event Action onGridViewChanged;
-        public event Action onUVViewChanged;
-
         [SerializeField]
         bool lockTarget;
         public bool LockTarget 
         {
             get => lockTarget;
             set {
+                if (value == lockTarget)
+                    return;
                 Undo.RecordObject(this, "ModEditor LockTarget");
                 lockTarget = value;
             }
@@ -28,18 +24,14 @@ namespace ModEditor
 
         [SerializeField]
         ExposedReference<GameObject> target;
-        public GameObject Target
+        public GameObject Target 
         {
-            get
-            {
-                return target.Resolve(ModEditorWindow.ExposedManagement);
-            }
+            get => target.Resolve(ModEditorWindow.ExposedManagement);
             set
             {
                 if (LockTarget)
                     return;
                 target = ModEditorWindow.ExposedManagement.LinkExposedReference(value);
-                RefreshObjDic();
             }
         }
 
@@ -47,7 +39,7 @@ namespace ModEditor
         UndoClass.Dictionary_Obj_Bool actionableDic;
         public UndoClass.Dictionary_Obj_Bool ActionableDic { get => actionableDic; }
 
-        public List<GameObject> TargetChildren { get; private set; }
+        public List<GameObject> TargetChildren { get; set; }
 
         #region Normal Shading
         [SerializeField]
@@ -57,9 +49,10 @@ namespace ModEditor
             get => normalView;
             set 
             {
+                if (value == normalView)
+                    return;
                 Undo.RecordObject(this, "ModEditor NormalView");
                 normalView = value;
-                onNormalViewChanged?.Invoke();
             }
         }
 
@@ -70,6 +63,8 @@ namespace ModEditor
             get => normalViewUnfold;
             set
             {
+                if (value == normalViewUnfold)
+                    return;
                 Undo.RecordObject(this, "ModEditor NormalViewUnfold");
                 normalViewUnfold = value;
             }
@@ -82,6 +77,8 @@ namespace ModEditor
             get => normalColor;
             set
             {
+                if (value == normalColor)
+                    return;
                 Undo.RecordObject(this, "ModEditor NormalColor");
                 normalColor = value;
             }
@@ -94,6 +91,8 @@ namespace ModEditor
             get => normalLength;
             set
             {
+                if (value == normalLength)
+                    return;
                 Undo.RecordObject(this, "ModEditor NormalLength");
                 normalLength = value;
             }
@@ -108,9 +107,10 @@ namespace ModEditor
             get => tangentView;
             set
             {
+                if (value == tangentView)
+                    return;
                 Undo.RecordObject(this, "ModEditor TangentView");
                 tangentView = value;
-                onTangentViewChanged?.Invoke();
             }
         }
 
@@ -121,6 +121,8 @@ namespace ModEditor
             get => tangentViewUnfold;
             set
             {
+                if (value == tangentViewUnfold)
+                    return;
                 Undo.RecordObject(this, "ModEditor TangentViewUnfold");
                 tangentViewUnfold = value;
             }
@@ -133,6 +135,8 @@ namespace ModEditor
             get => tangentColor;
             set
             {
+                if (value == tangentColor)
+                    return;
                 Undo.RecordObject(this, "ModEditor TangentColor");
                 tangentColor = value;
             }
@@ -145,6 +149,8 @@ namespace ModEditor
             get => tangentLength;
             set
             {
+                if (value == tangentLength)
+                    return;
                 Undo.RecordObject(this, "ModEditor TangentLength");
                 tangentLength = value;
             }
@@ -157,6 +163,8 @@ namespace ModEditor
             get => arrowLength;
             set
             {
+                if (value == arrowLength)
+                    return;
                 Undo.RecordObject(this, "ModEditor ArrowLength");
                 arrowLength = value;
             }
@@ -169,6 +177,8 @@ namespace ModEditor
             get => arrowSize;
             set
             {
+                if (value == arrowSize)
+                    return;
                 Undo.RecordObject(this, "ModEditor ArrowSize");
                 arrowSize = value;
             }
@@ -183,9 +193,10 @@ namespace ModEditor
             get => gridView;
             set
             {
+                if (value == gridView)
+                    return;
                 Undo.RecordObject(this, "ModEditor GridView");
                 gridView = value;
-                onGridViewChanged?.Invoke();
             }
         }
 
@@ -196,6 +207,8 @@ namespace ModEditor
             get => gridViewUnfold;
             set
             {
+                if (value == gridViewUnfold)
+                    return;
                 Undo.RecordObject(this, "ModEditor GridViewUnfold");
                 gridViewUnfold = value;
             }
@@ -208,6 +221,8 @@ namespace ModEditor
             get => gridColor;
             set
             {
+                if (value == gridColor)
+                    return;
                 Undo.RecordObject(this, "ModEditor GridColor");
                 gridColor = value;
             }
@@ -222,9 +237,10 @@ namespace ModEditor
             get => uvView;
             set
             {
+                if (value == uvView)
+                    return;
                 Undo.RecordObject(this, "ModEditor UVView");
                 uvView = value;
-                onUVViewChanged?.Invoke();
             }
         }
 
@@ -235,6 +251,8 @@ namespace ModEditor
             get => uvViewUnfold;
             set
             {
+                if (value == uvViewUnfold)
+                    return;
                 Undo.RecordObject(this, "ModEditor UVViewUnfold");
                 uvViewUnfold = value;
             }
@@ -247,6 +265,8 @@ namespace ModEditor
             get => uvAlpha;
             set
             {
+                if (value == uvAlpha)
+                    return;
                 Undo.RecordObject(this, "ModEditor UVAlpha");
                 uvAlpha = value;
             }
@@ -257,26 +277,6 @@ namespace ModEditor
         {
             if (actionableDic == null)
                 actionableDic = new UndoClass.Dictionary_Obj_Bool(this);
-        }
-
-        public void RefreshObjDic()
-        {
-            if (Target == null)
-            {
-                if (TargetChildren != null)
-                    TargetChildren.Clear();
-            }
-            else
-            {
-                TargetChildren = Target.GetComponentsInChildren<Renderer>().Select(x => x.gameObject).ToList();
-                for (int i = 0; i < TargetChildren.Count; i++)
-                {
-                    GameObject obj = TargetChildren[i];
-                    if (!ActionableDic.ContainsKey(obj))
-                        ActionableDic.Add(obj, true);
-                }
-            }
-            onRefreshTargetDic?.Invoke();
         }
 
         public void CheckAndClearExposed()

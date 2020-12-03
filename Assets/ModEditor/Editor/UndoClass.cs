@@ -44,6 +44,8 @@ namespace ModEditor
                     int index = keyList.IndexOf(ModEditorWindow.ExposedManagement.GetKey(key));
                     if (index >= 0)
                     {
+                        if (valList[index] == value)
+                            return;
                         if(parent != null)
                             Undo.RecordObject(parent, "UndoDic set");
                         valList[index] = value;

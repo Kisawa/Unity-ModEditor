@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -33,11 +34,17 @@ namespace ModEditor
 
         public ModEditorManager Manager { get; private set; }
 
+        public event Action onRefreshTargetDic;
+
         [MenuItem("Tools/Mod Editor")]
         static void Open()
         {
             ModEditorWindow window = GetWindow<ModEditorWindow>("Mod Editor");
-            window.Manager.Target = Selection.activeGameObject;
+            if (!window.Manager.LockTarget)
+            {
+                window.Manager.Target = Selection.activeGameObject;
+                window.refreshObjDic();
+            }
             window.minSize = new Vector2(330, 700);
         }
 
@@ -72,6 +79,8 @@ namespace ModEditor
         public GUIContent viewContent { get; private set; }
         public GUIContent dropdownContent { get; private set; }
         public GUIContent dropdownRightContent { get; private set; }
+        public GUIContent olToggleContent { get; private set; }
+        public GUIContent olToggleOnContent { get; private set; }
 
         private void OnEnable()
         {
@@ -90,7 +99,12 @@ namespace ModEditor
                 dropdownContent = EditorGUIUtility.IconContent("d_dropdown");
             if (dropdownRightContent == null)
                 dropdownRightContent = EditorGUIUtility.IconContent("d_scrollright");
+            if (olToggleContent == null)
+                olToggleContent = EditorGUIUtility.IconContent("ol toggle");
+            if (olToggleOnContent == null)
+                olToggleOnContent = EditorGUIUtility.IconContent("ol toggle on");
             refreshWindow();
+
             for (int i = 0; i < tabs.Count; i++)
                 tabs[i].OnEnable();
             Selection.selectionChanged += selectionChanged;
@@ -119,7 +133,10 @@ namespace ModEditor
             {
                 Manager.LockTarget = !Manager.LockTarget;
                 if (!Manager.LockTarget)
+                {
                     Manager.Target = Selection.activeGameObject;
+                    refreshObjDic();
+                }
             }
             EditorGUI.BeginDisabledGroup(true);
             EditorGUILayout.ObjectField(Manager.Target, typeof(GameObject), true);
@@ -128,25 +145,29 @@ namespace ModEditor
             EditorGUILayout.Space(10);
             tabIndex = GUILayout.Toolbar(tabIndex, new string[] { "Scene Collection", "Normal Editor", "Other" }, "SearchModeFilter");
             EditorGUILayout.Space(10);
-            if (tabIndex < tabs.Count)
-            {
+            if(tabIndex < tabs.Count)
                 tabs[tabIndex].Draw();
-            }
             if (GUI.changed)
             {
+                if (tabIndex < tabs.Count)
+                    tabs[tabIndex].OnValidate();
                 EditorUtility.SetDirty(Manager);
             }
         }
 
-        private void Update()
+        private void OnInspectorUpdate()
         {
             for (int i = 0; i < tabs.Count; i++)
-                tabs[i].Update();
+                tabs[i].OnInspectorUpdate();
         }
 
         void selectionChanged()
         {
-            Manager.Target = Selection.activeGameObject;
+            if (!Manager.LockTarget)
+            {
+                Manager.Target = Selection.activeGameObject;
+                refreshObjDic();
+            }
             Repaint();
         }
 
@@ -154,13 +175,13 @@ namespace ModEditor
         {
             if (currentScene != SceneManager.GetActiveScene())
                 refreshWindow();
-            Manager.RefreshObjDic();
+            refreshObjDic();
             Repaint();
         }
 
         void undoRedoPerformed()
         {
-            Manager.RefreshObjDic();
+            refreshObjDic();
             Repaint();
         }
 
@@ -202,7 +223,27 @@ namespace ModEditor
                 AssetDatabase.CreateAsset(Manager, $"{managerPath}ModEditorManager-{currentScene.name}.asset");
                 AssetDatabase.ImportAsset($"{managerPath}ModEditorManager-{currentScene.name}.asset");
             }
-            Manager.RefreshObjDic();
+            refreshObjDic();
+        }
+        
+        void refreshObjDic()
+        {
+            if (Manager.Target == null)
+            {
+                if (Manager.TargetChildren != null)
+                    Manager.TargetChildren.Clear();
+            }
+            else
+            {
+                Manager.TargetChildren = Manager.Target.GetComponentsInChildren<Renderer>().Select(x => x.gameObject).ToList();
+                for (int i = 0; i < Manager.TargetChildren.Count; i++)
+                {
+                    GameObject obj = Manager.TargetChildren[i];
+                    if (!Manager.ActionableDic.ContainsKey(obj))
+                        Manager.ActionableDic.Add(obj, true);
+                }
+            }
+            onRefreshTargetDic?.Invoke();
         }
     }
 }

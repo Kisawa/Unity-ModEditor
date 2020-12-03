@@ -24,7 +24,9 @@ namespace ModEditor
 
         public abstract void Draw();
 
-        public virtual void Update() { }
+        public virtual void OnInspectorUpdate() { }
+
+        public virtual void OnValidate() { }
 
         protected void Repaint()
         {
