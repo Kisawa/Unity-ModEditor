@@ -215,12 +215,14 @@ namespace ModEditor
         void refreshWindow()
         {
             currentScene = SceneManager.GetActiveScene();
-            Manager = AssetDatabase.LoadAssetAtPath<ModEditorManager>($"{ModEditorPath}ModEditorManager-{currentScene.name}.asset");
+            string path = $"{ModEditorPath}ModEditorManager-{currentScene.name}.asset";
+            Manager = AssetDatabase.LoadAssetAtPath<ModEditorManager>(path);
             if (Manager == null)
             {
                 Manager = CreateInstance<ModEditorManager>();
-                AssetDatabase.CreateAsset(Manager, $"{ModEditorPath}ModEditorManager-{currentScene.name}.asset");
-                AssetDatabase.ImportAsset($"{ModEditorPath}ModEditorManager-{currentScene.name}.asset");
+                AssetDatabase.CreateAsset(Manager, path);
+                AssetDatabase.SetMainObject(Manager, path);
+                AssetDatabase.ImportAsset(path);
             }
             refreshObjDic();
         }
