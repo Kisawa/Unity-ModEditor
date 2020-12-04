@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -241,6 +240,22 @@ namespace ModEditor
                     GameObject obj = Manager.TargetChildren[i];
                     if (!Manager.ActionableDic.ContainsKey(obj))
                         Manager.ActionableDic.Add(obj, true);
+                    if (!Manager.MeshDic.ContainsKey(obj))
+                    {
+                        Mesh mesh = null;
+                        MeshFilter meshFilter = obj.GetComponent<MeshFilter>();
+                        if (meshFilter != null)
+                            mesh = Instantiate(meshFilter.sharedMesh);
+                        SkinnedMeshRenderer skinnedMeshRenderer = obj.GetComponent<SkinnedMeshRenderer>();
+                        if (skinnedMeshRenderer != null)
+                            mesh = Instantiate(skinnedMeshRenderer.sharedMesh);
+                        if (mesh != null)
+                        {
+                            mesh.name = obj.name;
+                            AssetDatabase.AddObjectToAsset(mesh, Manager);
+                            Manager.MeshDic.Add(obj, mesh);
+                        }
+                    }
                 }
             }
             onRefreshTargetDic?.Invoke();

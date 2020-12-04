@@ -32,12 +32,17 @@ namespace ModEditor
                 if (LockTarget)
                     return;
                 target = ModEditorWindow.ExposedManagement.LinkExposedReference(value);
+                EditorUtility.SetDirty(this);
             }
         }
 
         [SerializeField]
         UndoClass.Dictionary_Obj_Bool actionableDic;
         public UndoClass.Dictionary_Obj_Bool ActionableDic { get => actionableDic; }
+
+        [SerializeField]
+        UndoClass.Dictionary_Obj_Mesh meshDic;
+        public UndoClass.Dictionary_Obj_Mesh MeshDic { get => meshDic; }
 
         public List<GameObject> TargetChildren { get; set; }
 
@@ -277,6 +282,8 @@ namespace ModEditor
         {
             if (actionableDic == null)
                 actionableDic = new UndoClass.Dictionary_Obj_Bool(this);
+            if (meshDic == null)
+                meshDic = new UndoClass.Dictionary_Obj_Mesh(this);
         }
 
         public void CheckAndClearExposed()
@@ -284,6 +291,7 @@ namespace ModEditor
             if (ModEditorWindow.ExposedManagement.CheckAndClearExposed(target.exposedName))
                 target = default;
             ActionableDic.CheckAndClearExposed();
+            MeshDic.CheckAndClearExposed();
             EditorUtility.SetDirty(this);
         }
     }
