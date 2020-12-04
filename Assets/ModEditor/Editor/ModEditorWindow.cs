@@ -10,7 +10,7 @@ namespace ModEditor
 {
     public class ModEditorWindow : EditorWindow
     {
-        const string managerPath = "Assets/ModEditor/";
+        public static readonly string ModEditorPath = "Assets/ModEditor/";
 
         static ExposedManagement exposedManagement;
         public static ExposedManagement ExposedManagement 
@@ -216,12 +216,12 @@ namespace ModEditor
         void refreshWindow()
         {
             currentScene = SceneManager.GetActiveScene();
-            Manager = AssetDatabase.LoadAssetAtPath<ModEditorManager>($"{managerPath}ModEditorManager-{currentScene.name}.asset");
+            Manager = AssetDatabase.LoadAssetAtPath<ModEditorManager>($"{ModEditorPath}ModEditorManager-{currentScene.name}.asset");
             if (Manager == null)
             {
                 Manager = CreateInstance<ModEditorManager>();
-                AssetDatabase.CreateAsset(Manager, $"{managerPath}ModEditorManager-{currentScene.name}.asset");
-                AssetDatabase.ImportAsset($"{managerPath}ModEditorManager-{currentScene.name}.asset");
+                AssetDatabase.CreateAsset(Manager, $"{ModEditorPath}ModEditorManager-{currentScene.name}.asset");
+                AssetDatabase.ImportAsset($"{ModEditorPath}ModEditorManager-{currentScene.name}.asset");
             }
             refreshObjDic();
         }
