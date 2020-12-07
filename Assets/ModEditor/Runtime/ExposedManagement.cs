@@ -65,6 +65,10 @@ namespace ModEditor
                 return keys[index];
             else
             {
+#if UNITY_EDITOR
+                if (EditorApplication.isPlaying)
+                    return 0;
+#endif
                 PropertyName property = new PropertyName(++growthId);
                 SetReferenceValue(property, obj);
                 return property;
@@ -81,6 +85,10 @@ namespace ModEditor
                 exposedReference.exposedName = keys[index];
             else
             {
+#if UNITY_EDITOR
+                if (EditorApplication.isPlaying)
+                    return exposedReference;
+#endif
                 PropertyName property = new PropertyName(++growthId);
                 exposedReference.exposedName = property;
                 SetReferenceValue(property, obj);

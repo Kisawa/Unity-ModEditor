@@ -37,12 +37,12 @@ namespace ModEditor
         }
 
         [SerializeField]
-        UndoClass.Dictionary_Obj_Bool actionableDic;
-        public UndoClass.Dictionary_Obj_Bool ActionableDic { get => actionableDic; }
+        SerializableClass.Dictionary_Obj_Bool actionableDic;
+        public SerializableClass.Dictionary_Obj_Bool ActionableDic { get => actionableDic; }
 
         [SerializeField]
-        UndoClass.Dictionary_Obj_Mesh meshDic;
-        public UndoClass.Dictionary_Obj_Mesh MeshDic { get => meshDic; }
+        SerializableClass.Dictionary_Obj_Mesh meshDic;
+        public SerializableClass.Dictionary_Obj_Mesh MeshDic { get => meshDic; }
 
         public List<GameObject> TargetChildren { get; set; }
 
@@ -281,9 +281,9 @@ namespace ModEditor
         private void Awake()
         {
             if (actionableDic == null)
-                actionableDic = new UndoClass.Dictionary_Obj_Bool(this);
+                actionableDic = new SerializableClass.Dictionary_Obj_Bool(this);
             if (meshDic == null)
-                meshDic = new UndoClass.Dictionary_Obj_Mesh(this);
+                meshDic = new SerializableClass.Dictionary_Obj_Mesh(this);
         }
 
         public void CheckAndClearExposed()

@@ -20,11 +20,6 @@ namespace ModEditor
             {
                 writeAcgNormalToTangent();
             }
-            EditorGUILayout.Space(10);
-            if (GUILayout.Button("Save mesh"))
-            {
-                saveMesh();
-            }
         }
 
         void writeAcgNormalToTangent()
@@ -38,10 +33,16 @@ namespace ModEditor
                     continue;
                 MeshFilter meshFilter = target.GetComponent<MeshFilter>();
                 if (meshFilter != null)
+                {
+                    window.SetEditingMesh(target, meshFilter);
                     writeAcgNormalToTangent(meshFilter.sharedMesh);
+                }
                 SkinnedMeshRenderer skinnedMeshRenderer = target.GetComponent<SkinnedMeshRenderer>();
                 if (skinnedMeshRenderer != null)
+                {
+                    window.SetEditingMesh(target, skinnedMeshRenderer);
                     writeAcgNormalToTangent(skinnedMeshRenderer.sharedMesh);
+                }
             }
         }
 
@@ -60,33 +61,6 @@ namespace ModEditor
             for (int j = 0; j < mesh.vertexCount; j++)
                 avgNormals[j] = avgNormalDic[mesh.vertices[j]];
             mesh.tangents = avgNormals;
-        }
-
-        void saveMesh()
-        {
-            for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
-            {
-                GameObject target = window.Manager.TargetChildren[i];
-                if (target == null)
-                    continue;
-                if (!window.Manager.ActionableDic[target])
-                    continue;
-                string path = $"{ModEditorWindow.ModEditorPath}{target.name}.mesh";
-                MeshFilter meshFilter = target.GetComponent<MeshFilter>();
-                if (meshFilter != null)
-                {
-                    Mesh mesh = Object.Instantiate(meshFilter.sharedMesh);
-                    AssetDatabase.CreateAsset(mesh, path);
-                    AssetDatabase.ImportAsset(path);
-                }
-                SkinnedMeshRenderer skinnedMeshRenderer = target.GetComponent<SkinnedMeshRenderer>();
-                if (skinnedMeshRenderer != null)
-                {
-                    Mesh mesh = Object.Instantiate(skinnedMeshRenderer.sharedMesh);
-                    AssetDatabase.CreateAsset(mesh, path);
-                    AssetDatabase.ImportAsset(path);
-                }
-            }
         }
     }
 }

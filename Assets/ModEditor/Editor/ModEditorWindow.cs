@@ -124,6 +124,11 @@ namespace ModEditor
             AssetModificationManagement.onWillSaveAssets -= onWillSaveAssets;
         }
 
+        private void OnDestroy()
+        {
+            Manager.MeshDic.ClearRecycleBin();
+        }
+
         private void OnGUI()
         {
             EditorGUILayout.BeginHorizontal();
@@ -198,6 +203,7 @@ namespace ModEditor
             switch (obj)
             {
                 case PlayModeStateChange.EnteredEditMode:
+                    applyPlayModeEditing();
                     break;
                 case PlayModeStateChange.ExitingEditMode:
                     Manager.CheckAndClearExposed();
@@ -242,25 +248,78 @@ namespace ModEditor
                     GameObject obj = Manager.TargetChildren[i];
                     if (!Manager.ActionableDic.ContainsKey(obj))
                         Manager.ActionableDic.Add(obj, true);
-                    if (!Manager.MeshDic.ContainsKey(obj))
-                    {
-                        Mesh mesh = null;
-                        MeshFilter meshFilter = obj.GetComponent<MeshFilter>();
-                        if (meshFilter != null)
-                            mesh = Instantiate(meshFilter.sharedMesh);
-                        SkinnedMeshRenderer skinnedMeshRenderer = obj.GetComponent<SkinnedMeshRenderer>();
-                        if (skinnedMeshRenderer != null)
-                            mesh = Instantiate(skinnedMeshRenderer.sharedMesh);
-                        if (mesh != null)
-                        {
-                            mesh.name = obj.name;
-                            AssetDatabase.AddObjectToAsset(mesh, Manager);
-                            Manager.MeshDic.Add(obj, mesh);
-                        }
-                    }
                 }
             }
+            refreshMeshDic();
             onRefreshTargetDic?.Invoke();
+        }
+
+        void refreshMeshDic()
+        {
+            for (int i = 0; i < Manager.MeshDic.count; i++)
+            {
+                GameObject obj = Manager.MeshDic.Resolve(i);
+                if (obj == null)
+                    continue;
+                Mesh mesh = Manager.MeshDic[obj];
+                MeshFilter meshFilter = obj.GetComponent<MeshFilter>();
+                if (meshFilter != null)
+                {
+                    if (meshFilter.sharedMesh != mesh)
+                        Manager.MeshDic.Add(obj, meshFilter.sharedMesh);
+                }
+                SkinnedMeshRenderer skinnedMeshRenderer = obj.GetComponent<SkinnedMeshRenderer>();
+                if (skinnedMeshRenderer != null)
+                {
+                    if (skinnedMeshRenderer.sharedMesh != mesh)
+                        Manager.MeshDic.Add(obj, skinnedMeshRenderer.sharedMesh);
+                }
+            }
+        }
+
+        public void SetEditingMesh(GameObject target, MeshFilter meshFilter)
+        {
+            Mesh mesh = Instantiate(meshFilter.sharedMesh);
+            mesh.name = target.name + "-Editing";
+            AssetDatabase.AddObjectToAsset(mesh, Manager);
+            if (Manager.MeshDic.ContainsKey(target))
+                Manager.MeshDic.Add(target, mesh);
+            else
+                Manager.MeshDic.Add(target, mesh, meshFilter.sharedMesh);
+            Undo.RecordObject(meshFilter, "ModEditor MeshEditing");
+            meshFilter.sharedMesh = mesh;
+            EditorUtility.SetDirty(target);
+        }
+
+        public void SetEditingMesh(GameObject target, SkinnedMeshRenderer skinnedMeshRenderer)
+        {
+            Mesh mesh = Instantiate(skinnedMeshRenderer.sharedMesh);
+            mesh.name = target.name + "-Editing";
+            AssetDatabase.AddObjectToAsset(mesh, Manager);
+            if (Manager.MeshDic.ContainsKey(target))
+                Manager.MeshDic.Add(target, mesh);
+            else
+                Manager.MeshDic.Add(target, mesh, skinnedMeshRenderer.sharedMesh);
+            Undo.RecordObject(skinnedMeshRenderer, "ModEditor MeshEditing");
+            skinnedMeshRenderer.sharedMesh = mesh;
+            EditorUtility.SetDirty(target);
+        }
+
+        void applyPlayModeEditing()
+        {
+            for (int i = 0; i < Manager.MeshDic.count; i++)
+            {
+                GameObject obj = Manager.MeshDic.Resolve(i);
+                if (obj == null)
+                    continue;
+                MeshFilter meshFilter = obj.GetComponent<MeshFilter>();
+                if (meshFilter != null)
+                    meshFilter.sharedMesh = Manager.MeshDic[obj];
+                SkinnedMeshRenderer skinnedMeshRenderer = obj.GetComponent<SkinnedMeshRenderer>();
+                if (skinnedMeshRenderer != null)
+                    skinnedMeshRenderer.sharedMesh = Manager.MeshDic[obj];
+                EditorUtility.SetDirty(obj);
+            }
         }
     }
 }
