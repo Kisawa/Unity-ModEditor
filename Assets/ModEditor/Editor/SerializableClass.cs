@@ -57,6 +57,30 @@ namespace ModEditor
                 }
             }
 
+            public bool this[int index]
+            {
+                get
+                {
+                    if (index >= 0)
+                        return valList[index];
+                    else
+                        throw new Exception("SerializableClass.Dictionary_Obj_Bool: This key does not exist.");
+                }
+                set
+                {
+                    if (index >= 0)
+                    {
+                        if (valList[index] == value)
+                            return;
+                        if (parent != null)
+                            Undo.RecordObject(parent, "UndoDic set");
+                        valList[index] = value;
+                    }
+                    else
+                        throw new Exception("SerializableClass.Dictionary_Obj_Bool: This key does not exist.");
+                }
+            }
+
             public void Add(GameObject key, bool val)
             {
                 if (keyList.Contains(ModEditorWindow.ExposedManagement.GetKey(key)))
@@ -176,6 +200,12 @@ namespace ModEditor
                     Mesh mesh = valList[index];
                     if (mesh != null && mesh.name.EndsWith("-Editing"))
                         recycleBin.Add(mesh);
+                    if (recycleBin.Count > 50)
+                    {
+                        for (int i = 0; i < 30; i++)
+                            AssetDatabase.RemoveObjectFromAsset(recycleBin[i]);
+                        recycleBin.RemoveRange(0, 30);
+                    }
                     if (recycleBin.Contains(val))
                         recycleBin.Remove(val);
                     valList[index] = val;
@@ -199,6 +229,12 @@ namespace ModEditor
                     Mesh mesh = valList[index];
                     if (mesh != null && mesh.name.EndsWith("-Editing"))
                         recycleBin.Add(mesh);
+                    if (recycleBin.Count > 50)
+                    {
+                        for (int i = 0; i < 30; i++)
+                            AssetDatabase.RemoveObjectFromAsset(recycleBin[i]);
+                        recycleBin.RemoveRange(0, 30);
+                    }
                     if (recycleBin.Contains(val))
                         recycleBin.Remove(val);
                     valList[index] = val;

@@ -35,7 +35,6 @@
 
 			fixed4 _NormalColor;
 			fixed _NormalLength;
-			float4x4 _ViewToWorld;
 
             v2g vert(appdata v)
             {

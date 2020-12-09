@@ -2,7 +2,7 @@
 {
     Properties
     {
-        _Alpha("Alpha", Range(0, 1)) = 1
+        _UVAlpha("UVAlpha", Range(0, 1)) = 1
     }
     SubShader
     {
@@ -35,7 +35,7 @@
                 float2 uv : TEXCOORD0;
             };
 
-			fixed _Alpha;
+			fixed _UVAlpha;
 
             v2f vert (appdata v)
             {
@@ -47,7 +47,7 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
-                return fixed4(i.uv, 0, _Alpha);
+                return fixed4(i.uv, 0, _UVAlpha);
             }
             ENDCG
         }

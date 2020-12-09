@@ -80,6 +80,8 @@ namespace ModEditor
         public GUIContent dropdownRightContent { get; private set; }
         public GUIContent olToggleContent { get; private set; }
         public GUIContent olToggleOnContent { get; private set; }
+        public GUIContent toggleContent { get; private set; }
+        public GUIContent toggleOnContent { get; private set; }
 
         private void OnEnable()
         {
@@ -102,6 +104,10 @@ namespace ModEditor
                 olToggleContent = EditorGUIUtility.IconContent("ol toggle");
             if (olToggleOnContent == null)
                 olToggleOnContent = EditorGUIUtility.IconContent("ol toggle on");
+            if (toggleContent == null)
+                toggleContent = EditorGUIUtility.IconContent("ShurikenToggleHover");
+            if (toggleOnContent == null)
+                toggleOnContent = EditorGUIUtility.IconContent("ShurikenToggleFocusedOn");
             refreshWindow();
 
             for (int i = 0; i < tabs.Count; i++)
@@ -122,11 +128,6 @@ namespace ModEditor
             Undo.undoRedoPerformed -= undoRedoPerformed;
             EditorApplication.playModeStateChanged -= playModeStateChanged;
             AssetModificationManagement.onWillSaveAssets -= onWillSaveAssets;
-        }
-
-        private void OnDestroy()
-        {
-            Manager.MeshDic.ClearRecycleBin();
         }
 
         private void OnGUI()
@@ -204,6 +205,7 @@ namespace ModEditor
             {
                 case PlayModeStateChange.EnteredEditMode:
                     applyPlayModeEditing();
+                    Manager.MeshDic.ClearRecycleBin();
                     break;
                 case PlayModeStateChange.ExitingEditMode:
                     Manager.CheckAndClearExposed();
@@ -242,7 +244,7 @@ namespace ModEditor
             }
             else
             {
-                Manager.TargetChildren = Manager.Target.GetComponentsInChildren<Renderer>().Select(x => x.gameObject).ToList();
+                Manager.TargetChildren = Manager.Target.GetComponentsInChildren<Renderer>(true).Select(x => x.gameObject).ToList();
                 for (int i = 0; i < Manager.TargetChildren.Count; i++)
                 {
                     GameObject obj = Manager.TargetChildren[i];
@@ -279,6 +281,8 @@ namespace ModEditor
 
         public void SetEditingMesh(GameObject target, MeshFilter meshFilter)
         {
+            if (meshFilter.sharedMesh == null)
+                return;
             Mesh mesh = Instantiate(meshFilter.sharedMesh);
             mesh.name = target.name + "-Editing";
             AssetDatabase.AddObjectToAsset(mesh, Manager);
@@ -293,6 +297,8 @@ namespace ModEditor
 
         public void SetEditingMesh(GameObject target, SkinnedMeshRenderer skinnedMeshRenderer)
         {
+            if (skinnedMeshRenderer.sharedMesh == null)
+                return;
             Mesh mesh = Instantiate(skinnedMeshRenderer.sharedMesh);
             mesh.name = target.name + "-Editing";
             AssetDatabase.AddObjectToAsset(mesh, Manager);

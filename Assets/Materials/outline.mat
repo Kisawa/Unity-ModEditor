@@ -34,14 +34,14 @@ Material:
     m_Floats:
     - _OpenAO: 0
     - _Outline: 0.1
-    - _OutlineWidth: 1
-    - _ShadowBlend: 0.435
-    - _ShadowRange: 0.5
-    - _ShadowSmooth: 0
+    - _OutlineWidth: 0.099
+    - _ShadowBlend: 0.344
+    - _ShadowRange: 0.087
+    - _ShadowSmooth: 0.399
     - _SnowScale: 0
     - _SpecularScale: 0.004
     m_Colors:
-    - _Color: {r: 0.8018868, g: 0.8018868, b: 0.8018868, a: 1}
+    - _Color: {r: 0.9245283, g: 0.9245283, b: 0.9245283, a: 1}
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _ShadowColor: {r: 0, g: 0, b: 0, a: 1}
     - _SnowColor: {r: 1, g: 1, b: 1, a: 1}

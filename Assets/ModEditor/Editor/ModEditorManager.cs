@@ -46,6 +46,20 @@ namespace ModEditor
 
         public List<GameObject> TargetChildren { get; set; }
 
+        [SerializeField]
+        bool sceneCollectionView = true;
+        public bool SceneCollectionView
+        {
+            get => sceneCollectionView;
+            set
+            {
+                if (value == sceneCollectionView)
+                    return;
+                Undo.RecordObject(this, "ModEditor SceneCollectionView");
+                sceneCollectionView = value;
+            }
+        }
+
         #region Normal Shading
         [SerializeField]
         bool normalView;
@@ -274,6 +288,66 @@ namespace ModEditor
                     return;
                 Undo.RecordObject(this, "ModEditor UVAlpha");
                 uvAlpha = value;
+            }
+        }
+        #endregion
+
+        #region VertexColor Shading
+        [SerializeField]
+        bool vertexColorView;
+        public bool VertexColorView
+        {
+            get => vertexColorView;
+            set
+            {
+                if (value == vertexColorView)
+                    return;
+                Undo.RecordObject(this, "ModEditor VertexColorView");
+                vertexColorView = value;
+            }
+        }
+        #endregion
+
+        #region Depth Shading
+        [SerializeField]
+        bool depthView;
+        public bool DepthView
+        {
+            get => depthView;
+            set
+            {
+                if (value == depthView)
+                    return;
+                Undo.RecordObject(this, "ModEditor DepthView");
+                depthView = value;
+            }
+        }
+
+        [SerializeField]
+        bool depthViewUnfold = true;
+        public bool DepthViewUnfold
+        {
+            get => depthViewUnfold;
+            set
+            {
+                if (value == depthViewUnfold)
+                    return;
+                Undo.RecordObject(this, "ModEditor DepthViewUnfold");
+                depthViewUnfold = value;
+            }
+        }
+
+        [SerializeField]
+        float depthCompress = 0.1f;
+        public float DepthCompress
+        {
+            get => depthCompress;
+            set
+            {
+                if (value == depthCompress)
+                    return;
+                Undo.RecordObject(this, "ModEditor DepthCompress");
+                depthCompress = value;
             }
         }
         #endregion

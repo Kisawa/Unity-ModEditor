@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using Unity.Jobs;
+using Unity.Collections;
 
 namespace ModEditor
 {
@@ -48,19 +50,18 @@ namespace ModEditor
 
         void writeAcgNormalToTangent(Mesh mesh)
         {
-            Dictionary<Vector3, Vector3> avgNormalDic = new Dictionary<Vector3, Vector3>();
-            for (var j = 0; j < mesh.vertexCount; j++)
+            if (mesh == null)
+                return;
+            var job = new AvgNormal()
             {
-                Vector3 vertex = mesh.vertices[j];
-                if (avgNormalDic.TryGetValue(vertex, out Vector3 avgNormal))
-                    avgNormalDic[vertex] = (avgNormal + mesh.normals[j]).normalized;
-                else
-                    avgNormalDic.Add(vertex, mesh.normals[j]);
-            }
-            Vector4[] avgNormals = new Vector4[mesh.vertexCount];
-            for (int j = 0; j < mesh.vertexCount; j++)
-                avgNormals[j] = avgNormalDic[mesh.vertices[j]];
-            mesh.tangents = avgNormals;
+                vertexs = new NativeArray<Vector3>(mesh.vertices, Allocator.TempJob),
+                normals = new NativeArray<Vector3>(mesh.normals, Allocator.TempJob),
+                output = new NativeArray<Vector4>(mesh.vertexCount, Allocator.TempJob)
+            };
+            JobHandle jobHandle = job.Schedule();
+            jobHandle.Complete();
+            mesh.tangents = job.output.ToArray();
+            job.output.Dispose();
         }
     }
 }

@@ -29,8 +29,11 @@ namespace ModEditor
                 camera.RemoveCommandBuffer(cameraEvent, buffer);
         }
 
+        Vector2 scroll;
+
         public override void Draw()
         {
+            scroll = EditorGUILayout.BeginScrollView(scroll);
             drawCollection();
             EditorGUILayout.Space(20);
             drawNormalViewUtil();
@@ -40,42 +43,26 @@ namespace ModEditor
             drawGridViewUtil();
             EditorGUILayout.Space(10);
             drawUVViewUtil();
+            EditorGUILayout.Space(10);
+            drawVertexColorViewUtil();
+            EditorGUILayout.Space(10);
+            drawDepthViewUtil();
+            EditorGUILayout.Space(10);
+            EditorGUILayout.EndScrollView();
         }
 
         Camera camera;
         CommandBuffer buffer;
         CameraEvent cameraEvent = CameraEvent.AfterForwardAlpha;
 
-        Material _mat_normal;
-        Material mat_normal {
-            get { 
-                if(_mat_normal == null)
-                    _mat_normal = new Material(Shader.Find("ModEditor/ShowNormal"));
-                return _mat_normal;
-            }
-        }
-        Material _mat_tangent;
-        Material mat_tangent {
-            get { 
-                if(_mat_tangent == null)
-                    _mat_tangent = new Material(Shader.Find("ModEditor/ShowTangent"));
-                return _mat_tangent;
-            }
-        }
-        Material _mat_grid;
-        Material mat_grid {
-            get { 
-                if(_mat_grid == null)
-                    _mat_grid = new Material(Shader.Find("ModEditor/ShowGrid"));
-                return _mat_grid;
-            }
-        }
-        Material _mat_uv;
-        Material mat_uv {
-            get { 
-                if(_mat_uv == null)
-                    _mat_uv = new Material(Shader.Find("ModEditor/ShowUV"));
-                return _mat_uv;
+        Material _mat_viewUtil;
+        Material mat_viewUtil 
+        {
+            get
+            {
+                if (_mat_viewUtil == null)
+                    _mat_viewUtil = new Material(Shader.Find("ModEditor/ViewUtil"));
+                return _mat_viewUtil;
             }
         }
 
@@ -123,35 +110,73 @@ namespace ModEditor
             EditorGUI.BeginDisabledGroup(true);
             EditorGUILayout.ObjectField(window.Manager.Target, typeof(GameObject), true);
             EditorGUI.EndDisabledGroup();
-            EditorGUILayout.EndHorizontal();
-
+            bool hasChildrenRenderer = false;
             if (window.Manager.Target != null)
             {
-                for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
+                if (window.Manager.TargetChildren.Contains(window.Manager.Target))
                 {
-                    GameObject obj = window.Manager.TargetChildren[i];
-                    if (obj == window.Manager.Target || obj.gameObject == null)
-                        continue;
-                    EditorGUI.indentLevel = 1;
-                    Transform parent = obj.transform.parent;
-                    while (parent != window.Manager.Target.transform && parent != null)
+                    if (window.Manager.TargetChildren.Count > 1)
+                        hasChildrenRenderer = true;
+                }
+                else if (window.Manager.TargetChildren.Count > 0)
+                    hasChildrenRenderer = true;
+            }
+            if (hasChildrenRenderer)
+            {
+                if (GUILayout.Button(window.viewContent, "ObjectPickerTab"))
+                {
+                    for (int i = 0; i < window.Manager.ActionableDic.count; i++)
+                        window.Manager.ActionableDic[i] = true;
+                    refreshBuffer();
+                }
+                if (GUILayout.Button(window.hiddenContent, "ObjectPickerTab"))
+                {
+                    for (int i = 0; i < window.Manager.ActionableDic.count; i++)
+                        window.Manager.ActionableDic[i] = false;
+                    refreshBuffer();
+                }
+                if (GUILayout.Button(window.Manager.SceneCollectionView ? window.dropdownContent : window.dropdownRightContent, "ObjectPickerTab"))
+                    window.Manager.SceneCollectionView = !window.Manager.SceneCollectionView;
+            }
+            EditorGUILayout.EndHorizontal();
+
+            if (hasChildrenRenderer)
+            {
+                if (window.Manager.SceneCollectionView)
+                {
+                    for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
                     {
-                        EditorGUI.indentLevel++;
-                        parent = parent.parent;
+                        GameObject obj = window.Manager.TargetChildren[i];
+                        if (obj == window.Manager.Target || obj.gameObject == null)
+                            continue;
+                        EditorGUI.indentLevel = 1;
+                        Transform parent = obj.transform.parent;
+                        while (parent != window.Manager.Target.transform && parent != null)
+                        {
+                            EditorGUI.indentLevel++;
+                            parent = parent.parent;
+                        }
+                        EditorGUILayout.BeginHorizontal();
+                        bool actionable = window.Manager.ActionableDic[obj];
+                        if (GUILayout.Button(actionable ? window.viewContent : window.hiddenContent, "ObjectPickerTab"))
+                        {
+                            window.Manager.ActionableDic[obj] = !actionable;
+                            refreshBuffer();
+                        }
+                        EditorGUI.BeginDisabledGroup(true);
+                        EditorGUILayout.ObjectField(obj, typeof(GameObject), true);
+                        EditorGUI.EndDisabledGroup();
+                        EditorGUILayout.EndHorizontal();
                     }
+                    EditorGUI.indentLevel = 0;
+                }
+                else
+                {
                     EditorGUILayout.BeginHorizontal();
-                    bool actionable = window.Manager.ActionableDic[obj];
-                    if (GUILayout.Button(actionable ? window.viewContent : window.hiddenContent, "ObjectPickerTab"))
-                    {
-                        window.Manager.ActionableDic[obj] = !actionable;
-                        refreshBuffer();
-                    }
-                    EditorGUI.BeginDisabledGroup(true);
-                    EditorGUILayout.ObjectField(obj, typeof(GameObject), true);
-                    EditorGUI.EndDisabledGroup();
+                    EditorGUILayout.Space(16, false);
+                    GUILayout.Label("······", "LODRenderersText");
                     EditorGUILayout.EndHorizontal();
                 }
-                EditorGUI.indentLevel = 0;
             }
             EditorGUILayout.EndVertical();
         }
@@ -166,7 +191,7 @@ namespace ModEditor
                 refreshBuffer();
             }
             if (GUILayout.Button("Normal View", "AboutWIndowLicenseLabel", GUILayout.Width(150)) ||
-                GUILayout.Button(window.Manager.NormalViewUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 195)))
+                GUILayout.Button(window.Manager.NormalViewUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 205)))
                 window.Manager.NormalViewUnfold = !window.Manager.NormalViewUnfold;
             EditorGUILayout.EndHorizontal();
             if (window.Manager.NormalViewUnfold)
@@ -180,7 +205,7 @@ namespace ModEditor
                 EditorGUILayout.EndHorizontal();
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Normal Length", labelStyle, GUILayout.Width(120));
-                window.Manager.NormalLength = EditorGUILayout.Slider(window.Manager.NormalLength, 0.01f, 1, GUILayout.Width(170));
+                window.Manager.NormalLength = EditorGUILayout.Slider(window.Manager.NormalLength, 0.01f, 1, GUILayout.Width(165));
                 EditorGUILayout.EndHorizontal();
                 EditorGUI.EndDisabledGroup();
             }
@@ -198,7 +223,7 @@ namespace ModEditor
                 refreshBuffer();
             }
             if (GUILayout.Button("Tangent View", "AboutWIndowLicenseLabel", GUILayout.Width(150)) ||
-                GUILayout.Button(window.Manager.TangentViewUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 195)))
+                GUILayout.Button(window.Manager.TangentViewUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 205)))
                 window.Manager.TangentViewUnfold = !window.Manager.TangentViewUnfold;
             EditorGUILayout.EndHorizontal();
             if (window.Manager.TangentViewUnfold)
@@ -212,16 +237,16 @@ namespace ModEditor
                 EditorGUILayout.EndHorizontal();
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Tangent Length", labelStyle, GUILayout.Width(120));
-                window.Manager.TangentLength = EditorGUILayout.Slider(window.Manager.TangentLength, 0.01f, 1, GUILayout.Width(170));
+                window.Manager.TangentLength = EditorGUILayout.Slider(window.Manager.TangentLength, 0.01f, 1, GUILayout.Width(165));
                 EditorGUILayout.EndHorizontal();
                 EditorGUILayout.LabelField("Binormal", GUI.skin.GetStyle("AnimationTimelineTick"));
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Arrow Length", labelStyle, GUILayout.Width(120));
-                window.Manager.ArrowLength = EditorGUILayout.Slider(window.Manager.ArrowLength, 0, 1, GUILayout.Width(170));
+                window.Manager.ArrowLength = EditorGUILayout.Slider(window.Manager.ArrowLength, 0, 1, GUILayout.Width(165));
                 EditorGUILayout.EndHorizontal();
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Arrow Size", labelStyle, GUILayout.Width(120));
-                window.Manager.ArrowSize = EditorGUILayout.Slider(window.Manager.ArrowSize, 0, 1, GUILayout.Width(170));
+                window.Manager.ArrowSize = EditorGUILayout.Slider(window.Manager.ArrowSize, 0, 1, GUILayout.Width(165));
                 EditorGUILayout.EndHorizontal();
                 EditorGUI.EndDisabledGroup();
             }
@@ -239,7 +264,7 @@ namespace ModEditor
                 refreshBuffer();
             }
             if (GUILayout.Button("Grid View", "AboutWIndowLicenseLabel", GUILayout.Width(150)) ||
-                GUILayout.Button(window.Manager.GridViewUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 195)))
+                GUILayout.Button(window.Manager.GridViewUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 205)))
                 window.Manager.GridViewUnfold = !window.Manager.GridViewUnfold;
             EditorGUILayout.EndHorizontal();
             if (window.Manager.GridViewUnfold)
@@ -267,7 +292,7 @@ namespace ModEditor
                 refreshBuffer();
             }
             if (GUILayout.Button("UV View", "AboutWIndowLicenseLabel", GUILayout.Width(150)) ||
-                GUILayout.Button(window.Manager.UVViewUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 195)))
+                GUILayout.Button(window.Manager.UVViewUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 205)))
                 window.Manager.UVViewUnfold = !window.Manager.UVViewUnfold;
             EditorGUILayout.EndHorizontal();
             if (window.Manager.UVViewUnfold)
@@ -277,7 +302,50 @@ namespace ModEditor
                 EditorGUI.BeginDisabledGroup(!window.Manager.UVView);
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Alpha", labelStyle, GUILayout.Width(120));
-                window.Manager.UVAlpha = EditorGUILayout.Slider(window.Manager.UVAlpha, 0, 1, GUILayout.Width(170));
+                window.Manager.UVAlpha = EditorGUILayout.Slider(window.Manager.UVAlpha, 0, 1, GUILayout.Width(165));
+                EditorGUILayout.EndHorizontal();
+                EditorGUI.EndDisabledGroup();
+            }
+            EditorGUILayout.EndVertical();
+            EditorGUI.indentLevel = 0;
+        }
+
+        void drawVertexColorViewUtil()
+        {
+            EditorGUILayout.BeginVertical("AnimationEventTooltip");
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button(window.Manager.VertexColorView ? window.olToggleOnContent : window.olToggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(20)))
+            {
+                window.Manager.VertexColorView = !window.Manager.VertexColorView;
+                refreshBuffer();
+            }
+            GUILayout.Label("Vertex Color View", "AboutWIndowLicenseLabel");
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndVertical();
+            EditorGUI.indentLevel = 0;
+        }
+
+        void drawDepthViewUtil()
+        {
+            EditorGUILayout.BeginVertical("AnimationEventTooltip");
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button(window.Manager.DepthView ? window.olToggleOnContent : window.olToggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(20)))
+            {
+                window.Manager.DepthView = !window.Manager.DepthView;
+                refreshBuffer();
+            }
+            if (GUILayout.Button("Depth View", "AboutWIndowLicenseLabel", GUILayout.Width(150)) ||
+                GUILayout.Button(window.Manager.DepthViewUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 205)))
+                window.Manager.DepthViewUnfold = !window.Manager.DepthViewUnfold;
+            EditorGUILayout.EndHorizontal();
+            if (window.Manager.DepthViewUnfold)
+            {
+                EditorGUI.indentLevel = 2;
+                GUIStyle labelStyle = GUI.skin.GetStyle("LODRenderersText");
+                EditorGUI.BeginDisabledGroup(!window.Manager.DepthView);
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Depth Compress", labelStyle, GUILayout.Width(120));
+                window.Manager.DepthCompress = EditorGUILayout.Slider(window.Manager.DepthCompress, 0, 1, GUILayout.Width(165));
                 EditorGUILayout.EndHorizontal();
                 EditorGUI.EndDisabledGroup();
             }
@@ -302,30 +370,38 @@ namespace ModEditor
                 Renderer renderer = target.GetComponent<Renderer>();
                 if (renderer == null)
                     continue;
+                if (window.Manager.UVView || window.Manager.VertexColorView)
+                    buffer.DrawRenderer(renderer, mat_viewUtil, 0, 0);
                 if (window.Manager.NormalView)
-                    buffer.DrawRenderer(renderer, mat_normal);
+                    buffer.DrawRenderer(renderer, mat_viewUtil, 0, 1);
                 if (window.Manager.TangentView)
-                    buffer.DrawRenderer(renderer, mat_tangent);
+                    buffer.DrawRenderer(renderer, mat_viewUtil, 0, 2);
                 if (window.Manager.GridView)
-                    buffer.DrawRenderer(renderer, mat_grid);
+                    buffer.DrawRenderer(renderer, mat_viewUtil, 0, 3);
                 if (window.Manager.UVView)
-                    buffer.DrawRenderer(renderer, mat_uv);
+                    buffer.DrawRenderer(renderer, mat_viewUtil, 0, 4);
+                if (window.Manager.VertexColorView)
+                    buffer.DrawRenderer(renderer, mat_viewUtil, 0, 5);
+                if(window.Manager.DepthView)
+                    buffer.DrawRenderer(renderer, mat_viewUtil, 0, 6);
             }
         }
 
         void updateMaterial()
         {
-            mat_normal.SetColor("_NormalColor", window.Manager.NormalColor);
-            mat_normal.SetFloat("_NormalLength", window.Manager.NormalLength);
+            mat_viewUtil.SetColor("_NormalColor", window.Manager.NormalColor);
+            mat_viewUtil.SetFloat("_NormalLength", window.Manager.NormalLength);
 
-            mat_tangent.SetColor("_TangentColor", window.Manager.TangentColor);
-            mat_tangent.SetFloat("_TangentLength", window.Manager.TangentLength);
-            mat_tangent.SetFloat("_ArrowLength", window.Manager.ArrowLength);
-            mat_tangent.SetFloat("_ArrowSize", window.Manager.ArrowSize);
+            mat_viewUtil.SetColor("_TangentColor", window.Manager.TangentColor);
+            mat_viewUtil.SetFloat("_TangentLength", window.Manager.TangentLength);
+            mat_viewUtil.SetFloat("_ArrowLength", window.Manager.ArrowLength);
+            mat_viewUtil.SetFloat("_ArrowSize", window.Manager.ArrowSize);
 
-            mat_grid.SetColor("_GridColor", window.Manager.GridColor);
+            mat_viewUtil.SetColor("_GridColor", window.Manager.GridColor);
 
-            mat_uv.SetFloat("_Alpha", window.Manager.UVAlpha);
+            mat_viewUtil.SetFloat("_UVAlpha", window.Manager.UVAlpha);
+
+            mat_viewUtil.SetFloat("_DepthCompress", window.Manager.DepthCompress);
         }
     }
 }
