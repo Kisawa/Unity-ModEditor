@@ -11,6 +11,8 @@ namespace ModEditor
     {
         public static readonly string ModEditorPath = "Assets/ModEditor/";
 
+        public static ModEditorWindow Self;
+
         static ExposedManagement exposedManagement;
         public static ExposedManagement ExposedManagement 
         {
@@ -34,6 +36,7 @@ namespace ModEditor
         public ModEditorManager Manager { get; private set; }
 
         public event Action onRefreshTargetDic;
+        public event Action onVertexViewChange;
 
         [MenuItem("Tools/Mod Editor")]
         static void Open()
@@ -72,6 +75,21 @@ namespace ModEditor
         }
         List<WindowTabBase> tabs;
 
+        #region Vertex Shading
+        bool vertexView;
+        public bool VertexView
+        {
+            get => vertexView;
+            set
+            {
+                if (vertexView == value)
+                    return;
+                vertexView = value;
+                onVertexViewChange?.Invoke();
+            }
+        }
+        #endregion
+
         public GUIContent lockContent { get; private set; }
         public GUIContent unlockContent { get; private set; }
         public GUIContent hiddenContent { get; private set; }
@@ -85,6 +103,7 @@ namespace ModEditor
 
         private void OnEnable()
         {
+            Self = this;
             tabs = new List<WindowTabBase>();
             tabs.Add(new SceneCollectionTab(this));
             tabs.Add(new NormalEditorTab(this));
@@ -117,10 +136,25 @@ namespace ModEditor
             Undo.undoRedoPerformed += undoRedoPerformed;
             EditorApplication.playModeStateChanged += playModeStateChanged;
             AssetModificationManagement.onWillSaveAssets += onWillSaveAssets;
+            SceneView.duringSceneGui += SceneView_duringSceneGui;
+        }
+
+        private void SceneView_duringSceneGui(SceneView obj)
+        {
+            VertexView = Tools.current == Tool.Custom;
+            if (!Manager.GameCameraFollow)
+                return;
+            Camera cam = Camera.main;
+            if (cam != null)
+            {
+                cam.transform.position = SceneView.lastActiveSceneView.camera.transform.position;
+                cam.transform.rotation = SceneView.lastActiveSceneView.camera.transform.rotation;
+            }
         }
 
         private void OnDisable()
         {
+            Self = null;
             for (int i = 0; i < tabs.Count; i++)
                 tabs[i].OnDiable();
             Selection.selectionChanged -= selectionChanged;
@@ -128,12 +162,12 @@ namespace ModEditor
             Undo.undoRedoPerformed -= undoRedoPerformed;
             EditorApplication.playModeStateChanged -= playModeStateChanged;
             AssetModificationManagement.onWillSaveAssets -= onWillSaveAssets;
+            SceneView.duringSceneGui -= SceneView_duringSceneGui;
         }
 
         private void OnGUI()
         {
             EditorGUILayout.BeginHorizontal();
-
             if (GUILayout.Button(Manager.LockTarget ? lockContent : unlockContent, "ObjectPickerTab"))
             {
                 Manager.LockTarget = !Manager.LockTarget;
@@ -147,23 +181,33 @@ namespace ModEditor
             EditorGUILayout.ObjectField(Manager.Target, typeof(GameObject), true);
             EditorGUI.EndDisabledGroup();
             EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Game Camera Follow", Manager.GameCameraFollow ? "WarningOverlay" : "ProjectBrowserHeaderBgTop"))
+                Manager.GameCameraFollow = !Manager.GameCameraFollow;
+            EditorGUILayout.EndHorizontal();
+
             EditorGUILayout.Space(10);
             tabIndex = GUILayout.Toolbar(tabIndex, new string[] { "Scene Collection", "Normal Editor", "Other" }, "SearchModeFilter");
             EditorGUILayout.Space(10);
-            if(tabIndex < tabs.Count)
+
+            if (tabIndex < tabs.Count)
                 tabs[tabIndex].Draw();
             if (GUI.changed)
-            {
-                if (tabIndex < tabs.Count)
-                    tabs[tabIndex].OnValidate();
-                EditorUtility.SetDirty(Manager);
-            }
+                Validate();
         }
 
         private void OnInspectorUpdate()
         {
             for (int i = 0; i < tabs.Count; i++)
                 tabs[i].OnInspectorUpdate();
+        }
+
+        public void Validate()
+        {
+            for (int i = 0; i < tabs.Count; i++)
+                tabs[i].OnValidate();
+            EditorUtility.SetDirty(Manager);
         }
 
         void selectionChanged()

@@ -1,0 +1,11 @@
+﻿#pragma kernel CSMain
+
+RWStructuredBuffer<float3> vertexs;
+
+[numthreads(1024,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+	float3 vertex = vertexs[id.x];
+    vertex.x += step(0, vertex.x) * 1;
+	vertexs[id.x] = vertex;
+}

@@ -37,6 +37,20 @@ namespace ModEditor
         }
 
         [SerializeField]
+        bool gameCameraFollow;
+        public bool GameCameraFollow
+        {
+            get => gameCameraFollow;
+            set
+            {
+                if (value == gameCameraFollow)
+                    return;
+                Undo.RecordObject(this, "ModEditor GameCameraFollow");
+                gameCameraFollow = value;
+            }
+        }
+
+        [SerializeField]
         SerializableClass.Dictionary_Obj_Bool actionableDic;
         public SerializableClass.Dictionary_Obj_Bool ActionableDic { get => actionableDic; }
 
@@ -59,6 +73,36 @@ namespace ModEditor
                 sceneCollectionView = value;
             }
         }
+
+        #region Vertex Shading
+        [SerializeField]
+        Color vertexColor = Color.black;
+        public Color VertexColor
+        {
+            get => vertexColor;
+            set
+            {
+                if (value == vertexColor)
+                    return;
+                Undo.RecordObject(this, "ModEditor VertexColor");
+                vertexColor = value;
+            }
+        }
+
+        [SerializeField]
+        float vertexScale = 0.5f;
+        public float VertexScale
+        {
+            get => vertexScale;
+            set
+            {
+                if (value == vertexScale)
+                    return;
+                Undo.RecordObject(this, "ModEditor VertexScale");
+                vertexScale = value;
+            }
+        }
+        #endregion
 
         #region Normal Shading
         [SerializeField]
@@ -308,32 +352,32 @@ namespace ModEditor
         }
         #endregion
 
-        #region Depth Shading
+        #region DepthMap Shading
         [SerializeField]
-        bool depthView;
-        public bool DepthView
+        bool depthMapView;
+        public bool DepthMapView
         {
-            get => depthView;
+            get => depthMapView;
             set
             {
-                if (value == depthView)
+                if (value == depthMapView)
                     return;
-                Undo.RecordObject(this, "ModEditor DepthView");
-                depthView = value;
+                Undo.RecordObject(this, "ModEditor DepthMapView");
+                depthMapView = value;
             }
         }
 
         [SerializeField]
-        bool depthViewUnfold = true;
-        public bool DepthViewUnfold
+        bool depthMapViewUnfold = true;
+        public bool DepthMapViewUnfold
         {
-            get => depthViewUnfold;
+            get => depthMapViewUnfold;
             set
             {
-                if (value == depthViewUnfold)
+                if (value == depthMapViewUnfold)
                     return;
-                Undo.RecordObject(this, "ModEditor DepthViewUnfold");
-                depthViewUnfold = value;
+                Undo.RecordObject(this, "ModEditor DepthMapViewUnfold");
+                depthMapViewUnfold = value;
             }
         }
 
@@ -348,6 +392,22 @@ namespace ModEditor
                     return;
                 Undo.RecordObject(this, "ModEditor DepthCompress");
                 depthCompress = value;
+            }
+        }
+        #endregion
+
+        #region NormalMap Shading
+        [SerializeField]
+        bool normalMapView;
+        public bool NormalMapView
+        {
+            get => normalMapView;
+            set
+            {
+                if (value == normalMapView)
+                    return;
+                Undo.RecordObject(this, "ModEditor NormalMapView");
+                normalMapView = value;
             }
         }
         #endregion

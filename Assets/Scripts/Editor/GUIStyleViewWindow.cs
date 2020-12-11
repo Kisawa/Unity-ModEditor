@@ -24,12 +24,21 @@ public class GUIStyleViewer : EditorWindow
             //EditorGUILayout.BeginFadeGroup(1);
             //EditorGUILayout.BeginVertical();
 
-            EditorGUILayout.BeginHorizontal();
-            //EditorGUILayout.LabelField("Binormal", style, GUILayout.Width(200));
+            //EditorGUILayout.BeginVertical(style);
+            ////EditorGUILayout.LabelField("Binormal", style, GUILayout.Width(200));
+            //GUILayout.Label(style.name);
+            //if (GUILayout.Button(style.name))
+            //    GUIUtility.systemCopyBuffer = style.name;
+            //EditorGUILayout.EndVertical();
 
-            if (GUILayout.Button(style.name, style, GUILayout.Width(50)))
+            EditorGUILayout.BeginVertical(style);
+            GUILayout.Label("Mod Editor");
+            if (GUILayout.Button("Game Camera Follow"))
+            {
                 GUIUtility.systemCopyBuffer = style.name;
-            EditorGUILayout.EndHorizontal();
+            }
+            EditorGUILayout.EndVertical();
+
             EditorGUILayout.Space(10);
 
             //EditorGUILayout.EndVertical();

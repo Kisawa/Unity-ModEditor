@@ -19,12 +19,14 @@ namespace ModEditor
         {
             base.OnEnable();
             window.onRefreshTargetDic += refreshBuffer;
+            window.onVertexViewChange += refreshBuffer;
         }
 
         public override void OnDiable()
         {
             base.OnDiable();
             window.onRefreshTargetDic -= refreshBuffer;
+            window.onVertexViewChange -= refreshBuffer;
             if (camera != null && buffer != null)
                 camera.RemoveCommandBuffer(cameraEvent, buffer);
         }
@@ -47,6 +49,8 @@ namespace ModEditor
             drawVertexColorViewUtil();
             EditorGUILayout.Space(10);
             drawDepthViewUtil();
+            EditorGUILayout.Space(10);
+            drawNormalMapViewUtil();
             EditorGUILayout.Space(10);
             EditorGUILayout.EndScrollView();
         }
@@ -329,26 +333,41 @@ namespace ModEditor
         {
             EditorGUILayout.BeginVertical("AnimationEventTooltip");
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button(window.Manager.DepthView ? window.olToggleOnContent : window.olToggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(20)))
+            if (GUILayout.Button(window.Manager.DepthMapView ? window.olToggleOnContent : window.olToggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(20)))
             {
-                window.Manager.DepthView = !window.Manager.DepthView;
+                window.Manager.DepthMapView = !window.Manager.DepthMapView;
                 refreshBuffer();
             }
-            if (GUILayout.Button("Depth View", "AboutWIndowLicenseLabel", GUILayout.Width(150)) ||
-                GUILayout.Button(window.Manager.DepthViewUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 205)))
-                window.Manager.DepthViewUnfold = !window.Manager.DepthViewUnfold;
+            if (GUILayout.Button("Depth Map View", "AboutWIndowLicenseLabel", GUILayout.Width(150)) ||
+                GUILayout.Button(window.Manager.DepthMapViewUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 205)))
+                window.Manager.DepthMapViewUnfold = !window.Manager.DepthMapViewUnfold;
             EditorGUILayout.EndHorizontal();
-            if (window.Manager.DepthViewUnfold)
+            if (window.Manager.DepthMapViewUnfold)
             {
                 EditorGUI.indentLevel = 2;
                 GUIStyle labelStyle = GUI.skin.GetStyle("LODRenderersText");
-                EditorGUI.BeginDisabledGroup(!window.Manager.DepthView);
+                EditorGUI.BeginDisabledGroup(!window.Manager.DepthMapView);
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Depth Compress", labelStyle, GUILayout.Width(120));
                 window.Manager.DepthCompress = EditorGUILayout.Slider(window.Manager.DepthCompress, 0, 1, GUILayout.Width(165));
                 EditorGUILayout.EndHorizontal();
                 EditorGUI.EndDisabledGroup();
             }
+            EditorGUILayout.EndVertical();
+            EditorGUI.indentLevel = 0;
+        }
+
+        void drawNormalMapViewUtil()
+        {
+            EditorGUILayout.BeginVertical("AnimationEventTooltip");
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button(window.Manager.NormalMapView ? window.olToggleOnContent : window.olToggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(20)))
+            {
+                window.Manager.NormalMapView = !window.Manager.NormalMapView;
+                refreshBuffer();
+            }
+            GUILayout.Label("Normal Map View", "AboutWIndowLicenseLabel");
+            EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndVertical();
             EditorGUI.indentLevel = 0;
         }
@@ -370,20 +389,24 @@ namespace ModEditor
                 Renderer renderer = target.GetComponent<Renderer>();
                 if (renderer == null)
                     continue;
-                if (window.Manager.UVView || window.Manager.VertexColorView)
+                if(window.Manager.UVView || window.Manager.VertexColorView || window.VertexView)
                     buffer.DrawRenderer(renderer, mat_viewUtil, 0, 0);
                 if (window.Manager.NormalView)
-                    buffer.DrawRenderer(renderer, mat_viewUtil, 0, 1);
-                if (window.Manager.TangentView)
                     buffer.DrawRenderer(renderer, mat_viewUtil, 0, 2);
-                if (window.Manager.GridView)
+                if (window.Manager.TangentView)
                     buffer.DrawRenderer(renderer, mat_viewUtil, 0, 3);
-                if (window.Manager.UVView)
+                if (window.Manager.GridView)
                     buffer.DrawRenderer(renderer, mat_viewUtil, 0, 4);
-                if (window.Manager.VertexColorView)
+                if (window.Manager.UVView)
                     buffer.DrawRenderer(renderer, mat_viewUtil, 0, 5);
-                if(window.Manager.DepthView)
+                if (window.Manager.VertexColorView)
                     buffer.DrawRenderer(renderer, mat_viewUtil, 0, 6);
+                if(window.Manager.DepthMapView)
+                    buffer.DrawRenderer(renderer, mat_viewUtil, 0, 7);
+                if (window.Manager.NormalMapView)
+                    buffer.DrawRenderer(renderer, mat_viewUtil, 0, 8);
+                if(window.VertexView)
+                    buffer.DrawRenderer(renderer, mat_viewUtil, 0, 1);
             }
         }
 
@@ -402,6 +425,9 @@ namespace ModEditor
             mat_viewUtil.SetFloat("_UVAlpha", window.Manager.UVAlpha);
 
             mat_viewUtil.SetFloat("_DepthCompress", window.Manager.DepthCompress);
+
+            mat_viewUtil.SetColor("_VertexColor", window.Manager.VertexColor);
+            mat_viewUtil.SetFloat("_VertexScale", window.Manager.VertexScale);
         }
     }
 }

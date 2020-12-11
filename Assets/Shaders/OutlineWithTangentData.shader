@@ -28,11 +28,15 @@
 			{
 				float4 vertex: POSITION;
 				float4 tangent: TANGENT;
+				float4 color: COLOR;
 			};
 
 			float4 vert(appdata v): SV_POSITION
 			{
-				float3 pos = v.vertex + v.tangent.xyz * _OutlineWidth * 0.1;
+				float depth;
+				COMPUTE_EYEDEPTH(depth);
+				float outlineWidth = clamp(_OutlineWidth * 0.01 * depth * v.color.a, 0.003, 0.03);
+				float3 pos = v.vertex + v.tangent.xyz * outlineWidth;
 				return UnityObjectToClipPos(pos);
 			}
 
@@ -72,7 +76,7 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
-                return fixed4(_Color.xyz, 1);
+                return _Color;
             }
             ENDCG
         }

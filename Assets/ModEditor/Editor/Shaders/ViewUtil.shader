@@ -26,7 +26,7 @@
 			float4 pos : SV_POSITION;
 			float2 uv : TEXCOORD0;
 			float4 color: TEXCOORD1;
-			float depth : TEXCOORD2;
+			float4 normal: TEXCOORD2;
         };
 
 		fixed4 _NormalColor;
@@ -42,6 +42,9 @@
 		fixed _UVAlpha;
 
 		float _DepthCompress;
+
+		fixed4 _VertexColor;
+		float _VertexScale;
 
 		v2g vertToGeom(appdata v)
         {
@@ -61,10 +64,42 @@
             o.pos = UnityObjectToClipPos(v.vertex);
             o.uv = v.texcoord;
 			o.color = v.color;
-			COMPUTE_EYEDEPTH(o.depth);
-			o.depth *= _DepthCompress;
+			COMPUTE_EYEDEPTH(o.normal.w);
+			o.normal.w *= _DepthCompress;
+			o.normal.xyz = UnityObjectToWorldNormal(v.normal);
             return o;
         }
+
+		[maxvertexcount(15)]
+		void geom_vertexView(triangle v2g input[3], inout TriangleStream<g2f> tristream)
+		{
+			for(int i = 0; i < 3; i++)
+			{
+				int i_cw = fmod(i + 1, 3);
+				int i_ccw = fmod(i + 2, 3);
+				float len = clamp(min(length(input[i].worldPos - input[i_cw].worldPos), length(input[i].worldPos - input[i_ccw].worldPos)) * _VertexScale * 0.1, 0.0005, 0.02);
+
+				g2f o1;
+				UNITY_INITIALIZE_OUTPUT(g2f, o1);
+				o1.pos = UnityViewToClipPos(UnityWorldToViewPos(input[i].worldPos.xyz) - float3(1, 0, 0) * len);
+				g2f o2;
+				UNITY_INITIALIZE_OUTPUT(g2f, o2);
+				o2.pos = UnityViewToClipPos(UnityWorldToViewPos(input[i].worldPos.xyz) + float3(1, 0, 0) * len);
+				g2f o3;
+				UNITY_INITIALIZE_OUTPUT(g2f, o3);
+				o3.pos = UnityViewToClipPos(UnityWorldToViewPos(input[i].worldPos.xyz) - float3(0, 1, 0) * len);
+				g2f o4;
+				UNITY_INITIALIZE_OUTPUT(g2f, o4);
+				o4.pos = UnityViewToClipPos(UnityWorldToViewPos(input[i].worldPos.xyz) + float3(0, 1, 0) * len);
+
+				tristream.Append(o1);
+				tristream.Append(o4);
+				tristream.Append(o2);
+				tristream.Append(o3);
+				tristream.Append(o1);
+				tristream.RestartStrip();
+			}
+		}
 
 		[maxvertexcount(6)]
 		void geom_normalView(triangle v2g input[3], inout LineStream<g2f> tristream)
@@ -131,6 +166,13 @@
 			tristream.Append(o1);
 		}
 
+		fixed4 frag_vertexView(g2f i) : SV_Target
+        {
+			fixed4 col = _VertexColor;
+			col.a = 0.1;
+            return _VertexColor;
+        }
+
         fixed4 frag_normalView(g2f i) : SV_Target
         {
             return _NormalColor;
@@ -156,9 +198,14 @@
             return i.color;
         }
 
-		fixed4 frag_DepthView (g2f i) : SV_Target
+		fixed4 frag_DepthMapView (g2f i) : SV_Target
         {
-            return fixed4(i.depth, i.depth, i.depth, 1);
+            return fixed4(i.normal.w, i.normal.w, i.normal.w, 1);
+        }
+
+		fixed4 frag_NormalMapView (g2f i) : SV_Target
+        {
+            return fixed4(i.normal.xyz, 1);
         }
 		ENDCG
 
@@ -166,6 +213,17 @@
 		{
 			ZWrite On
 			ColorMask 0
+		}
+
+		Pass
+		{
+			ZWrite Off
+			Blend SrcAlpha OneMinusSrcAlpha
+			CGPROGRAM
+			#pragma vertex vertToGeom
+			#pragma geometry geom_vertexView
+			#pragma fragment frag_vertexView
+			ENDCG
 		}
 
         Pass
@@ -219,7 +277,15 @@
         {
             CGPROGRAM
 			#pragma vertex vert
-			#pragma fragment frag_DepthView
+			#pragma fragment frag_DepthMapView
+			ENDCG
+        }
+
+		Pass
+        {
+            CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag_NormalMapView
 			ENDCG
         }
     }
