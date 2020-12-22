@@ -135,8 +135,6 @@ namespace ModEditor
             List<Mesh> valList;
             [SerializeField]
             List<Mesh> originList;
-            [SerializeField]
-            List<Mesh> recycleBin;
 
             public int count => keyList.Count;
 
@@ -145,7 +143,6 @@ namespace ModEditor
                 keyList = new List<PropertyName>();
                 valList = new List<Mesh>();
                 originList = new List<Mesh>();
-                recycleBin = new List<Mesh>();
             }
 
             public Dictionary_Obj_Mesh(UnityEngine.Object parent)
@@ -154,7 +151,6 @@ namespace ModEditor
                 keyList = new List<PropertyName>();
                 valList = new List<Mesh>();
                 originList = new List<Mesh>();
-                recycleBin = new List<Mesh>();
             }
 
             public Mesh this[GameObject key, bool origin = false]
@@ -199,15 +195,9 @@ namespace ModEditor
                 {
                     Mesh mesh = valList[index];
                     if (mesh != null && mesh.name.EndsWith("-Editing"))
-                        recycleBin.Add(mesh);
-                    if (recycleBin.Count > 50)
-                    {
-                        for (int i = 0; i < 30; i++)
-                            AssetDatabase.RemoveObjectFromAsset(recycleBin[i]);
-                        recycleBin.RemoveRange(0, 30);
-                    }
-                    if (recycleBin.Contains(val))
-                        recycleBin.Remove(val);
+                        AssetDatabase.RemoveObjectFromAsset(mesh);
+                    if (parent != null && string.IsNullOrEmpty(AssetDatabase.GetAssetPath(val)))
+                        AssetDatabase.AddObjectToAsset(val, parent);
                     valList[index] = val;
                     originList[index] = origin;
                 }
@@ -228,15 +218,9 @@ namespace ModEditor
                 {
                     Mesh mesh = valList[index];
                     if (mesh != null && mesh.name.EndsWith("-Editing"))
-                        recycleBin.Add(mesh);
-                    if (recycleBin.Count > 50)
-                    {
-                        for (int i = 0; i < 30; i++)
-                            AssetDatabase.RemoveObjectFromAsset(recycleBin[i]);
-                        recycleBin.RemoveRange(0, 30);
-                    }
-                    if (recycleBin.Contains(val))
-                        recycleBin.Remove(val);
+                        AssetDatabase.RemoveObjectFromAsset(mesh);
+                    if (parent != null && string.IsNullOrEmpty(AssetDatabase.GetAssetPath(val)))
+                        AssetDatabase.AddObjectToAsset(val, parent);
                     valList[index] = val;
                 }
                 else
@@ -293,13 +277,6 @@ namespace ModEditor
                 }
                 if (parent != null)
                     EditorUtility.SetDirty(parent);
-            }
-
-            public void ClearRecycleBin()
-            {
-                for (int i = 0; i < recycleBin.Count; i++)
-                    AssetDatabase.RemoveObjectFromAsset(recycleBin[i]);
-                recycleBin.Clear();
             }
         }
     }

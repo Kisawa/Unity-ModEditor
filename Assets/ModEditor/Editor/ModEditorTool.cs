@@ -82,7 +82,7 @@ namespace ModEditor
 
         public override bool IsAvailable()
         {
-            if (ModEditorWindow.Self != null && ModEditorWindow.Self.Manager.Target != null && ModEditorWindow.Self.Manager.Target == Selection.activeGameObject)
+            if (ModEditorWindow.Self != null && ModEditorWindow.Self.Manager.Target != null && (ModEditorWindow.Self.Manager.LockTarget || ModEditorWindow.Self.Manager.Target == Selection.activeGameObject))
                 return true;
             return false;
         }

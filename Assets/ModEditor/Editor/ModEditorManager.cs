@@ -412,6 +412,52 @@ namespace ModEditor
         }
         #endregion
 
+        #region Brush
+        [SerializeField]
+        BrushType brushType = BrushType.DepthCull;
+        public BrushType BrushType
+        {
+            get => brushType;
+            set
+            {
+                if (value == brushType)
+                    return;
+                Undo.RecordObject(this, "ModEditor BrushType");
+                brushType = value;
+            }
+        }
+
+        [SerializeField]
+        Color brushColor = Color.red;
+        public Color BrushColor
+        {
+            get => brushColor;
+            set
+            {
+                if (value == brushColor)
+                    return;
+                Undo.RecordObject(this, "ModEditor BrushColor");
+                brushColor = value;
+            }
+        }
+
+        [SerializeField]
+        float brushSize = 0.05f;
+        public float BrushSize
+        {
+            get => brushSize;
+            set
+            {
+                if (value == brushSize)
+                    return;
+                if (value < 0.01 || value > 0.5)
+                    return;
+                Undo.RecordObject(this, "ModEditor BrushSize");
+                brushSize = value;
+            }
+        }
+        #endregion
+
         private void Awake()
         {
             if (actionableDic == null)

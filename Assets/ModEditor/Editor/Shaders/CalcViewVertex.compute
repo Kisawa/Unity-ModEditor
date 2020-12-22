@@ -1,11 +1,47 @@
-﻿#pragma kernel CSMain
+﻿#pragma kernel WriteVertexColorWithPenetrate
+#pragma kernel WriteVertexColorWithDepthCull
 
-RWStructuredBuffer<float3> vertexs;
+Texture2D _DepthMap;
+SamplerState sampler_DepthMap
+{
+    Filter = MIN_MAG_MIP_LINEAR;
+    AddressU = Wrap;
+    AddressV = Wrap;
+};
+StructuredBuffer<float4x4> _MVP;
+StructuredBuffer<float4x4> _MV;
+float4x4 _P;
+float3 _MouseTexcoord;
+float _Size;
+float4 _Color;
+StructuredBuffer<float3> _Vertexs;
+RWStructuredBuffer<float4> RW_Colors;
 
 [numthreads(1024,1,1)]
-void CSMain (uint3 id : SV_DispatchThreadID)
+void WriteVertexColorWithPenetrate(uint3 id : SV_DispatchThreadID)
 {
-	float3 vertex = vertexs[id.x];
-    vertex.x += step(0, vertex.x) * 1;
-	vertexs[id.x] = vertex;
+	float4 clipPos = mul(_MVP[id.x], float4(_Vertexs[id.x], 1.0));
+	float2 screenPos = (clipPos.xy + clipPos.w) * 0.5;
+	float2 uv = screenPos / clipPos.w;
+	uv.x *= _MouseTexcoord.z;
+	_MouseTexcoord.x *= _MouseTexcoord.z;
+	float dis = length(uv - _MouseTexcoord.xy);
+	float res = 1 - step(_Size, dis);
+	RW_Colors[id.x] = lerp(RW_Colors[id.x], _Color, res);
+}
+
+[numthreads(1024,1,1)]
+void WriteVertexColorWithDepthCull(uint3 id : SV_DispatchThreadID)
+{
+	float3 viewPos = mul(_MV[id.x], float4(_Vertexs[id.x], 1.0)).xyz;
+	float depth = -viewPos.z;
+	float4 clipPos = mul(_P, float4(viewPos, 1.0));
+	float2 screenPos = (clipPos.xy + clipPos.w) * 0.5;
+	float2 uv = screenPos / clipPos.w;
+	float sampleDepth = _DepthMap.SampleLevel(sampler_DepthMap, uv, 0).x;
+	uv.x *= _MouseTexcoord.z;
+	_MouseTexcoord.x *= _MouseTexcoord.z;
+	float dis = length(uv - _MouseTexcoord.xy);
+	float res = (1 - step(0.05, abs(depth - sampleDepth))) * (1 - step(_Size, dis));
+	RW_Colors[id.x] = lerp(RW_Colors[id.x], _Color, res);
 }

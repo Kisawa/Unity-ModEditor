@@ -15,23 +15,28 @@ namespace ModEditor
             this.window = window as ModEditorWindow;
         }
 
+        Vector2 scroll;
+        CommandBuffer buffer;
+        CameraEvent cameraEvent = CameraEvent.AfterForwardAlpha;
+
         public override void OnEnable()
         {
             base.OnEnable();
+            window.onCameraChange += onCameraChange;
             window.onRefreshTargetDic += refreshBuffer;
             window.onVertexViewChange += refreshBuffer;
+            onCameraChange(null);
         }
 
         public override void OnDiable()
         {
             base.OnDiable();
+            window.onCameraChange -= onCameraChange;
             window.onRefreshTargetDic -= refreshBuffer;
             window.onVertexViewChange -= refreshBuffer;
-            if (camera != null && buffer != null)
-                camera.RemoveCommandBuffer(cameraEvent, buffer);
+            if (window.camera != null && buffer != null)
+                window.camera.RemoveCommandBuffer(cameraEvent, buffer);
         }
-
-        Vector2 scroll;
 
         public override void Draw()
         {
@@ -53,43 +58,6 @@ namespace ModEditor
             drawNormalMapViewUtil();
             EditorGUILayout.Space(10);
             EditorGUILayout.EndScrollView();
-        }
-
-        Camera camera;
-        CommandBuffer buffer;
-        CameraEvent cameraEvent = CameraEvent.AfterForwardAlpha;
-
-        Material _mat_viewUtil;
-        Material mat_viewUtil 
-        {
-            get
-            {
-                if (_mat_viewUtil == null)
-                    _mat_viewUtil = new Material(Shader.Find("ModEditor/ViewUtil"));
-                return _mat_viewUtil;
-            }
-        }
-
-        public override void OnInspectorUpdate()
-        {
-            base.OnInspectorUpdate();
-            Camera cam = SceneView.lastActiveSceneView.camera;
-            if (cam != camera)
-            {
-                if (camera != null && buffer != null)
-                    camera.RemoveCommandBuffer(cameraEvent, buffer);
-                camera = cam;
-                if (camera != null)
-                {
-                    if (buffer == null)
-                    {
-                        buffer = new CommandBuffer();
-                        buffer.name = "ModEditor";
-                    }
-                    camera.AddCommandBuffer(cameraEvent, buffer);
-                    refreshBuffer();
-                }
-            }
         }
 
         public override void OnValidate()
@@ -129,14 +97,14 @@ namespace ModEditor
             {
                 if (GUILayout.Button(window.viewContent, "ObjectPickerTab"))
                 {
-                    for (int i = 0; i < window.Manager.ActionableDic.count; i++)
-                        window.Manager.ActionableDic[i] = true;
+                    for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
+                        window.Manager.ActionableDic[window.Manager.TargetChildren[i]] = true;
                     refreshBuffer();
                 }
                 if (GUILayout.Button(window.hiddenContent, "ObjectPickerTab"))
                 {
-                    for (int i = 0; i < window.Manager.ActionableDic.count; i++)
-                        window.Manager.ActionableDic[i] = false;
+                    for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
+                        window.Manager.ActionableDic[window.Manager.TargetChildren[i]] = false;
                     refreshBuffer();
                 }
                 if (GUILayout.Button(window.Manager.SceneCollectionView ? window.dropdownContent : window.dropdownRightContent, "ObjectPickerTab"))
@@ -372,11 +340,27 @@ namespace ModEditor
             EditorGUI.indentLevel = 0;
         }
 
+        private void onCameraChange(Camera obj)
+        {
+            if (obj != null && buffer != null)
+                obj.RemoveCommandBuffer(cameraEvent, buffer);
+            if (window.camera != null)
+            {
+                if (buffer == null)
+                {
+                    buffer = new CommandBuffer();
+                    buffer.name = "ModEditor SceneView";
+                }
+                window.camera.AddCommandBuffer(cameraEvent, buffer);
+                refreshBuffer();
+            }
+        }
+
         void refreshBuffer()
         {
             if(buffer != null)
                 buffer.Clear();
-            if (camera == null || window.Manager.Target == null || window.Manager.TargetChildren.Count == 0)
+            if (window.camera == null || window.Manager.Target == null || window.Manager.TargetChildren.Count == 0)
                 return;
             updateMaterial();
             for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
@@ -390,44 +374,44 @@ namespace ModEditor
                 if (renderer == null)
                     continue;
                 if(window.Manager.UVView || window.Manager.VertexColorView || window.VertexView)
-                    buffer.DrawRenderer(renderer, mat_viewUtil, 0, 0);
+                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 0);
                 if (window.Manager.NormalView)
-                    buffer.DrawRenderer(renderer, mat_viewUtil, 0, 2);
+                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 2);
                 if (window.Manager.TangentView)
-                    buffer.DrawRenderer(renderer, mat_viewUtil, 0, 3);
+                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 3);
                 if (window.Manager.GridView)
-                    buffer.DrawRenderer(renderer, mat_viewUtil, 0, 4);
+                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 4);
                 if (window.Manager.UVView)
-                    buffer.DrawRenderer(renderer, mat_viewUtil, 0, 5);
+                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 5);
                 if (window.Manager.VertexColorView)
-                    buffer.DrawRenderer(renderer, mat_viewUtil, 0, 6);
+                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 6);
                 if(window.Manager.DepthMapView)
-                    buffer.DrawRenderer(renderer, mat_viewUtil, 0, 7);
+                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 7);
                 if (window.Manager.NormalMapView)
-                    buffer.DrawRenderer(renderer, mat_viewUtil, 0, 8);
+                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 8);
                 if(window.VertexView)
-                    buffer.DrawRenderer(renderer, mat_viewUtil, 0, 1);
+                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 1);
             }
         }
 
         void updateMaterial()
         {
-            mat_viewUtil.SetColor("_NormalColor", window.Manager.NormalColor);
-            mat_viewUtil.SetFloat("_NormalLength", window.Manager.NormalLength);
+            window.Mat_viewUtil.SetColor("_NormalColor", window.Manager.NormalColor);
+            window.Mat_viewUtil.SetFloat("_NormalLength", window.Manager.NormalLength);
 
-            mat_viewUtil.SetColor("_TangentColor", window.Manager.TangentColor);
-            mat_viewUtil.SetFloat("_TangentLength", window.Manager.TangentLength);
-            mat_viewUtil.SetFloat("_ArrowLength", window.Manager.ArrowLength);
-            mat_viewUtil.SetFloat("_ArrowSize", window.Manager.ArrowSize);
+            window.Mat_viewUtil.SetColor("_TangentColor", window.Manager.TangentColor);
+            window.Mat_viewUtil.SetFloat("_TangentLength", window.Manager.TangentLength);
+            window.Mat_viewUtil.SetFloat("_ArrowLength", window.Manager.ArrowLength);
+            window.Mat_viewUtil.SetFloat("_ArrowSize", window.Manager.ArrowSize);
 
-            mat_viewUtil.SetColor("_GridColor", window.Manager.GridColor);
+            window.Mat_viewUtil.SetColor("_GridColor", window.Manager.GridColor);
 
-            mat_viewUtil.SetFloat("_UVAlpha", window.Manager.UVAlpha);
+            window.Mat_viewUtil.SetFloat("_UVAlpha", window.Manager.UVAlpha);
 
-            mat_viewUtil.SetFloat("_DepthCompress", window.Manager.DepthCompress);
+            window.Mat_viewUtil.SetFloat("_DepthCompress", window.Manager.DepthCompress);
 
-            mat_viewUtil.SetColor("_VertexColor", window.Manager.VertexColor);
-            mat_viewUtil.SetFloat("_VertexScale", window.Manager.VertexScale);
+            window.Mat_viewUtil.SetColor("_VertexColor", window.Manager.VertexColor);
+            window.Mat_viewUtil.SetFloat("_VertexScale", window.Manager.VertexScale);
         }
     }
 }

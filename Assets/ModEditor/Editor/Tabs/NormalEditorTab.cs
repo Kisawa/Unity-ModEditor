@@ -1,13 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using Unity.Jobs;
-using Unity.Collections;
+using UnityEngine.Rendering;
 
 namespace ModEditor
 {
-    public class NormalEditorTab : WindowTabBase
+    public partial class NormalEditorTab : WindowTabBase
     {
         new ModEditorWindow window;
 
@@ -16,15 +15,55 @@ namespace ModEditor
             this.window = window as ModEditorWindow;
         }
 
-        ComputeShader _calcVertexShader;
-        ComputeShader calcVertexShader
+        Texture2D defaultCursor;
+        Texture2D brushCursor;
+
+        RenderTexture texture;
+        CommandBuffer buffer;
+        CameraEvent cameraEvent = CameraEvent.BeforeForwardOpaque;
+        Vector3 screenTexcoord;
+
+        List<(Transform, Mesh, SkinnedMeshRenderer)> objInOperation;
+
+        public override void OnEnable()
         {
-            get
+            base.OnEnable();
+            test = new int[5] { 0, 1, 2, 3, 4 };
+        }
+        int[] test;
+        public override void OnFocus()
+        {
+            base.OnFocus();
+            window.onCameraChange += onCameraChange;
+            window.onRefreshTargetDic += refreshBuffer;
+            window.onVertexViewChange += refreshBuffer;
+            window.onSceneGUI += onSceneGUI;
+            onCameraChange(null);
+            if (brushCursor == null)
+                brushCursor = AssetDatabase.LoadAssetAtPath<Texture2D>($"{ModEditorWindow.ModEditorPath}Textures/brushCursor.png");
+        }
+
+        public override void OnLostFocus()
+        {
+            base.OnLostFocus();
+            window.onCameraChange -= onCameraChange;
+            window.onRefreshTargetDic -= refreshBuffer;
+            window.onVertexViewChange -= refreshBuffer;
+            window.onSceneGUI -= onSceneGUI;
+            if (window.camera != null && buffer != null)
+                window.camera.RemoveCommandBuffer(cameraEvent, buffer);
+            if (texture != null)
             {
-                if (_calcVertexShader == null)
-                    _calcVertexShader = AssetDatabase.LoadAssetAtPath<ComputeShader>($"{ModEditorWindow.ModEditorPath}Editor/Shaders/CalcViewVertex.compute");
-                return _calcVertexShader;
+                RenderTexture.ReleaseTemporary(texture);
+                texture = null;
             }
+            if (_expandEdgeTexture != null)
+            {
+                RenderTexture.ReleaseTemporary(_expandEdgeTexture);
+                _expandEdgeTexture = null;
+            }
+            PlayerSettings.defaultCursor = defaultCursor;
+            Cursor.SetCursor(defaultCursor, Vector2.zero, CursorMode.Auto);
         }
 
         public override void Draw()
@@ -33,15 +72,116 @@ namespace ModEditor
             {
                 writeAcgNormalToTangent();
             }
-            EditorGUILayout.Space(10);
-            if (GUILayout.Button("Compute Shader Test"))
+            window.Manager.BrushType = (BrushType)EditorGUILayout.EnumPopup(window.Manager.BrushType);
+            window.Manager.BrushColor = EditorGUILayout.ColorField("Brush Color", window.Manager.BrushColor);
+            EditorGUILayout.ObjectField(texture, typeof(RenderTexture), true);
+            EditorGUILayout.ObjectField(_expandEdgeTexture, typeof(RenderTexture), true);
+
+            if(GUILayout.Button("test"))
             {
-                calcTest();
+                int[] _test = test.Skip(0).Take(2).ToArray();
+                for (int i = 0; i < _test.Length; i++)
+                {
+                    Debug.LogError(_test[i]);
+                }
             }
         }
 
-        void calcTest()
+        private void onSceneGUI(SceneView scene)
         {
+            if (!window.VertexView)
+                return;
+            if (PlayerSettings.defaultCursor != brushCursor)
+            {
+                defaultCursor = PlayerSettings.defaultCursor;
+                PlayerSettings.defaultCursor = brushCursor;
+                Cursor.SetCursor(brushCursor, new Vector2(brushCursor.width / 2f, brushCursor.height / 2f), CursorMode.Auto);
+            }
+            EditorGUIUtility.AddCursorRect(new Rect(0, 0, scene.position.width, scene.position.height), MouseCursor.CustomCursor);
+            updateMaterial();
+            if (window.sceneHandleType != SceneHandleType.None)
+                return;
+            if (Event.current.type == EventType.MouseUp)
+            {
+                objInOperation = null;
+            }
+            if (Event.current.alt)
+                return;
+            if (Event.current.button == 0)
+            {
+                if (Event.current.type == EventType.MouseDown)
+                {
+                    objInOperation = recordObjInOperation();
+                    write();
+                }
+                if (Event.current.type == EventType.MouseDrag)
+                {
+                    write();
+                }
+            }
+        }
+
+        private void onCameraChange(Camera obj)
+        {
+            if (obj != null && buffer != null)
+                obj.RemoveCommandBuffer(cameraEvent, buffer);
+            if (window.camera != null)
+            {
+                if (texture == null)
+                {
+                    texture = RenderTexture.GetTemporary(4096, 4096, 24);
+                    texture.format = RenderTextureFormat.RFloat;
+                    texture.hideFlags = HideFlags.HideAndDontSave;
+                }
+                if (buffer == null)
+                {
+                    buffer = new CommandBuffer();
+                    buffer.name = "ModEditor NormalEditor";
+                }
+                window.camera.AddCommandBuffer(cameraEvent, buffer);
+                refreshBuffer();
+            }
+        }
+
+        void refreshBuffer()
+        {
+            if (buffer != null)
+            {
+                buffer.Clear();
+            }
+            if (texture == null || window.camera == null || window.Manager.Target == null || window.Manager.TargetChildren.Count == 0)
+                return;
+            buffer.SetRenderTarget(texture);
+            buffer.ClearRenderTarget(true, true, Color.black);
+            for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
+            {
+                GameObject target = window.Manager.TargetChildren[i];
+                if (target == null)
+                    continue;
+                if (!window.Manager.ActionableDic[target])
+                    continue;
+                Renderer renderer = target.GetComponent<Renderer>();
+                if (renderer == null)
+                    continue;
+                buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 9);
+            }
+        }
+
+        void updateMaterial()
+        {
+            screenTexcoord = window.camera.ScreenToViewportPoint(Event.current.mousePosition);
+            screenTexcoord.y = 1 - screenTexcoord.y;
+            screenTexcoord.z = (float)Screen.width / Screen.height;
+            window.Mat_viewUtil.SetVector("_MousePos", screenTexcoord);
+            window.Mat_viewUtil.SetFloat("_SelcetDis", window.Manager.BrushSize);
+            SceneView.RepaintAll();
+        }
+
+        List<(Transform, Mesh, SkinnedMeshRenderer)> recordObjInOperation()
+        {
+            if (window.camera == null || texture == null)
+                return null;
+            List<(Transform, Mesh, SkinnedMeshRenderer)> _objInOperation = new List<(Transform, Mesh, SkinnedMeshRenderer)>();
             for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
             {
                 GameObject target = window.Manager.TargetChildren[i];
@@ -53,72 +193,16 @@ namespace ModEditor
                 if (meshFilter != null)
                 {
                     window.SetEditingMesh(target, meshFilter);
-                    calcMesh(meshFilter.sharedMesh);
+                    _objInOperation.Add((target.transform, meshFilter.sharedMesh, null));
                 }
                 SkinnedMeshRenderer skinnedMeshRenderer = target.GetComponent<SkinnedMeshRenderer>();
                 if (skinnedMeshRenderer != null)
                 {
                     window.SetEditingMesh(target, skinnedMeshRenderer);
-                    calcMesh(skinnedMeshRenderer.sharedMesh);
+                    _objInOperation.Add((target.transform, skinnedMeshRenderer.sharedMesh, skinnedMeshRenderer));
                 }
             }
-        }
-
-        void calcMesh(Mesh mesh)
-        {
-            if (mesh == null)
-                return;
-            int kernel = calcVertexShader.FindKernel("CSMain");
-            ComputeBuffer vertexs = new ComputeBuffer(mesh.vertexCount, 12);
-            NativeArray<Vector3> _vertexs = new NativeArray<Vector3>(mesh.vertices, Allocator.Temp);
-            vertexs.SetData(_vertexs);
-            _vertexs.Dispose();
-            calcVertexShader.SetBuffer(kernel, "vertexs", vertexs);
-            calcVertexShader.Dispatch(kernel, Mathf.CeilToInt((float)mesh.vertexCount / 1024), 1, 1);
-            Vector3[] newVertex = new Vector3[mesh.vertexCount];
-            vertexs.GetData(newVertex);
-            vertexs.Dispose();
-            mesh.vertices = newVertex;
-        }
-
-        void writeAcgNormalToTangent()
-        {
-            for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
-            {
-                GameObject target = window.Manager.TargetChildren[i];
-                if (target == null)
-                    continue;
-                if (!window.Manager.ActionableDic[target])
-                    continue;
-                MeshFilter meshFilter = target.GetComponent<MeshFilter>();
-                if (meshFilter != null)
-                {
-                    window.SetEditingMesh(target, meshFilter);
-                    writeAcgNormalToTangent(meshFilter.sharedMesh);
-                }
-                SkinnedMeshRenderer skinnedMeshRenderer = target.GetComponent<SkinnedMeshRenderer>();
-                if (skinnedMeshRenderer != null)
-                {
-                    window.SetEditingMesh(target, skinnedMeshRenderer);
-                    writeAcgNormalToTangent(skinnedMeshRenderer.sharedMesh);
-                }
-            }
-        }
-
-        void writeAcgNormalToTangent(Mesh mesh)
-        {
-            if (mesh == null)
-                return;
-            var job = new AvgNormal()
-            {
-                vertexs = new NativeArray<Vector3>(mesh.vertices, Allocator.TempJob),
-                normals = new NativeArray<Vector3>(mesh.normals, Allocator.TempJob),
-                output = new NativeArray<Vector4>(mesh.vertexCount, Allocator.TempJob)
-            };
-            JobHandle jobHandle = job.Schedule();
-            jobHandle.Complete();
-            mesh.tangents = job.output.ToArray();
-            job.output.Dispose();
+            return _objInOperation;
         }
     }
 }

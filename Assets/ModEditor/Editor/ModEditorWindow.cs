@@ -7,14 +7,14 @@ using UnityEngine.SceneManagement;
 
 namespace ModEditor
 {
-    public class ModEditorWindow : EditorWindow
+    public partial class ModEditorWindow : EditorWindow
     {
         public static readonly string ModEditorPath = "Assets/ModEditor/";
 
         public static ModEditorWindow Self;
 
         static ExposedManagement exposedManagement;
-        public static ExposedManagement ExposedManagement 
+        public static ExposedManagement ExposedManagement
         {
             get
             {
@@ -38,7 +38,7 @@ namespace ModEditor
         public event Action onRefreshTargetDic;
         public event Action onVertexViewChange;
 
-        [MenuItem("Tools/Mod Editor")]
+        [MenuItem("Tools/Mod Editor %#E")]
         static void Open()
         {
             ModEditorWindow window = GetWindow<ModEditorWindow>("Mod Editor");
@@ -75,20 +75,16 @@ namespace ModEditor
         }
         List<WindowTabBase> tabs;
 
-        #region Vertex Shading
-        bool vertexView;
-        public bool VertexView
+        Material mat_viewUtil;
+        public Material Mat_viewUtil
         {
-            get => vertexView;
-            set
+            get
             {
-                if (vertexView == value)
-                    return;
-                vertexView = value;
-                onVertexViewChange?.Invoke();
+                if (mat_viewUtil == null)
+                    mat_viewUtil = new Material(Shader.Find("Hidden/ModEditorUtil"));
+                return mat_viewUtil;
             }
         }
-        #endregion
 
         public GUIContent lockContent { get; private set; }
         public GUIContent unlockContent { get; private set; }
@@ -136,25 +132,13 @@ namespace ModEditor
             Undo.undoRedoPerformed += undoRedoPerformed;
             EditorApplication.playModeStateChanged += playModeStateChanged;
             AssetModificationManagement.onWillSaveAssets += onWillSaveAssets;
-            SceneView.duringSceneGui += SceneView_duringSceneGui;
-        }
-
-        private void SceneView_duringSceneGui(SceneView obj)
-        {
-            VertexView = Tools.current == Tool.Custom;
-            if (!Manager.GameCameraFollow)
-                return;
-            Camera cam = Camera.main;
-            if (cam != null)
-            {
-                cam.transform.position = SceneView.lastActiveSceneView.camera.transform.position;
-                cam.transform.rotation = SceneView.lastActiveSceneView.camera.transform.rotation;
-            }
+            SceneView.duringSceneGui += duringSceneGui;
         }
 
         private void OnDisable()
         {
             Self = null;
+            tabIndex = -1;
             for (int i = 0; i < tabs.Count; i++)
                 tabs[i].OnDiable();
             Selection.selectionChanged -= selectionChanged;
@@ -162,7 +146,7 @@ namespace ModEditor
             Undo.undoRedoPerformed -= undoRedoPerformed;
             EditorApplication.playModeStateChanged -= playModeStateChanged;
             AssetModificationManagement.onWillSaveAssets -= onWillSaveAssets;
-            SceneView.duringSceneGui -= SceneView_duringSceneGui;
+            SceneView.duringSceneGui -= duringSceneGui;
         }
 
         private void OnGUI()
@@ -249,7 +233,6 @@ namespace ModEditor
             {
                 case PlayModeStateChange.EnteredEditMode:
                     applyPlayModeEditing();
-                    Manager.MeshDic.ClearRecycleBin();
                     break;
                 case PlayModeStateChange.ExitingEditMode:
                     Manager.CheckAndClearExposed();

@@ -1,12 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 
 namespace ModEditor
 {
-    public struct AvgNormal : IJob
+    public struct AvgNormalJob : IJob
     {
         [ReadOnly]
         [DeallocateOnJobCompletion]
