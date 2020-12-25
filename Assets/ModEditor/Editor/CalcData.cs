@@ -2,15 +2,9 @@
 
 namespace ModEditor
 {
-    public static class CalcData
+    public sealed class CalcData
     {
-        public abstract class CalcWithScreenScopeBase
-        {
-            public Vector3 _MouseTexcoord;
-            public float _Size;
-        }
-
-        public abstract class CalcDataWithVertexsBase : CalcWithScreenScopeBase
+        public abstract class CalcDataWithVertexsBase
         {
             public Vector3[] _Vertexs;
         }
@@ -20,16 +14,20 @@ namespace ModEditor
             public Color[] _Colors;
         }
 
-        public class CalcVertexColorWithPenetrate : CalcDataWithVertexColorBase
+        public abstract class CalcVertexColorWithScreenScopeBase : CalcDataWithVertexColorBase
         {
-            public Matrix4x4[] _MVP;
+            public Vector3 _MouseTexcoord;
+            public float _Size;
         }
 
-        public class CalcVertexColorWithDepthCull : CalcDataWithVertexColorBase
+        public class CalcVertexColorWithScreenScope : CalcVertexColorWithScreenScopeBase
         {
-            public Matrix4x4[] _MV;
-            public Matrix4x4 _P;
-            public RenderTexture _DepthMap;
+            public Matrix4x4 _MVP;
+        }
+
+        public class CalcVertexColorWithScreenScope_Batch : CalcVertexColorWithScreenScopeBase
+        {
+            public Matrix4x4[] _MVPs;
         }
     }
 }

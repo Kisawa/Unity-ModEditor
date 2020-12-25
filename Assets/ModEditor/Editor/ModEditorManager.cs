@@ -290,6 +290,20 @@ namespace ModEditor
                 gridColor = value;
             }
         }
+
+        [SerializeField]
+        bool gridWithZTest = false;
+        public bool GridWithZTest
+        {
+            get => gridWithZTest;
+            set
+            {
+                if (value == gridWithZTest)
+                    return;
+                Undo.RecordObject(this, "ModEditor GridWithZTest");
+                gridWithZTest = value;
+            }
+        }
         #endregion
 
         #region UV Shading
@@ -414,7 +428,7 @@ namespace ModEditor
 
         #region Brush
         [SerializeField]
-        BrushType brushType = BrushType.DepthCull;
+        BrushType brushType = BrushType.ScreenScope;
         public BrushType BrushType
         {
             get => brushType;

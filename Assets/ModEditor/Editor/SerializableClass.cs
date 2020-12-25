@@ -81,6 +81,17 @@ namespace ModEditor
                 }
             }
 
+            public GameObject Resolve(int index)
+            {
+                if (index < count)
+                {
+                    GameObject obj = ModEditorWindow.ExposedManagement.GetReferenceValue(keyList[index], out bool idValid) as GameObject;
+                    if (idValid)
+                        return obj;
+                }
+                return null;
+            }
+
             public void Add(GameObject key, bool val)
             {
                 if (keyList.Contains(ModEditorWindow.ExposedManagement.GetKey(key)))
@@ -135,6 +146,7 @@ namespace ModEditor
             List<Mesh> valList;
             [SerializeField]
             List<Mesh> originList;
+            List<Mesh> recycleBin;
 
             public int count => keyList.Count;
 
@@ -143,6 +155,7 @@ namespace ModEditor
                 keyList = new List<PropertyName>();
                 valList = new List<Mesh>();
                 originList = new List<Mesh>();
+                recycleBin = new List<Mesh>();
             }
 
             public Dictionary_Obj_Mesh(UnityEngine.Object parent)
@@ -151,6 +164,7 @@ namespace ModEditor
                 keyList = new List<PropertyName>();
                 valList = new List<Mesh>();
                 originList = new List<Mesh>();
+                recycleBin = new List<Mesh>();
             }
 
             public Mesh this[GameObject key, bool origin = false]
@@ -195,8 +209,11 @@ namespace ModEditor
                 {
                     Mesh mesh = valList[index];
                     if (mesh != null && mesh.name.EndsWith("-Editing"))
+                    {
+                        recycleBin.Add(mesh);
                         AssetDatabase.RemoveObjectFromAsset(mesh);
-                    if (parent != null && string.IsNullOrEmpty(AssetDatabase.GetAssetPath(val)))
+                    }
+                    if (val != null && parent != null && string.IsNullOrEmpty(AssetDatabase.GetAssetPath(val)))
                         AssetDatabase.AddObjectToAsset(val, parent);
                     valList[index] = val;
                     originList[index] = origin;
@@ -218,8 +235,11 @@ namespace ModEditor
                 {
                     Mesh mesh = valList[index];
                     if (mesh != null && mesh.name.EndsWith("-Editing"))
+                    {
+                        recycleBin.Add(mesh);
                         AssetDatabase.RemoveObjectFromAsset(mesh);
-                    if (parent != null && string.IsNullOrEmpty(AssetDatabase.GetAssetPath(val)))
+                    }
+                    if (val != null && parent != null && string.IsNullOrEmpty(AssetDatabase.GetAssetPath(val)))
                         AssetDatabase.AddObjectToAsset(val, parent);
                     valList[index] = val;
                 }

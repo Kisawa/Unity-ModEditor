@@ -70,10 +70,38 @@ namespace ModEditor
                     if (value < tabs.Count && value >= 0)
                         tabs[value].OnFocus();
                 }
+                if (value == 0)
+                    TabType = ModEditorTabType.SceneCollection;
+                else if (value == 1)
+                    TabType = ModEditorTabType.NormalEditor;
+                else
+                    TabType = ModEditorTabType.Other;
                 _tabIndex = value;
             }
         }
         List<WindowTabBase> tabs;
+
+        public SceneCollectionTab Tab_SceneCollection
+        {
+            get 
+            {
+                if (tabs == null || tabs.Count < 1)
+                    return null;
+                return tabs[0] as SceneCollectionTab;
+            }
+        }
+
+        public NormalEditorTab Tab_NormalEditor
+        {
+            get
+            {
+                if (tabs == null || tabs.Count < 2)
+                    return null;
+                return tabs[1] as NormalEditorTab;
+            }
+        }
+
+        public ModEditorTabType TabType { get; set; }
 
         Material mat_viewUtil;
         public Material Mat_viewUtil
@@ -132,7 +160,7 @@ namespace ModEditor
             Undo.undoRedoPerformed += undoRedoPerformed;
             EditorApplication.playModeStateChanged += playModeStateChanged;
             AssetModificationManagement.onWillSaveAssets += onWillSaveAssets;
-            SceneView.duringSceneGui += duringSceneGui;
+            SceneView.beforeSceneGui += beforeSceneGui;
         }
 
         private void OnDisable()
@@ -141,12 +169,13 @@ namespace ModEditor
             tabIndex = -1;
             for (int i = 0; i < tabs.Count; i++)
                 tabs[i].OnDiable();
+            ModEditorTool.RemoveCalcBuffer();
             Selection.selectionChanged -= selectionChanged;
             EditorApplication.hierarchyChanged -= hierarchyChanged;
             Undo.undoRedoPerformed -= undoRedoPerformed;
             EditorApplication.playModeStateChanged -= playModeStateChanged;
             AssetModificationManagement.onWillSaveAssets -= onWillSaveAssets;
-            SceneView.duringSceneGui -= duringSceneGui;
+            SceneView.beforeSceneGui -= beforeSceneGui;
         }
 
         private void OnGUI()
@@ -281,6 +310,7 @@ namespace ModEditor
             }
             refreshMeshDic();
             onRefreshTargetDic?.Invoke();
+            ModEditorTool.RefreshCalcBuffer();
         }
 
         void refreshMeshDic()

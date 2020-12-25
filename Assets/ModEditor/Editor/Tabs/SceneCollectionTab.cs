@@ -76,6 +76,7 @@ namespace ModEditor
                 if (GUILayout.Button(activeable ? window.viewContent : window.hiddenContent, "ObjectPickerTab"))
                 {
                     window.Manager.ActionableDic[window.Manager.Target] = !activeable;
+                    ModEditorTool.RefreshCalcBuffer();
                     refreshBuffer();
                 }
             }
@@ -99,12 +100,14 @@ namespace ModEditor
                 {
                     for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
                         window.Manager.ActionableDic[window.Manager.TargetChildren[i]] = true;
+                    ModEditorTool.RefreshCalcBuffer();
                     refreshBuffer();
                 }
                 if (GUILayout.Button(window.hiddenContent, "ObjectPickerTab"))
                 {
                     for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
                         window.Manager.ActionableDic[window.Manager.TargetChildren[i]] = false;
+                    ModEditorTool.RefreshCalcBuffer();
                     refreshBuffer();
                 }
                 if (GUILayout.Button(window.Manager.SceneCollectionView ? window.dropdownContent : window.dropdownRightContent, "ObjectPickerTab"))
@@ -133,6 +136,7 @@ namespace ModEditor
                         if (GUILayout.Button(actionable ? window.viewContent : window.hiddenContent, "ObjectPickerTab"))
                         {
                             window.Manager.ActionableDic[obj] = !actionable;
+                            ModEditorTool.RefreshCalcBuffer();
                             refreshBuffer();
                         }
                         EditorGUI.BeginDisabledGroup(true);
@@ -247,6 +251,11 @@ namespace ModEditor
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Grid Color", labelStyle, GUILayout.Width(120));
                 window.Manager.GridColor = EditorGUILayout.ColorField(window.Manager.GridColor, GUILayout.Width(80));
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Grid With ZTest", labelStyle, GUILayout.Width(150));
+                if (GUILayout.Button(window.Manager.GridWithZTest ? window.toggleOnContent : window.toggleContent, "AboutWIndowLicenseLabel"))
+                    window.Manager.GridWithZTest = !window.Manager.GridWithZTest;
                 EditorGUILayout.EndHorizontal();
                 EditorGUI.EndDisabledGroup();
             }
@@ -373,24 +382,22 @@ namespace ModEditor
                 Renderer renderer = target.GetComponent<Renderer>();
                 if (renderer == null)
                     continue;
-                if(window.Manager.UVView || window.Manager.VertexColorView || window.VertexView)
+                if (window.Manager.GridView || window.Manager.UVView || window.Manager.VertexColorView || window.VertexView)
                     buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 0);
                 if (window.Manager.NormalView)
-                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 2);
-                if (window.Manager.TangentView)
-                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 3);
-                if (window.Manager.GridView)
-                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 4);
-                if (window.Manager.UVView)
-                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 5);
-                if (window.Manager.VertexColorView)
-                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 6);
-                if(window.Manager.DepthMapView)
-                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 7);
-                if (window.Manager.NormalMapView)
-                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 8);
-                if(window.VertexView)
                     buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 1);
+                if (window.Manager.TangentView)
+                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 2);
+                if (window.Manager.GridView)
+                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 3);
+                if (window.Manager.UVView)
+                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 4);
+                if (window.Manager.VertexColorView)
+                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 5);
+                if(window.Manager.DepthMapView)
+                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 6);
+                if (window.Manager.NormalMapView)
+                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 7);
             }
         }
 
@@ -405,13 +412,11 @@ namespace ModEditor
             window.Mat_viewUtil.SetFloat("_ArrowSize", window.Manager.ArrowSize);
 
             window.Mat_viewUtil.SetColor("_GridColor", window.Manager.GridColor);
+            window.Mat_viewUtil.SetInt("_GridWithZTest", window.Manager.GridWithZTest ? (int)CompareFunction.LessEqual : (int)CompareFunction.Always);
 
             window.Mat_viewUtil.SetFloat("_UVAlpha", window.Manager.UVAlpha);
 
             window.Mat_viewUtil.SetFloat("_DepthCompress", window.Manager.DepthCompress);
-
-            window.Mat_viewUtil.SetColor("_VertexColor", window.Manager.VertexColor);
-            window.Mat_viewUtil.SetFloat("_VertexScale", window.Manager.VertexScale);
         }
     }
 }

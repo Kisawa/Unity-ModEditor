@@ -56,6 +56,7 @@ public class testEditor: EditorWindow
     }
 
     public Parent asset;
+    public RecycleBin recycleBin;
 
     void createAsset()
     {
@@ -68,6 +69,10 @@ public class testEditor: EditorWindow
         AssetDatabase.AddObjectToAsset(asset.test, asset);
 
         AssetDatabase.ImportAsset("Assets/Parent.asset");
+
+        recycleBin = CreateInstance<RecycleBin>();
+        AssetDatabase.CreateAsset(recycleBin, "Assets/RecycleBin.asset");
+        AssetDatabase.ImportAsset("Assets/RecycleBin.asset");
     }
 
     void moveAsset()
@@ -76,6 +81,8 @@ public class testEditor: EditorWindow
         if (asset != null && asset.test != null)
         {
             AssetDatabase.RemoveObjectFromAsset(asset.test);
+            AssetDatabase.AddObjectToAsset(asset.test, recycleBin);
+            AssetDatabase.Refresh();
         }
     }
 }

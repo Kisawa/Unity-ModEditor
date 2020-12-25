@@ -6,7 +6,6 @@ namespace ModEditor
 {
     public enum BrushType
     {
-        Penetrate,
-        DepthCull
+        ScreenScope
     }
 }

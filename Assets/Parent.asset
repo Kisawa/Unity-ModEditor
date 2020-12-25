@@ -1,18 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-3034540759969516114
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 674271a9150a37644957944eb5332540, type: 3}
-  m_Name: test
-  m_EditorClassIdentifier: 
-  Name: kisawa
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09a5f479febf9de4d81a487c239860bf, type: 3}
   m_Name: Parent
   m_EditorClassIdentifier: 
-  test: {fileID: -3034540759969516114}
+  test: {fileID: 6265737310971503797, guid: 5ba831e6a0969ce4dbe202ed023071bf, type: 2}

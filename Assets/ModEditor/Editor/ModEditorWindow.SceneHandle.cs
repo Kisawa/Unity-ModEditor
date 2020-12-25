@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,6 +6,9 @@ namespace ModEditor
 {
     public partial class ModEditorWindow
     {
+        Vector3 screenTexcoord;
+        public Vector3 ScreenTexcoord { get => screenTexcoord; }
+
         public event Action<Camera> onCameraChange;
         public event Action<SceneView> onSceneGUI;
 
@@ -36,6 +37,10 @@ namespace ModEditor
                     return;
                 vertexView = value;
                 onVertexViewChange?.Invoke();
+                if (vertexView)
+                    ModEditorTool.RefreshCalcBuffer();
+                else
+                    ModEditorTool.RemoveCalcBuffer();
             }
         }
 
@@ -43,11 +48,14 @@ namespace ModEditor
 
         MouseCursor mouseCursor;
 
-        private void duringSceneGui(SceneView obj)
+        private void beforeSceneGui(SceneView obj)
         {
             camera = obj.camera;
             VertexView = Tools.current == Tool.Custom;
             viewHandle(obj);
+            screenTexcoord = camera.ScreenToViewportPoint(Event.current.mousePosition);
+            screenTexcoord.y = 1 - ScreenTexcoord.y;
+            screenTexcoord.z = (float)Screen.width / Screen.height;
             onSceneGUI?.Invoke(obj);
             if (Manager.GameCameraFollow)
                 gameCameraFollow(camera.transform.position, camera.transform.rotation);
@@ -79,7 +87,7 @@ namespace ModEditor
                 {
                     if (Event.current.button == 0 && !Event.current.alt)
                     {
-                        if (tabIndex == 1 && VertexView && Event.current.type == EventType.MouseDrag)
+                        if (TabType == ModEditorTabType.NormalEditor && VertexView && Event.current.type == EventType.MouseDrag)
                         {
                             Manager.BrushSize += Event.current.delta.x * 0.01f;
                             Event.current.Use();
