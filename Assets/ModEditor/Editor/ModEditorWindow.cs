@@ -114,6 +114,17 @@ namespace ModEditor
             }
         }
 
+        List<CalcShaderData.CalcVertexsData> calcShaderDatas;
+        public List<CalcShaderData.CalcVertexsData> CalcShaderDatas
+        {
+            get
+            {
+                if (calcShaderDatas == null)
+                    calcShaderDatas = new List<CalcShaderData.CalcVertexsData>();
+                return calcShaderDatas;
+            }
+        }
+
         public GUIContent lockContent { get; private set; }
         public GUIContent unlockContent { get; private set; }
         public GUIContent hiddenContent { get; private set; }
@@ -161,6 +172,7 @@ namespace ModEditor
             EditorApplication.playModeStateChanged += playModeStateChanged;
             AssetModificationManagement.onWillSaveAssets += onWillSaveAssets;
             SceneView.beforeSceneGui += beforeSceneGui;
+            registerEvent();
         }
 
         private void OnDisable()
@@ -169,13 +181,13 @@ namespace ModEditor
             tabIndex = -1;
             for (int i = 0; i < tabs.Count; i++)
                 tabs[i].OnDiable();
-            ModEditorTool.RemoveCalcBuffer();
             Selection.selectionChanged -= selectionChanged;
             EditorApplication.hierarchyChanged -= hierarchyChanged;
             Undo.undoRedoPerformed -= undoRedoPerformed;
             EditorApplication.playModeStateChanged -= playModeStateChanged;
             AssetModificationManagement.onWillSaveAssets -= onWillSaveAssets;
             SceneView.beforeSceneGui -= beforeSceneGui;
+            logoutEvent();
         }
 
         private void OnGUI()
@@ -310,7 +322,6 @@ namespace ModEditor
             }
             refreshMeshDic();
             onRefreshTargetDic?.Invoke();
-            ModEditorTool.RefreshCalcBuffer();
         }
 
         void refreshMeshDic()

@@ -6,9 +6,6 @@ namespace ModEditor
 {
     public partial class ModEditorWindow
     {
-        Vector3 screenTexcoord;
-        public Vector3 ScreenTexcoord { get => screenTexcoord; }
-
         public event Action<Camera> onCameraChange;
         public event Action<SceneView> onSceneGUI;
 
@@ -37,25 +34,72 @@ namespace ModEditor
                     return;
                 vertexView = value;
                 onVertexViewChange?.Invoke();
-                if (vertexView)
-                    ModEditorTool.RefreshCalcBuffer();
-                else
-                    ModEditorTool.RemoveCalcBuffer();
             }
         }
 
-        public SceneHandleType sceneHandleType { get; private set; }
+        public SceneHandleType SceneHandleType { get; set; }
 
         MouseCursor mouseCursor;
+
+        void registerEvent()
+        {
+            EditorEventUse.OnKey.Tab.Down += Tab_Down;
+            EditorEventUse.OnKey.BackQuote.Down += BackQuote_Down;
+            EditorEventUse.Control.OnMouse.DragLeft += Control_OnMouse_DragLeft;
+            EditorEventUse.Control.OnScrollWheel.Roll += Control_OnScrollWheel_Roll;
+            EditorEventUse.Alt.OnScrollWheel.Roll += Alt_OnScrollWheel_Roll;
+        }
+
+        void logoutEvent()
+        {
+            EditorEventUse.OnKey.Tab.Down -= Tab_Down;
+            EditorEventUse.OnKey.BackQuote.Down -= BackQuote_Down;
+            EditorEventUse.Control.OnMouse.DragLeft -= Control_OnMouse_DragLeft;
+            EditorEventUse.Control.OnScrollWheel.Roll -= Control_OnScrollWheel_Roll;
+            EditorEventUse.Alt.OnScrollWheel.Roll -= Alt_OnScrollWheel_Roll;
+        }
+
+        private void BackQuote_Down()
+        {
+            Tools.current = Tool.Custom;
+        }
+
+        private void Tab_Down()
+        {
+            if(VertexView)
+                Manager.VertexWithZTest = !Manager.VertexWithZTest;
+        }
+
+        private void Control_OnMouse_DragLeft()
+        {
+            if (TabType != ModEditorTabType.NormalEditor || !VertexView)
+                return;
+            Manager.BrushSize += Event.current.delta.x * 0.01f;
+            SceneHandleType = SceneHandleType.BrushSize;
+        }
+
+        private void Control_OnScrollWheel_Roll(float obj)
+        {
+            if (TabType != ModEditorTabType.NormalEditor || !VertexView)
+                return;
+            Manager.BrushDepth -= Event.current.delta.y * 0.01f;
+            SceneHandleType = SceneHandleType.BrushDepth;
+        }
+
+        private void Alt_OnScrollWheel_Roll(float obj)
+        {
+            if (TabType != ModEditorTabType.NormalEditor || !VertexView)
+                return;
+            for (int i = 0; i < CalcShaderDatas.Count; i++)
+                CalcShaderDatas[i].SpreadSelects(1);
+        }
 
         private void beforeSceneGui(SceneView obj)
         {
             camera = obj.camera;
             VertexView = Tools.current == Tool.Custom;
+            EditorEventUse.Update(Event.current, camera);
             viewHandle(obj);
-            screenTexcoord = camera.ScreenToViewportPoint(Event.current.mousePosition);
-            screenTexcoord.y = 1 - ScreenTexcoord.y;
-            screenTexcoord.z = (float)Screen.width / Screen.height;
             onSceneGUI?.Invoke(obj);
             if (Manager.GameCameraFollow)
                 gameCameraFollow(camera.transform.position, camera.transform.rotation);
@@ -72,47 +116,31 @@ namespace ModEditor
 
         private void viewHandle(SceneView scene)
         {
-            if (Event.current.control)
+            if (Event.current.isMouse || (Event.current.isScrollWheel && !Event.current.alt))
             {
-                sceneHandleType = SceneHandleType.Ready;
-                if (Event.current.isScrollWheel)
-                {
-                    Vector3 pos = scene.pivot;
-                    pos -= scene.camera.transform.forward * Event.current.delta.y * 0.002f;
-                    scene.pivot = pos;
-                    Event.current.Use();
-                    sceneHandleType = SceneHandleType.ViewZoom;
-                }
-                if (Event.current.isMouse)
-                {
-                    if (Event.current.button == 0 && !Event.current.alt)
-                    {
-                        if (TabType == ModEditorTabType.NormalEditor && VertexView && Event.current.type == EventType.MouseDrag)
-                        {
-                            Manager.BrushSize += Event.current.delta.x * 0.01f;
-                            Event.current.Use();
-                            sceneHandleType = SceneHandleType.BrushSize;
-                        }
-                    }
-                }
+                for (int i = 0; i < CalcShaderDatas.Count; i++)
+                    CalcShaderDatas[i].ClearSpread();
+            }
+            if (Event.current.control || Event.current.alt)
+            {
+                SceneHandleType = SceneHandleType.Ready;
                 EditorGUIUtility.AddCursorRect(new Rect(0, 0, scene.position.width, scene.position.height), mouseCursor);
             }
-            else
+            else if (SceneHandleType == SceneHandleType.Ready)
             {
-                sceneHandleType = SceneHandleType.None;
+                SceneHandleType = SceneHandleType.None;
             }
-            if (Event.current.Equals(Event.KeyboardEvent("BackQuote")))
-            {
-                Tools.current = Tool.Custom;
-                Event.current.Use();
-            }
-            switch (sceneHandleType)
+            switch (SceneHandleType)
             {
                 case SceneHandleType.None:
-                    mouseCursor = MouseCursor.Arrow;
+                case SceneHandleType.BrushDepth:
+                    if (TabType == ModEditorTabType.NormalEditor)
+                        mouseCursor = MouseCursor.CustomCursor;
+                    else
+                        mouseCursor = MouseCursor.Arrow;
                     break;
-                case SceneHandleType.ViewZoom:
-                    mouseCursor = MouseCursor.ScaleArrow;
+                case SceneHandleType.SceneGUI:
+                    mouseCursor = MouseCursor.Arrow;
                     break;
                 case SceneHandleType.BrushSize:
                     mouseCursor = MouseCursor.SlideArrow;

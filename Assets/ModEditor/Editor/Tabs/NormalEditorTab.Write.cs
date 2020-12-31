@@ -23,13 +23,15 @@ namespace ModEditor
         {
             if (objInOperation == null)
                 return;
-            foreach (var item in objInOperation)
+            for (int i = 0; i < objInOperation.Count; i++)
             {
-                if (item.Key == null || item.Value == null)
+                Transform trans = objInOperation[i].Item1;
+                Mesh mesh = objInOperation[i].Item2;
+                if (trans == null || mesh == null)
                     continue;
-                CalcShaderData.CalcVertexsData data = ModEditorTool.CalcShaderDatas.FirstOrDefault(x => x.trans == item.Key);
+                CalcShaderData.CalcVertexsData data = window.CalcShaderDatas.FirstOrDefault(x => x.trans == trans);
                 if (data != null && data.IsAvailable)
-                    item.Value.colors = CalcUtil.WriteVertexColor_UseSelectData(window.Manager.BrushColor, data.RW_Selects, item.Value.colors);
+                    mesh.colors = CalcUtil.WriteVertexColor_UseSelectData(window.Manager.BrushColor, data.RW_Selects, mesh.colors);
             }
         }
 

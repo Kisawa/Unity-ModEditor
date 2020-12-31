@@ -102,6 +102,34 @@ namespace ModEditor
                 vertexScale = value;
             }
         }
+
+        [SerializeField]
+        bool vertexWithZTest = true;
+        public bool VertexWithZTest
+        {
+            get => vertexWithZTest;
+            set
+            {
+                if (value == vertexWithZTest)
+                    return;
+                Undo.RecordObject(this, "ModEditor VertexWithZTest");
+                vertexWithZTest = value;
+            }
+        }
+
+        [SerializeField]
+        bool hideUnselectedVertex = false;
+        public bool HideUnselectedVertex
+        {
+            get => hideUnselectedVertex;
+            set
+            {
+                if (value == hideUnselectedVertex)
+                    return;
+                Undo.RecordObject(this, "ModEditor HideUnselectedVertex");
+                hideUnselectedVertex = value;
+            }
+        }
         #endregion
 
         #region Normal Shading
@@ -468,6 +496,22 @@ namespace ModEditor
                     return;
                 Undo.RecordObject(this, "ModEditor BrushSize");
                 brushSize = value;
+            }
+        }
+
+        [SerializeField]
+        float brushDepth = 10;
+        public float BrushDepth
+        {
+            get => brushDepth;
+            set
+            {
+                if (value == brushDepth)
+                    return;
+                if (value < 0 || value > 10)
+                    return;
+                Undo.RecordObject(this, "ModEditor BrushDepth");
+                brushDepth = value;
             }
         }
         #endregion

@@ -19,12 +19,14 @@ namespace ModEditor
 
         public ComputeShader CalcVertexShader { get; private set; }
         public int kernel_CalcVertexsWithScreenScope { get; private set; }
+        public int kernel_SpreadSelectInTirangle { get; private set; }
         public int kernel_WriteVertexColorUseSelectData { get; private set; }
 
         public CalcUtil()
         {
             CalcVertexShader = AssetDatabase.LoadAssetAtPath<ComputeShader>($"{ModEditorWindow.ModEditorPath}Editor/Shaders/CalcViewVertex.compute");
             kernel_CalcVertexsWithScreenScope = CalcVertexShader.FindKernel("CalcVertexsWithScreenScope");
+            kernel_SpreadSelectInTirangle = CalcVertexShader.FindKernel("SpreadSelectInTirangle");
             kernel_WriteVertexColorUseSelectData = CalcVertexShader.FindKernel("WriteVertexColorUseSelectData");
         }
 

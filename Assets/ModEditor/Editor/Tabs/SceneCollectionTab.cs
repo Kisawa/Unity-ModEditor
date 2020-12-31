@@ -36,6 +36,9 @@ namespace ModEditor
             window.onVertexViewChange -= refreshBuffer;
             if (window.camera != null && buffer != null)
                 window.camera.RemoveCommandBuffer(cameraEvent, buffer);
+            for (int i = 0; i < window.CalcShaderDatas.Count; i++)
+                window.CalcShaderDatas[i].Clear();
+            window.CalcShaderDatas.Clear();
         }
 
         public override void Draw()
@@ -76,7 +79,6 @@ namespace ModEditor
                 if (GUILayout.Button(activeable ? window.viewContent : window.hiddenContent, "ObjectPickerTab"))
                 {
                     window.Manager.ActionableDic[window.Manager.Target] = !activeable;
-                    ModEditorTool.RefreshCalcBuffer();
                     refreshBuffer();
                 }
             }
@@ -100,14 +102,12 @@ namespace ModEditor
                 {
                     for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
                         window.Manager.ActionableDic[window.Manager.TargetChildren[i]] = true;
-                    ModEditorTool.RefreshCalcBuffer();
                     refreshBuffer();
                 }
                 if (GUILayout.Button(window.hiddenContent, "ObjectPickerTab"))
                 {
                     for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
                         window.Manager.ActionableDic[window.Manager.TargetChildren[i]] = false;
-                    ModEditorTool.RefreshCalcBuffer();
                     refreshBuffer();
                 }
                 if (GUILayout.Button(window.Manager.SceneCollectionView ? window.dropdownContent : window.dropdownRightContent, "ObjectPickerTab"))
@@ -136,7 +136,6 @@ namespace ModEditor
                         if (GUILayout.Button(actionable ? window.viewContent : window.hiddenContent, "ObjectPickerTab"))
                         {
                             window.Manager.ActionableDic[obj] = !actionable;
-                            ModEditorTool.RefreshCalcBuffer();
                             refreshBuffer();
                         }
                         EditorGUI.BeginDisabledGroup(true);
@@ -369,6 +368,9 @@ namespace ModEditor
         {
             if(buffer != null)
                 buffer.Clear();
+            for (int i = 0; i < window.CalcShaderDatas.Count; i++)
+                window.CalcShaderDatas[i].Clear();
+            window.CalcShaderDatas.Clear();
             if (window.camera == null || window.Manager.Target == null || window.Manager.TargetChildren.Count == 0)
                 return;
             updateMaterial();
@@ -398,7 +400,15 @@ namespace ModEditor
                     buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 6);
                 if (window.Manager.NormalMapView)
                     buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 7);
+                if (window.VertexView)
+                {
+                    MeshFilter meshFilter = target.GetComponent<MeshFilter>();
+                    addCalcShaderRender(renderer, meshFilter);
+                    addCalcShaderRender(renderer as SkinnedMeshRenderer);
+                }
             }
+            for (int i = 0; i < window.CalcShaderDatas.Count; i++)
+                buffer.DrawRenderer(window.CalcShaderDatas[i].renderer, window.CalcShaderDatas[i].material, 0, 0);
         }
 
         void updateMaterial()
@@ -417,6 +427,38 @@ namespace ModEditor
             window.Mat_viewUtil.SetFloat("_UVAlpha", window.Manager.UVAlpha);
 
             window.Mat_viewUtil.SetFloat("_DepthCompress", window.Manager.DepthCompress);
+        }
+
+        void addCalcShaderRender(Renderer renderer, MeshFilter meshFilter)
+        {
+            if (renderer == null || meshFilter == null || meshFilter.sharedMesh == null)
+                return;
+            Material material = new Material(Shader.Find("Hidden/ModEditorVertexView"));
+            CalcShaderData.CalcVertexsData data;
+            switch (window.Manager.BrushType)
+            {
+                case BrushType.ScreenScope:
+                    data = new CalcShaderData.CalcMeshVertexsData_ScreenScope(renderer, meshFilter);
+                    data.BindMaterial(material);
+                    window.CalcShaderDatas.Add(data);
+                    break;
+            }
+        }
+
+        void addCalcShaderRender(SkinnedMeshRenderer skinnedMesh)
+        {
+            if (skinnedMesh == null || skinnedMesh.sharedMesh == null)
+                return;
+            Material material = new Material(Shader.Find("Hidden/ModEditorVertexView"));
+            CalcShaderData.CalcVertexsData data;
+            switch (window.Manager.BrushType)
+            {
+                case BrushType.ScreenScope:
+                    data = new CalcShaderData.CalcSkinnedMeshVertexsData_ScreenScope(skinnedMesh);
+                    data.BindMaterial(material);
+                    window.CalcShaderDatas.Add(data);
+                    break;
+            }
         }
     }
 }

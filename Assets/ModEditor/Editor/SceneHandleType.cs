@@ -7,8 +7,9 @@ namespace ModEditor
     public enum SceneHandleType
     {
         None,
+        SceneGUI,
         Ready,
-        ViewZoom,
-        BrushSize
+        BrushSize,
+        BrushDepth
     }
 }

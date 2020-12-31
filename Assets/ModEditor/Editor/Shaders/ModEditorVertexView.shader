@@ -5,6 +5,7 @@
         Pass
         {
 			ZWrite Off
+			ZTest [_VertexWithZTest]
 			Blend SrcAlpha OneMinusSrcAlpha
             CGPROGRAM
             #pragma vertex vert
@@ -32,13 +33,14 @@
 			fixed4 _VertexColor;
 			float _VertexScale;
 			int _BrushOn;
+			int _HideNoSelectVertex;
 			StructuredBuffer<float> _Selects;
 
             v2g vert (appdata v, uint id : SV_VertexID)
             {
                 v2g o;
 				o.worldPos = mul(unity_ObjectToWorld, v.vertex);
-				o.select = _Selects[id];
+				o.select = any(_Selects[id]);
                 return o;
             }
 
@@ -64,7 +66,7 @@
 					UNITY_INITIALIZE_OUTPUT(g2f, o4);
 					o4.pos = UnityViewToClipPos(UnityWorldToViewPos(input[i].worldPos.xyz) + float3(0, 1, 0) * len);
 
-					fixed4 col = lerp(fixed4(1, 1, 1, 0.1), _VertexColor, input[i].select * _BrushOn);
+					fixed4 col = lerp(fixed4(1, 1, 1, 0.1 * (1 - _HideNoSelectVertex)), _VertexColor, input[i].select * _BrushOn);
 					o1.color = col;
 					o2.color = col;
 					o3.color = col;

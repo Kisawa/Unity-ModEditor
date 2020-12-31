@@ -31,8 +31,8 @@ public class GUIStyleViewer : EditorWindow
             //    GUIUtility.systemCopyBuffer = style.name;
             //EditorGUILayout.EndVertical();
 
-            EditorGUILayout.BeginVertical(style);
-            GUILayout.Label("Mod Editor");
+            EditorGUILayout.BeginVertical();
+            EditorGUILayout.LabelField($"Current brush dpeth:  5.000", style);
             if (GUILayout.Button("Game Camera Follow"))
             {
                 GUIUtility.systemCopyBuffer = style.name;

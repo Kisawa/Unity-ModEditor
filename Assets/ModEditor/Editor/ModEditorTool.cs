@@ -13,20 +13,10 @@ namespace ModEditor
     {
         static ModEditorWindow ModEditor => ModEditorWindow.Self;
 
-        static List<CalcShaderData.CalcVertexsData> calcShaderDatas;
-        public static List<CalcShaderData.CalcVertexsData> CalcShaderDatas
-        {
-            get
-            {
-                if (calcShaderDatas == null)
-                    calcShaderDatas = new List<CalcShaderData.CalcVertexsData>();
-                return calcShaderDatas;
-            }
-        }
-
-        static bool changed;
-
         GUIContent icon;
+        public GUIContent toggleContent;
+        public GUIContent toggleOnContent;
+
         public override GUIContent toolbarIcon => icon;
 
         Color vertexColor = Color.black;
@@ -65,13 +55,49 @@ namespace ModEditor
             }
         }
 
+        bool vertexWithZTest = true;
+        bool VertexWithZTest
+        {
+            get
+            {
+                if (ModEditor != null && ModEditor.Manager != null)
+                    vertexWithZTest = ModEditor.Manager.VertexWithZTest;
+                return vertexWithZTest;
+            }
+            set
+            {
+                if (ModEditor == null || ModEditor.Manager == null)
+                    return;
+                vertexWithZTest = value;
+                ModEditor.Manager.VertexWithZTest = vertexWithZTest;
+            }
+        }
+
+        bool hideNoSelectVertex = false;
+        bool HideUnselectedVertex
+        {
+            get
+            {
+                if (ModEditor != null && ModEditor.Manager != null)
+                    hideNoSelectVertex = ModEditor.Manager.HideUnselectedVertex;
+                return hideNoSelectVertex;
+            }
+            set
+            {
+                if (ModEditor == null || ModEditor.Manager == null)
+                    return;
+                hideNoSelectVertex = value;
+                ModEditor.Manager.HideUnselectedVertex = hideNoSelectVertex;
+            }
+        }
+
         Vector3 screenTexcoord;
         Vector3 ScreenTexcoord
         {
             get
             {
                 if (ModEditor != null)
-                    screenTexcoord = ModEditor.ScreenTexcoord;
+                    screenTexcoord = EditorEventUse.Mouse.ScreenTexcoord;
                 return screenTexcoord;
             }
         }
@@ -87,13 +113,25 @@ namespace ModEditor
             }
         }
 
-        Camera camera;
-        CommandBuffer buffer;
-        CameraEvent cameraEvent = CameraEvent.AfterForwardAlpha;
+        float brushDepth = 10;
+        float BrushDepth
+        {
+            get
+            {
+                if (ModEditor != null && ModEditor.Manager != null)
+                    brushDepth = ModEditor.Manager.BrushDepth;
+                return brushDepth;
+            }
+        }
 
         private void OnEnable()
         {
             icon = EditorGUIUtility.IconContent("d_Mesh Icon");
+
+            if (toggleContent == null)
+                toggleContent = EditorGUIUtility.IconContent("ShurikenToggleHover");
+            if (toggleOnContent == null)
+                toggleOnContent = EditorGUIUtility.IconContent("ShurikenToggleFocusedOn");
         }
 
         public override void OnToolGUI(EditorWindow window)
@@ -101,28 +139,48 @@ namespace ModEditor
             base.OnToolGUI(window);
             HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Keyboard));
             Handles.BeginGUI();
-            GUILayout.BeginArea(new Rect(window.position.width - 220, window.position.height - 90, 210, 60));
-            EditorGUILayout.BeginVertical("dragtabdropwindow");
+            Rect rect = new Rect(window.position.width - 250, window.position.height - 142, 240, 112);
+            GUILayout.BeginArea(rect);
+            GUILayout.Label($"Current brush dpeth:  {BrushDepth}", "ToolbarButtonFlat");
+            EditorGUILayout.BeginVertical("dragtabdropwindow", GUILayout.Width(rect.width), GUILayout.Height(rect.height));
             GUILayout.Label("Vertex View", "LODRenderersText");
 
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Label("Vertex's Color", "AboutWIndowLicenseLabel", GUILayout.Width(75));
+            GUILayout.Label("Vertex's Color", "AboutWIndowLicenseLabel", GUILayout.Width(120));
             VertexColor = EditorGUILayout.ColorField(new GUIContent(), VertexColor, true, false, false, GUILayout.Width(70));
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Label("Vertex Scale", "AboutWIndowLicenseLabel", GUILayout.Width(75));
+            GUILayout.Label("Vertex Scale", "AboutWIndowLicenseLabel", GUILayout.Width(120));
             VertexScale = EditorGUILayout.Slider(VertexScale, 0.001f, 1);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Vertex With ZTest", "AboutWIndowLicenseLabel", GUILayout.Width(120));
+            if (GUILayout.Button(VertexWithZTest ? toggleOnContent : toggleContent, "AboutWIndowLicenseLabel"))
+                VertexWithZTest = !VertexWithZTest;
+            GUILayout.Label("       /Tab", "AboutWIndowLicenseLabel", GUILayout.Width(50));
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Hide Unselected Vertex", "AboutWIndowLicenseLabel", GUILayout.Width(120));
+            if (GUILayout.Button(HideUnselectedVertex ? toggleOnContent : toggleContent, "AboutWIndowLicenseLabel"))
+                HideUnselectedVertex = !HideUnselectedVertex;
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.EndVertical();
             GUILayout.EndArea();
-            if (GUI.changed)
-                if (ModEditor != null && ModEditor.Manager != null)
-                    ModEditor.Validate();
-            Handles.EndGUI();
             if (ModEditor != null)
-                GUIUpdate((window as SceneView).camera);
+            {
+                if (GUI.changed)
+                    ModEditor.Validate();
+                if (rect.Contains(Event.current.mousePosition))
+                    ModEditor.SceneHandleType = SceneHandleType.SceneGUI;
+                else
+                    ModEditor.SceneHandleType = SceneHandleType.None;
+            }
+            Handles.EndGUI();
+            updateVertexViewBuffer();
         }
 
         public override bool IsAvailable()
@@ -132,102 +190,25 @@ namespace ModEditor
             return false;
         }
 
-        void GUIUpdate(Camera cam)
+        void updateVertexViewBuffer()
         {
-            if (camera != cam)
-            {
-                if (camera != null && buffer != null)
-                    camera.RemoveCommandBuffer(cameraEvent, buffer);
-                if (buffer == null)
-                    buffer = new CommandBuffer();
-                else
-                    buffer.Clear();
-                camera = cam;
-                camera.AddCommandBuffer(cameraEvent, buffer);
-            }
-            updateBuffer();
-        }
-
-        void updateBuffer()
-        {
-            if (changed)
-                buffer.Clear();
+            if (ModEditor == null || ModEditor.camera == null)
+                return;
             bool brushOn = ModEditor.TabType == ModEditorTabType.NormalEditor;
-            for (int i = 0; i < CalcShaderDatas.Count; i++)
+            for (int i = 0; i < ModEditor.CalcShaderDatas.Count; i++)
             {
-                CalcShaderData.CalcVertexsData data = CalcShaderDatas[i];
+                CalcShaderData.CalcVertexsData data = ModEditor.CalcShaderDatas[i];
                 if (brushOn)
-                    data.Update(camera, ScreenTexcoord, BrushSize);
+                    data.Update(ModEditor.camera, ScreenTexcoord, BrushSize, BrushDepth);
                 if (data.IsAvailable)
                 {
                     data.material.SetInt("_BrushOn", brushOn ? 1 : 0);
+                    data.material.SetInt("_HideNoSelectVertex", HideUnselectedVertex ? 1 : 0);
                     data.material.SetColor("_VertexColor", VertexColor);
                     data.material.SetFloat("_VertexScale", VertexScale);
-                    if (changed)
-                        buffer.DrawRenderer(data.renderer, data.material, 0, 0);
+                    data.material.SetInt("_VertexWithZTest", VertexWithZTest ? (int)CompareFunction.LessEqual : (int)CompareFunction.Always);
                 }
             }
-            changed = false;
-        }
-
-        static void addCalcShaderRender(Renderer renderer, MeshFilter meshFilter)
-        {
-            if (renderer == null || meshFilter == null || meshFilter.sharedMesh == null)
-                return;
-            Material material = new Material(Shader.Find("Hidden/ModEditorVertexView"));
-            CalcShaderData.CalcVertexsData data;
-            switch (ModEditor.Manager.BrushType)
-            {
-                case BrushType.ScreenScope:
-                    data = new CalcShaderData.CalcMeshVertexsData_ScreenScope(renderer, meshFilter);
-                    data.BindMaterial(material);
-                    CalcShaderDatas.Add(data);
-                    break;
-            }
-        }
-
-        static void addCalcShaderRender(SkinnedMeshRenderer skinnedMesh)
-        {
-            if (skinnedMesh == null || skinnedMesh.sharedMesh == null)
-                return;
-            Material material = new Material(Shader.Find("Hidden/ModEditorVertexView"));
-            CalcShaderData.CalcVertexsData data;
-            switch (ModEditor.Manager.BrushType)
-            {
-                case BrushType.ScreenScope:
-                    data = new CalcShaderData.CalcSkinnedMeshVertexsData_ScreenScope(skinnedMesh);
-                    data.BindMaterial(material);
-                    CalcShaderDatas.Add(data);
-                    break;
-            }
-        }
-
-        public static void RefreshCalcBuffer()
-        {
-            for (int i = 0; i < CalcShaderDatas.Count; i++)
-                CalcShaderDatas[i].Clear();
-            CalcShaderDatas.Clear();
-            for (int i = 0; i < ModEditor.Manager.TargetChildren.Count; i++)
-            {
-                GameObject target = ModEditor.Manager.TargetChildren[i];
-                if (target == null)
-                    continue;
-                if (!ModEditor.Manager.ActionableDic[target])
-                    continue;
-                Renderer renderer = target.GetComponent<Renderer>();
-                MeshFilter meshFilter = target.GetComponent<MeshFilter>();
-                addCalcShaderRender(renderer, meshFilter);
-                addCalcShaderRender(renderer as SkinnedMeshRenderer);
-            }
-            changed = true;
-        }
-
-        public static void RemoveCalcBuffer()
-        {
-            for (int i = 0; i < CalcShaderDatas.Count; i++)
-                CalcShaderDatas[i].Clear();
-            CalcShaderDatas.Clear();
-            changed = true;
         }
     }
 }
