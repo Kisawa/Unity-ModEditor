@@ -97,7 +97,7 @@ namespace ModEditor
             get
             {
                 if (ModEditor != null)
-                    screenTexcoord = EditorEventUse.Mouse.ScreenTexcoord;
+                    screenTexcoord = Mouse.ScreenTexcoord;
                 return screenTexcoord;
             }
         }

@@ -24,11 +24,12 @@ namespace ModEditor
         {
             base.OnFocus();
             window.onSceneGUI += onSceneGUI;
-            EditorEventUse.OnMouse.DownLeft += OnMouse_DownLeft;
-            EditorEventUse.OnMouse.UpLeft += OnMouse_UpLeft;
-            EditorEventUse.Control.OnMouse.UpLeft += OnMouse_UpLeft;
-            EditorEventUse.Alt.OnMouse.UpLeft += OnMouse_UpLeft;
-            EditorEventUse.OnMouse.DragLeft += OnMouse_DragLeft;
+            EditorEvent.OnMouse.DownLeft += OnMouse_DownLeft;
+            EditorEvent.OnMouse.UpLeft += OnMouse_UpLeft;
+            EditorEvent.Control.OnMouse.UpLeft += OnMouse_UpLeft;
+            EditorEvent.Alt.OnMouse.UpLeft += OnMouse_UpLeft;
+            EditorEvent.ControlAndAlt.OnMouse.UpLeft += OnMouse_UpLeft;
+            EditorEvent.OnMouse.DragLeft += OnMouse_DragLeft;
             if (brushCursor == null)
                 brushCursor = AssetDatabase.LoadAssetAtPath<Texture2D>($"{ModEditorWindow.ModEditorPath}Textures/brushCursor.png");
         }
@@ -37,11 +38,12 @@ namespace ModEditor
         {
             base.OnLostFocus();
             window.onSceneGUI -= onSceneGUI;
-            EditorEventUse.OnMouse.DownLeft -= OnMouse_DownLeft;
-            EditorEventUse.OnMouse.UpLeft -= OnMouse_UpLeft;
-            EditorEventUse.Control.OnMouse.UpLeft -= OnMouse_UpLeft;
-            EditorEventUse.Alt.OnMouse.UpLeft -= OnMouse_UpLeft;
-            EditorEventUse.OnMouse.DragLeft -= OnMouse_DragLeft;
+            EditorEvent.OnMouse.DownLeft -= OnMouse_DownLeft;
+            EditorEvent.OnMouse.UpLeft -= OnMouse_UpLeft;
+            EditorEvent.Control.OnMouse.UpLeft -= OnMouse_UpLeft;
+            EditorEvent.Alt.OnMouse.UpLeft -= OnMouse_UpLeft;
+            EditorEvent.ControlAndAlt.OnMouse.UpLeft -= OnMouse_UpLeft;
+            EditorEvent.OnMouse.DragLeft -= OnMouse_DragLeft;
             PlayerSettings.defaultCursor = defaultCursor;
             Cursor.SetCursor(defaultCursor, Vector2.zero, CursorMode.Auto);
         }
@@ -123,7 +125,7 @@ namespace ModEditor
 
         void updateMaterial()
         {
-            window.Mat_viewUtil.SetVector("_MousePos", EditorEventUse.Mouse.ScreenTexcoord);
+            window.Mat_viewUtil.SetVector("_MousePos", Mouse.ScreenTexcoord);
             window.Mat_viewUtil.SetFloat("_SelcetDis", window.Manager.BrushSize);
             SceneView.RepaintAll();
         }

@@ -43,20 +43,20 @@ namespace ModEditor
 
         void registerEvent()
         {
-            EditorEventUse.OnKey.Tab.Down += Tab_Down;
-            EditorEventUse.OnKey.BackQuote.Down += BackQuote_Down;
-            EditorEventUse.Control.OnMouse.DragLeft += Control_OnMouse_DragLeft;
-            EditorEventUse.Control.OnScrollWheel.Roll += Control_OnScrollWheel_Roll;
-            EditorEventUse.Alt.OnScrollWheel.Roll += Alt_OnScrollWheel_Roll;
+            EditorEvent.Use.OnKey.Tab.Down += Tab_Down;
+            EditorEvent.Use.OnKey.BackQuote.Down += BackQuote_Down;
+            EditorEvent.Use.Control.OnMouse.DragLeft += Control_OnMouse_DragLeft;
+            EditorEvent.Use.Control.OnScrollWheel.Roll += Control_OnScrollWheel_Roll;
+            EditorEvent.Use.Alt.OnScrollWheel.Roll += Alt_OnScrollWheel_Roll;
         }
 
         void logoutEvent()
         {
-            EditorEventUse.OnKey.Tab.Down -= Tab_Down;
-            EditorEventUse.OnKey.BackQuote.Down -= BackQuote_Down;
-            EditorEventUse.Control.OnMouse.DragLeft -= Control_OnMouse_DragLeft;
-            EditorEventUse.Control.OnScrollWheel.Roll -= Control_OnScrollWheel_Roll;
-            EditorEventUse.Alt.OnScrollWheel.Roll -= Alt_OnScrollWheel_Roll;
+            EditorEvent.Use.OnKey.Tab.Down -= Tab_Down;
+            EditorEvent.Use.OnKey.BackQuote.Down -= BackQuote_Down;
+            EditorEvent.Use.Control.OnMouse.DragLeft -= Control_OnMouse_DragLeft;
+            EditorEvent.Use.Control.OnScrollWheel.Roll -= Control_OnScrollWheel_Roll;
+            EditorEvent.Use.Alt.OnScrollWheel.Roll -= Alt_OnScrollWheel_Roll;
         }
 
         private void BackQuote_Down()
@@ -98,7 +98,7 @@ namespace ModEditor
         {
             camera = obj.camera;
             VertexView = Tools.current == Tool.Custom;
-            EditorEventUse.Update(Event.current, camera);
+            EditorEvent.Update(Event.current, camera);
             viewHandle(obj);
             onSceneGUI?.Invoke(obj);
             if (Manager.GameCameraFollow)
