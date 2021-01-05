@@ -7,7 +7,7 @@ namespace ModEditor
     public enum SceneHandleType
     {
         None,
-        SceneGUI,
+        OnSceneGUI,
         Ready,
         BrushSize,
         BrushDepth

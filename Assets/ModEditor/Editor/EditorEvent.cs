@@ -32,24 +32,83 @@ namespace ModEditor
                     if (@event.keyCode == KeyCode.Tab)
                     {
                         if (!@event.control && !@event.alt)
+                        {
                             OnKey.Tab.InvokeDown();
+                            if (Use.OnKey.Tab.InvokeDown())
+                                @event.Use();
+                        }
                         if (@event.control && !@event.alt)
+                        {
                             Control.OnKey.Tab.InvokeDown();
+                            if (Use.Control.OnKey.Tab.InvokeDown())
+                                @event.Use();
+                        }
                         if (@event.alt && !@event.control)
+                        {
                             Alt.OnKey.Tab.InvokeDown();
+                            if (Use.Alt.OnKey.Tab.InvokeDown())
+                                @event.Use();
+                        }
                         if (@event.control && @event.alt)
+                        {
                             ControlAndAlt.OnKey.Tab.InvokeDown();
+                            if (Use.ControlAndAlt.OnKey.Tab.InvokeDown())
+                                @event.Use();
+                        }
                     }
                     if (@event.keyCode == KeyCode.BackQuote)
                     {
                         if (!@event.control && !@event.alt)
+                        {
                             OnKey.BackQuote.InvokeDown();
+                            if (Use.OnKey.BackQuote.InvokeDown())
+                                @event.Use();
+                        }
                         if (@event.control && !@event.alt)
+                        {
                             Control.OnKey.BackQuote.InvokeDown();
+                            if (Use.Control.OnKey.BackQuote.InvokeDown())
+                                @event.Use();
+                        }
                         if (@event.alt && !@event.control)
+                        {
                             Alt.OnKey.BackQuote.InvokeDown();
+                            if (Use.Alt.OnKey.BackQuote.InvokeDown())
+                                @event.Use();
+                        }
                         if (@event.control && @event.alt)
+                        {
                             ControlAndAlt.OnKey.BackQuote.InvokeDown();
+                            if (Use.ControlAndAlt.OnKey.BackQuote.InvokeDown())
+                                @event.Use();
+                        }
+                    }
+                    if (@event.keyCode == KeyCode.Space)
+                    {
+                        if (!@event.control && !@event.alt)
+                        {
+                            OnKey.Space.InvokeDown();
+                            if (Use.OnKey.Space.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.control && !@event.alt)
+                        {
+                            Control.OnKey.Space.InvokeDown();
+                            if (Use.Control.OnKey.Space.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.alt && !@event.control)
+                        {
+                            Alt.OnKey.Space.InvokeDown();
+                            if (Use.Alt.OnKey.Space.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt)
+                        {
+                            ControlAndAlt.OnKey.Space.InvokeDown();
+                            if (Use.ControlAndAlt.OnKey.Space.InvokeDown())
+                                @event.Use();
+                        }
                     }
                 }
                 if (@event.type == EventType.KeyUp)
@@ -57,28 +116,88 @@ namespace ModEditor
                     if (@event.keyCode == KeyCode.Tab)
                     {
                         if (!@event.control && !@event.alt)
+                        {
                             OnKey.Tab.InvokeUp();
+                            if (Use.OnKey.Tab.InvokeUp())
+                                @event.Use();
+                        }
                         if (@event.control && !@event.alt)
+                        {
                             Control.OnKey.Tab.InvokeUp();
+                            if (Use.Control.OnKey.Tab.InvokeUp())
+                                @event.Use();
+                        }
                         if (@event.alt && !@event.control)
+                        {
                             Alt.OnKey.Tab.InvokeUp();
+                            if (Use.Alt.OnKey.Tab.InvokeUp())
+                                @event.Use();
+                        }
                         if (@event.control && @event.alt)
+                        {
                             ControlAndAlt.OnKey.Tab.InvokeUp();
+                            if (Use.ControlAndAlt.OnKey.Tab.InvokeUp())
+                                @event.Use();
+                        }
                     }
                     if (@event.keyCode == KeyCode.BackQuote)
                     {
                         if (!@event.control && !@event.alt)
+                        {
                             OnKey.BackQuote.InvokeUp();
+                            if (Use.OnKey.BackQuote.InvokeUp())
+                                @event.Use();
+                        }
                         if (@event.control && !@event.alt)
+                        {
                             Control.OnKey.BackQuote.InvokeUp();
+                            if (Use.Control.OnKey.BackQuote.InvokeUp())
+                                @event.Use();
+                        }
                         if (@event.alt && !@event.control)
+                        {
                             Alt.OnKey.BackQuote.InvokeUp();
+                            if (Use.Alt.OnKey.BackQuote.InvokeUp())
+                                @event.Use();
+                        }
                         if (@event.control && @event.alt)
+                        {
                             ControlAndAlt.OnKey.BackQuote.InvokeUp();
+                            if (Use.ControlAndAlt.OnKey.BackQuote.InvokeUp())
+                                @event.Use();
+                        }
+                    }
+                    if (@event.keyCode == KeyCode.Space)
+                    {
+                        if (!@event.control && !@event.alt)
+                        {
+                            OnKey.Space.InvokeUp();
+                            if (Use.OnKey.Space.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && !@event.alt)
+                        {
+                            Control.OnKey.Space.InvokeUp();
+                            if (Use.Control.OnKey.Space.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.alt && !@event.control)
+                        {
+                            Alt.OnKey.Space.InvokeUp();
+                            if (Use.Alt.OnKey.Space.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt)
+                        {
+                            ControlAndAlt.OnKey.Space.InvokeUp();
+                            if (Use.ControlAndAlt.OnKey.Space.InvokeUp())
+                                @event.Use();
+                        }
                     }
                 }
             }
 
+            Mouse.UpdateMouseState(@event.isMouse);
             Mouse.UpdateMousePos(@event, camera);
             if (@event.isMouse)
             {
@@ -87,63 +206,142 @@ namespace ModEditor
                     if (@event.type == EventType.MouseDown)
                     {
                         if (!@event.control && !@event.alt)
+                        {
                             OnMouse.InvokeDownLeft();
+                            if (Use.OnMouse.InvokeDownLeft())
+                                @event.Use();
+                        }
                         if (@event.control && !@event.alt)
+                        {
                             Control.OnMouse.InvokeDownLeft();
+                            if (Use.Control.OnMouse.InvokeDownLeft())
+                                @event.Use();
+                        }
                         if (@event.alt && !@event.control)
+                        {
                             Alt.OnMouse.InvokeDownLeft();
+                            if (Use.Alt.OnMouse.InvokeDownLeft())
+                                @event.Use();
+                        }
                         if (@event.control && @event.alt)
+                        {
                             ControlAndAlt.OnMouse.InvokeDownLeft();
+                            if (Use.ControlAndAlt.OnMouse.InvokeDownLeft())
+                                @event.Use();
+                        }
                     }
                     if (@event.type == EventType.MouseUp)
                     {
                         if (!@event.control && !@event.alt)
+                        {
                             OnMouse.InvokeUpLeft();
+                            if (Use.OnMouse.InvokeUpLeft())
+                                @event.Use();
+                        }
                         if (@event.control && !@event.alt)
+                        {
                             Control.OnMouse.InvokeUpLeft();
+                            if (Use.Control.OnMouse.InvokeUpLeft())
+                                @event.Use();
+                        }
                         if (@event.alt && !@event.control)
+                        {
                             Alt.OnMouse.InvokeUpLeft();
+                            if (Use.Alt.OnMouse.InvokeUpLeft())
+                                @event.Use();
+                        }
                         if (@event.control && @event.alt)
+                        {
                             ControlAndAlt.OnMouse.InvokeUpLeft();
+                            if (Use.ControlAndAlt.OnMouse.InvokeUpLeft())
+                                @event.Use();
+                        }
                     }
                     if (@event.type == EventType.MouseMove)
                     {
                         if (!@event.control && !@event.alt)
+                        {
                             OnMouse.InvokeMove();
+                            if (Use.OnMouse.InvokeMove())
+                                @event.Use();
+                        }
                         if (@event.control && !@event.alt)
+                        {
                             Control.OnMouse.InvokeMove();
+                            if (Use.Control.OnMouse.InvokeMove())
+                                @event.Use();
+                        }
                         if (@event.alt && !@event.control)
+                        {
                             Alt.OnMouse.InvokeMove();
+                            if (Use.Alt.OnMouse.InvokeMove())
+                                @event.Use();
+                        }
                         if (@event.control && @event.alt)
+                        {
                             ControlAndAlt.OnMouse.InvokeMove();
+                            if (Use.ControlAndAlt.OnMouse.InvokeMove())
+                                @event.Use();
+                        }
                     }
                     if (@event.type == EventType.MouseDrag)
                     {
                         if (!@event.control && !@event.alt)
+                        {
                             OnMouse.InvokeDragLeft();
+                            if (Use.OnMouse.InvokeDragLeft())
+                                @event.Use();
+                        }
                         if (@event.control && !@event.alt)
+                        {
                             Control.OnMouse.InvokeDragLeft();
+                            if (Use.Control.OnMouse.InvokeDragLeft())
+                                @event.Use();
+                        }
                         if (@event.alt && !@event.control)
+                        {
                             Alt.OnMouse.InvokeDragLeft();
+                            if (Use.Alt.OnMouse.InvokeDragLeft())
+                                @event.Use();
+                        }
                         if (@event.control && @event.alt)
+                        {
                             ControlAndAlt.OnMouse.InvokeDragLeft();
+                            if (Use.ControlAndAlt.OnMouse.InvokeDragLeft())
+                                @event.Use();
+                        }
                     }
                 }
             }
 
+            ScrollWheel.UpdateScrollWheelState(@event.isScrollWheel);
             if (@event.isScrollWheel)
             {
                 if (!@event.control && !@event.alt)
+                {
                     OnScrollWheel.InvokeRoll(@event.delta.y);
+                    if (Use.OnScrollWheel.InvokeRoll(@event.delta.y))
+                        @event.Use();
+                }
                 if (@event.control && !@event.alt)
+                {
                     Control.OnScrollWheel.InvokeRoll(@event.delta.y);
+                    if (Use.Control.OnScrollWheel.InvokeRoll(@event.delta.y))
+                        @event.Use();
+                }
                 if (@event.alt && !@event.control)
+                {
                     Alt.OnScrollWheel.InvokeRoll(@event.delta.y);
+                    if (Use.Alt.OnScrollWheel.InvokeRoll(@event.delta.y))
+                        @event.Use();
+                }
                 if (@event.control && @event.alt)
+                {
                     ControlAndAlt.OnScrollWheel.InvokeRoll(@event.delta.y);
+                    if (Use.ControlAndAlt.OnScrollWheel.InvokeRoll(@event.delta.y))
+                        @event.Use();
+                }
             }
-
-            Use.Update(@event);
         }
 
         public static class Use
@@ -159,234 +357,6 @@ namespace ModEditor
             public static Alt Alt = new Alt();
 
             public static ControlAndAlt ControlAndAlt = new ControlAndAlt();
-
-            public static void Update(Event @event)
-            {
-                if (@event.isKey)
-                {
-                    if (@event.type == EventType.KeyDown)
-                    {
-                        if (@event.keyCode == KeyCode.Tab)
-                        {
-                            if (!@event.control && !@event.alt)
-                            {
-                                if (OnKey.Tab.InvokeDown())
-                                    @event.Use();
-                            }
-                            if (@event.control && !@event.alt)
-                            {
-                                if (Control.OnKey.Tab.InvokeDown())
-                                    @event.Use();
-                            }
-                            if (@event.alt && !@event.control)
-                            {
-                                if (Alt.OnKey.Tab.InvokeDown())
-                                    @event.Use();
-                            }
-                            if (@event.control && @event.alt)
-                            {
-                                if (ControlAndAlt.OnKey.Tab.InvokeDown())
-                                    @event.Use();
-                            }
-                        }
-                        if (@event.keyCode == KeyCode.BackQuote)
-                        {
-                            if (!@event.control && !@event.alt)
-                            {
-                                if (OnKey.BackQuote.InvokeDown())
-                                    @event.Use();
-                            }
-                            if (@event.control && !@event.alt)
-                            {
-                                if (Control.OnKey.BackQuote.InvokeDown())
-                                    @event.Use();
-                            }
-                            if (@event.alt && !@event.control)
-                            {
-                                if (Alt.OnKey.BackQuote.InvokeDown())
-                                    @event.Use();
-                            }
-                            if (@event.control && @event.alt)
-                            {
-                                if (ControlAndAlt.OnKey.BackQuote.InvokeDown())
-                                    @event.Use();
-                            }
-                        }
-                    }
-                    if (@event.type == EventType.KeyUp)
-                    {
-                        if (@event.keyCode == KeyCode.Tab)
-                        {
-                            if (!@event.control && !@event.alt)
-                            {
-                                if (OnKey.Tab.InvokeUp())
-                                    @event.Use();
-                            }
-                            if (@event.control && !@event.alt)
-                            {
-                                if (Control.OnKey.Tab.InvokeUp())
-                                    @event.Use();
-                            }
-                            if (@event.alt && !@event.control)
-                            {
-                                if (Alt.OnKey.Tab.InvokeUp())
-                                    @event.Use();
-                            }
-                            if (@event.control && @event.alt)
-                            {
-                                if (ControlAndAlt.OnKey.Tab.InvokeUp())
-                                    @event.Use();
-                            }
-                        }
-                        if (@event.keyCode == KeyCode.BackQuote)
-                        {
-                            if (!@event.control && !@event.alt)
-                            {
-                                if (OnKey.BackQuote.InvokeUp())
-                                    @event.Use();
-                            }
-                            if (@event.control && !@event.alt)
-                            {
-                                if (Control.OnKey.BackQuote.InvokeUp())
-                                    @event.Use();
-                            }
-                            if (@event.alt && !@event.control)
-                            {
-                                if (Alt.OnKey.BackQuote.InvokeUp())
-                                    @event.Use();
-                            }
-                            if (@event.control && @event.alt)
-                            {
-                                if (ControlAndAlt.OnKey.BackQuote.InvokeUp())
-                                    @event.Use();
-                            }
-                        }
-                    }
-                }
-
-                if (@event.isMouse)
-                {
-                    if (@event.button == 0)
-                    {
-                        if (@event.type == EventType.MouseDown)
-                        {
-                            if (!@event.control && !@event.alt)
-                            {
-                                if (OnMouse.InvokeDownLeft())
-                                    @event.Use();
-                            }
-                            if (@event.control && !@event.alt)
-                            {
-                                if (Control.OnMouse.InvokeDownLeft())
-                                    @event.Use();
-                            }
-                            if (@event.alt && !@event.control)
-                            {
-                                if (Alt.OnMouse.InvokeDownLeft())
-                                    @event.Use();
-                            }
-                            if (@event.control && @event.alt)
-                            {
-                                if (ControlAndAlt.OnMouse.InvokeDownLeft())
-                                    @event.Use();
-                            }
-                        }
-                        if (@event.type == EventType.MouseUp)
-                        {
-                            if (!@event.control && !@event.alt)
-                            {
-                                if (OnMouse.InvokeUpLeft())
-                                    @event.Use();
-                            }
-                            if (@event.control && !@event.alt)
-                            {
-                                if (Control.OnMouse.InvokeUpLeft())
-                                    @event.Use();
-                            }
-                            if (@event.alt && !@event.control)
-                            {
-                                if (Alt.OnMouse.InvokeUpLeft())
-                                    @event.Use();
-                            }
-                            if (@event.control && @event.alt)
-                            {
-                                if (ControlAndAlt.OnMouse.InvokeUpLeft())
-                                    @event.Use();
-                            }
-                        }
-                        if (@event.type == EventType.MouseMove)
-                        {
-                            if (!@event.control && !@event.alt)
-                            {
-                                if (OnMouse.InvokeMove())
-                                    @event.Use();
-                            }
-                            if (@event.control && !@event.alt)
-                            {
-                                if (Control.OnMouse.InvokeMove())
-                                    @event.Use();
-                            }
-                            if (@event.alt && !@event.control)
-                            {
-                                if (Alt.OnMouse.InvokeMove())
-                                    @event.Use();
-                            }
-                            if (@event.control && @event.alt)
-                            {
-                                if (ControlAndAlt.OnMouse.InvokeMove())
-                                    @event.Use();
-                            }
-                        }
-                        if (@event.type == EventType.MouseDrag)
-                        {
-                            if (!@event.control && !@event.alt)
-                            {
-                                if (OnMouse.InvokeDragLeft())
-                                    @event.Use();
-                            }
-                            if (@event.control && !@event.alt)
-                            {
-                                if (Control.OnMouse.InvokeDragLeft())
-                                    @event.Use();
-                            }
-                            if (@event.alt && !@event.control)
-                            {
-                                if (Alt.OnMouse.InvokeDragLeft())
-                                    @event.Use();
-                            }
-                            if (@event.control && @event.alt)
-                            {
-                                if (ControlAndAlt.OnMouse.InvokeDragLeft())
-                                    @event.Use();
-                            }
-                        }
-                    }
-                }
-
-                if (@event.isScrollWheel)
-                {
-                    if (!@event.control && !@event.alt)
-                    {
-                        if (OnScrollWheel.InvokeRoll(@event.delta.y))
-                            @event.Use();
-                    }
-                    if (@event.control && !@event.alt)
-                    {
-                        if (Control.OnScrollWheel.InvokeRoll(@event.delta.y))
-                            @event.Use();
-                    }
-                    if (@event.alt && !@event.control)
-                    {
-                        if (Alt.OnScrollWheel.InvokeRoll(@event.delta.y))
-                            @event.Use();
-                    }
-                    if (@event.control && @event.alt)
-                    {
-                        if (ControlAndAlt.OnScrollWheel.InvokeRoll(@event.delta.y))
-                            @event.Use();
-                    }
-                }
-            }
         }
     }
 
@@ -429,7 +399,7 @@ namespace ModEditor
             ControlOrAltStateChange?.Invoke(ControlOrAlt);
         }
 
-        public class Tab
+        public abstract class Base
         {
             public event Action Down;
             public event Action Up;
@@ -449,25 +419,11 @@ namespace ModEditor
             }
         }
 
-        public class BackQuote
-        {
-            public event Action Down;
-            public event Action Up;
-            public bool InvokeDown()
-            {
-                if (Down == null)
-                    return false;
-                Down.Invoke();
-                return true;
-            }
-            public bool InvokeUp()
-            {
-                if (Up == null)
-                    return false;
-                Up.Invoke();
-                return true;
-            }
-        }
+        public class Tab : Base { }
+
+        public class BackQuote : Base { }
+
+        public class Space : Base { }
     }
 
     public class OnKey
@@ -475,12 +431,22 @@ namespace ModEditor
         public Key.Tab Tab = new Key.Tab();
 
         public Key.BackQuote BackQuote = new Key.BackQuote();
+
+        public Key.Space Space = new Key.Space();
     }
 
     public static class Mouse
     {
+        public static bool Is { get; private set; }
+        public static event Action Update;
         static Vector3 screenTexcoord;
         public static Vector3 ScreenTexcoord => screenTexcoord;
+        public static void UpdateMouseState(bool res)
+        {
+            Is = res;
+            if (res)
+                Update?.Invoke();
+        }
         public static void UpdateMousePos(Event @event, Camera camera)
         {
             screenTexcoord = camera.ScreenToViewportPoint(@event.mousePosition);
@@ -522,6 +488,18 @@ namespace ModEditor
                 return false;
             DragLeft.Invoke();
             return true;
+        }
+    }
+
+    public static class ScrollWheel
+    {
+        public static bool Is { get; set; }
+        public static event Action Update;
+        public static void UpdateScrollWheelState(bool res)
+        {
+            Is = res;
+            if (res)
+                Update.Invoke();
         }
     }
 

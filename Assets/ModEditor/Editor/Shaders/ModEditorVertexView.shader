@@ -30,7 +30,8 @@
 				float4 color: TEXCOORD0;
             };
 
-			fixed4 _VertexColor;
+			fixed4 _UnselectedVertexColor;
+			fixed4 _SelectedVertexColor;
 			float _VertexScale;
 			int _BrushOn;
 			int _HideNoSelectVertex;
@@ -51,8 +52,7 @@
 				{
 					int i_cw = fmod(i + 1, 3);
 					int i_ccw = fmod(i + 2, 3);
-					float len = clamp(min(length(input[i].worldPos - input[i_cw].worldPos), length(input[i].worldPos - input[i_ccw].worldPos)) * _VertexScale * 0.1, 0.0005, 0.02);
-
+					float len = clamp(min(length(input[i].worldPos - input[i_cw].worldPos), length(input[i].worldPos - input[i_ccw].worldPos)) * _VertexScale * 0.15, 0.001, 0.03);
 					g2f o1;
 					UNITY_INITIALIZE_OUTPUT(g2f, o1);
 					o1.pos = UnityViewToClipPos(UnityWorldToViewPos(input[i].worldPos.xyz) - float3(1, 0, 0) * len);
@@ -66,7 +66,7 @@
 					UNITY_INITIALIZE_OUTPUT(g2f, o4);
 					o4.pos = UnityViewToClipPos(UnityWorldToViewPos(input[i].worldPos.xyz) + float3(0, 1, 0) * len);
 
-					fixed4 col = lerp(fixed4(1, 1, 1, 0.1 * (1 - _HideNoSelectVertex)), _VertexColor, input[i].select * _BrushOn);
+					fixed4 col = lerp(fixed4(_UnselectedVertexColor.rgb, 0.1 * (1 - _HideNoSelectVertex)), _SelectedVertexColor, input[i].select * _BrushOn);
 					o1.color = col;
 					o2.color = col;
 					o3.color = col;

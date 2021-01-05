@@ -19,21 +19,39 @@ namespace ModEditor
 
         public override GUIContent toolbarIcon => icon;
 
-        Color vertexColor = Color.black;
-        Color VertexColor
+        Color unselectedVertexColor = Color.white;
+        Color UnselectedVertexColor
         {
             get
             {
                 if (ModEditor != null && ModEditor.Manager != null)
-                    vertexColor = ModEditor.Manager.VertexColor;
-                return vertexColor;
+                    unselectedVertexColor = ModEditor.Manager.UnselectedVertexColor;
+                return unselectedVertexColor;
             }
             set
             {
                 if (ModEditor == null || ModEditor.Manager == null)
                     return;
-                vertexColor = value;
-                ModEditor.Manager.VertexColor = vertexColor;
+                unselectedVertexColor = value;
+                ModEditor.Manager.UnselectedVertexColor = unselectedVertexColor;
+            }
+        }
+
+        Color selectedVertexColor = Color.black;
+        Color SelectedVertexColor
+        {
+            get
+            {
+                if (ModEditor != null && ModEditor.Manager != null)
+                    selectedVertexColor = ModEditor.Manager.SelectedVertexColor;
+                return selectedVertexColor;
+            }
+            set
+            {
+                if (ModEditor == null || ModEditor.Manager == null)
+                    return;
+                selectedVertexColor = value;
+                ModEditor.Manager.SelectedVertexColor = selectedVertexColor;
             }
         }
 
@@ -91,17 +109,6 @@ namespace ModEditor
             }
         }
 
-        Vector3 screenTexcoord;
-        Vector3 ScreenTexcoord
-        {
-            get
-            {
-                if (ModEditor != null)
-                    screenTexcoord = Mouse.ScreenTexcoord;
-                return screenTexcoord;
-            }
-        }
-
         float brushSize = 0.05f;
         float BrushSize
         {
@@ -139,15 +146,20 @@ namespace ModEditor
             base.OnToolGUI(window);
             HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Keyboard));
             Handles.BeginGUI();
-            Rect rect = new Rect(window.position.width - 250, window.position.height - 142, 240, 112);
+            Rect rect = new Rect(window.position.width - 250, window.position.height - 159, 240, 129);
             GUILayout.BeginArea(rect);
             GUILayout.Label($"Current brush dpeth:  {BrushDepth}", "ToolbarButtonFlat");
             EditorGUILayout.BeginVertical("dragtabdropwindow", GUILayout.Width(rect.width), GUILayout.Height(rect.height));
             GUILayout.Label("Vertex View", "LODRenderersText");
 
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Label("Vertex's Color", "AboutWIndowLicenseLabel", GUILayout.Width(120));
-            VertexColor = EditorGUILayout.ColorField(new GUIContent(), VertexColor, true, false, false, GUILayout.Width(70));
+            GUILayout.Label("Unselected Vertex Color", "AboutWIndowLicenseLabel", GUILayout.Width(120));
+            UnselectedVertexColor = EditorGUILayout.ColorField(new GUIContent(), UnselectedVertexColor, true, false, false, GUILayout.Width(70));
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Selected Vertex Color", "AboutWIndowLicenseLabel", GUILayout.Width(120));
+            SelectedVertexColor = EditorGUILayout.ColorField(new GUIContent(), SelectedVertexColor, true, false, false, GUILayout.Width(70));
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
@@ -174,10 +186,7 @@ namespace ModEditor
             {
                 if (GUI.changed)
                     ModEditor.Validate();
-                if (rect.Contains(Event.current.mousePosition))
-                    ModEditor.SceneHandleType = SceneHandleType.SceneGUI;
-                else
-                    ModEditor.SceneHandleType = SceneHandleType.None;
+                ModEditor.OnSceneGUI = rect.Contains(Event.current.mousePosition);
             }
             Handles.EndGUI();
             updateVertexViewBuffer();
@@ -194,21 +203,23 @@ namespace ModEditor
         {
             if (ModEditor == null || ModEditor.camera == null)
                 return;
-            bool brushOn = ModEditor.TabType == ModEditorTabType.NormalEditor;
+            bool brushOn = ModEditor.TabType == ModEditorTabType.VertexBrush;
             for (int i = 0; i < ModEditor.CalcShaderDatas.Count; i++)
             {
                 CalcShaderData.CalcVertexsData data = ModEditor.CalcShaderDatas[i];
                 if (brushOn)
-                    data.Update(ModEditor.camera, ScreenTexcoord, BrushSize, BrushDepth);
+                    data.Update(ModEditor.camera, Mouse.ScreenTexcoord, BrushSize, BrushDepth);
                 if (data.IsAvailable)
                 {
                     data.material.SetInt("_BrushOn", brushOn ? 1 : 0);
                     data.material.SetInt("_HideNoSelectVertex", HideUnselectedVertex ? 1 : 0);
-                    data.material.SetColor("_VertexColor", VertexColor);
+                    data.material.SetColor("_UnselectedVertexColor", UnselectedVertexColor);
+                    data.material.SetColor("_SelectedVertexColor", SelectedVertexColor);
                     data.material.SetFloat("_VertexScale", VertexScale);
                     data.material.SetInt("_VertexWithZTest", VertexWithZTest ? (int)CompareFunction.LessEqual : (int)CompareFunction.Always);
                 }
             }
+            SceneView.RepaintAll();
         }
     }
 }

@@ -20,6 +20,7 @@ namespace ModEditor
         public ComputeShader CalcVertexShader { get; private set; }
         public int kernel_CalcVertexsWithScreenScope { get; private set; }
         public int kernel_SpreadSelectInTirangle { get; private set; }
+        public int kernel_RespreadSelectInTirangle { get; private set; }
         public int kernel_WriteVertexColorUseSelectData { get; private set; }
 
         public CalcUtil()
@@ -27,11 +28,14 @@ namespace ModEditor
             CalcVertexShader = AssetDatabase.LoadAssetAtPath<ComputeShader>($"{ModEditorWindow.ModEditorPath}Editor/Shaders/CalcViewVertex.compute");
             kernel_CalcVertexsWithScreenScope = CalcVertexShader.FindKernel("CalcVertexsWithScreenScope");
             kernel_SpreadSelectInTirangle = CalcVertexShader.FindKernel("SpreadSelectInTirangle");
+            kernel_RespreadSelectInTirangle = CalcVertexShader.FindKernel("RespreadSelectInTirangle");
             kernel_WriteVertexColorUseSelectData = CalcVertexShader.FindKernel("WriteVertexColorUseSelectData");
         }
 
         public static Color[] WriteVertexColor_UseSelectData(Color color, ComputeBuffer _Selects, Color[] originColors)
         {
+            if (originColors.Length == 0)
+                return null;
             Self.CalcVertexShader.SetVector("_Color", color);
             Self.CalcVertexShader.SetBuffer(Self.kernel_WriteVertexColorUseSelectData, "RW_Selects", _Selects);
             ComputeBuffer RW_Colors = new ComputeBuffer(originColors.Length, sizeof(float) * 4);

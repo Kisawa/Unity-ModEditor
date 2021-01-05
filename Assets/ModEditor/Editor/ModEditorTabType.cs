@@ -7,7 +7,7 @@ namespace ModEditor
     public enum ModEditorTabType
     {
         SceneCollection,
-        NormalEditor,
+        VertexBrush,
         Other
     }
 }

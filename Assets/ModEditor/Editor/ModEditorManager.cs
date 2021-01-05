@@ -76,16 +76,30 @@ namespace ModEditor
 
         #region Vertex Shading
         [SerializeField]
-        Color vertexColor = Color.black;
-        public Color VertexColor
+        Color unselectedVertexColor = Color.white;
+        public Color UnselectedVertexColor
         {
-            get => vertexColor;
+            get => unselectedVertexColor;
             set
             {
-                if (value == vertexColor)
+                if (value == unselectedVertexColor)
                     return;
-                Undo.RecordObject(this, "ModEditor VertexColor");
-                vertexColor = value;
+                Undo.RecordObject(this, "ModEditor UnselectedVertexColor");
+                unselectedVertexColor = value;
+            }
+        }
+
+        [SerializeField]
+        Color selectedVertexColor = Color.black;
+        public Color SelectedVertexColor
+        {
+            get => selectedVertexColor;
+            set
+            {
+                if (value == selectedVertexColor)
+                    return;
+                Undo.RecordObject(this, "ModEditor SelectedVertexColor");
+                selectedVertexColor = value;
             }
         }
 
@@ -508,8 +522,10 @@ namespace ModEditor
             {
                 if (value == brushDepth)
                     return;
-                if (value < 0 || value > 10)
-                    return;
+                if (value < 0)
+                    value = 0;
+                if (value > ModEditorConstants.BrushMaxDepth)
+                    value = ModEditorConstants.BrushMaxDepth;
                 Undo.RecordObject(this, "ModEditor BrushDepth");
                 brushDepth = value;
             }

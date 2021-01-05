@@ -73,7 +73,7 @@ namespace ModEditor
                 if (value == 0)
                     TabType = ModEditorTabType.SceneCollection;
                 else if (value == 1)
-                    TabType = ModEditorTabType.NormalEditor;
+                    TabType = ModEditorTabType.VertexBrush;
                 else
                     TabType = ModEditorTabType.Other;
                 _tabIndex = value;
@@ -91,13 +91,13 @@ namespace ModEditor
             }
         }
 
-        public NormalEditorTab Tab_NormalEditor
+        public VertexBrushTab Tab_VertexBrush
         {
             get
             {
                 if (tabs == null || tabs.Count < 2)
                     return null;
-                return tabs[1] as NormalEditorTab;
+                return tabs[1] as VertexBrushTab;
             }
         }
 
@@ -141,7 +141,7 @@ namespace ModEditor
             Self = this;
             tabs = new List<WindowTabBase>();
             tabs.Add(new SceneCollectionTab(this));
-            tabs.Add(new NormalEditorTab(this));
+            tabs.Add(new VertexBrushTab(this));
             if (lockContent == null)
                 lockContent = EditorGUIUtility.IconContent("IN LockButton on act");
             if (unlockContent == null)
@@ -213,7 +213,7 @@ namespace ModEditor
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Space(10);
-            tabIndex = GUILayout.Toolbar(tabIndex, new string[] { "Scene Collection", "Normal Editor", "Other" }, "SearchModeFilter");
+            tabIndex = GUILayout.Toolbar(tabIndex, new string[] { "Scene Collection", "Vertex Brush", "Other" }, "SearchModeFilter");
             EditorGUILayout.Space(10);
 
             if (tabIndex < tabs.Count)

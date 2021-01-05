@@ -1,5 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.Collections;
+using Unity.Jobs;
 using UnityEngine;
 
 namespace ModEditor
@@ -14,6 +17,7 @@ namespace ModEditor
             public ComputeBuffer _Vertexs { get; private set; }
             public ComputeBuffer _Triangles { get; private set; }
             public ComputeBuffer RW_Selects { get; private set; }
+            public ComputeBuffer RW_Depths { get; private set; }
             public virtual bool IsAvailable
             {
                 get 
@@ -23,6 +27,8 @@ namespace ModEditor
                     return true;
                 }
             }
+
+            Vector3[] _vertexs;
 
             bool _clearSpread;
             protected bool clearSpread
@@ -38,28 +44,91 @@ namespace ModEditor
                 }
             }
 
+            float spreadLevel = 0;
+            float _SpreadLevel
+            {
+                get => spreadLevel;
+                set
+                {
+                    if (value > 0)
+                        return;
+                    spreadLevel = value;
+                }
+            }
+
             public CalcVertexsData(Renderer renderer, Vector3[] vertexs, int[] triangles)
             {
                 this.renderer = renderer;
+                _vertexs = vertexs;
                 _Vertexs = new ComputeBuffer(vertexs.Length, sizeof(float) * 3);
                 _Vertexs.SetData(vertexs);
                 _Triangles = new ComputeBuffer(triangles.Length, sizeof(int));
                 _Triangles.SetData(triangles);
                 RW_Selects = new ComputeBuffer(vertexs.Length, sizeof(float));
+                RW_Depths = new ComputeBuffer(vertexs.Length, sizeof(float));
             }
 
             public abstract void Update(Camera camera, Vector3 mouseTexcoord, float brushSize, float brushDepth);
 
-            public virtual void SpreadSelects(int spread)
+            public virtual float GetMinDepth(Camera camera, Vector3 mouseTexcoord, float brushSize)
+            {
+                if (!IsAvailable)
+                {
+                    Clear();
+                    return 0;
+                }
+                Update(camera, mouseTexcoord, brushSize, ModEditorConstants.BrushMaxDepth);
+                float[] _depths = new float[RW_Depths.count];
+                RW_Depths.GetData(_depths);
+                float[] _selects = new float[RW_Selects.count];
+                RW_Selects.GetData(_selects);
+                MinNum job = new MinNum()
+                {
+                    nums = new NativeArray<float>(_depths, Allocator.TempJob),
+                    selects = new NativeArray<float>(_selects, Allocator.TempJob),
+                    min = new NativeArray<float>(new float[] { float.MaxValue }, Allocator.TempJob)
+                };
+                JobHandle jobHandle = job.Schedule();
+                jobHandle.Complete();
+                float res = job.min[0];
+                job.min.Dispose();
+                return res;
+            }
+            
+            public virtual void SpreadSelects(bool spreadOrRespread)
             {
                 if (!IsAvailable)
                 {
                     Clear();
                     return;
                 }
-                CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_SpreadSelectInTirangle, "RW_Selects", RW_Selects);
-                CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_SpreadSelectInTirangle, "_Triangles", _Triangles);
-                CalcUtil.Self.CalcVertexShader.Dispatch(CalcUtil.Self.kernel_SpreadSelectInTirangle, Mathf.CeilToInt((float)_Triangles.count / 1024), 1, 1);
+                if (spreadOrRespread)
+                {
+                    CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_SpreadSelectInTirangle, "RW_Selects", RW_Selects);
+                    CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_SpreadSelectInTirangle, "_Triangles", _Triangles);
+                    CalcUtil.Self.CalcVertexShader.Dispatch(CalcUtil.Self.kernel_SpreadSelectInTirangle, Mathf.CeilToInt((float)_Triangles.count / 1024), 1, 1);
+                    _SpreadLevel--;
+                    float[] _selects = new float[RW_Selects.count];
+                    RW_Selects.GetData(_selects);
+                    UnifyOverlapSelectedVertex job = new UnifyOverlapSelectedVertex()
+                    {
+                        vertexs = new NativeArray<Vector3>(_vertexs, Allocator.TempJob),
+                        selects = new NativeArray<float>(_selects, Allocator.TempJob),
+                        spreadLevel = _SpreadLevel
+                    };
+                    JobHandle jobHandle = job.Schedule();
+                    jobHandle.Complete();
+                    RW_Selects.SetData(job.selects);
+                    job.selects.Dispose();
+                }
+                else
+                {
+                    CalcUtil.Self.CalcVertexShader.SetFloat("_SpreadLevel", _SpreadLevel);
+                    CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_RespreadSelectInTirangle, "RW_Selects", RW_Selects);
+                    CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_RespreadSelectInTirangle, "_Triangles", _Triangles);
+                    CalcUtil.Self.CalcVertexShader.Dispatch(CalcUtil.Self.kernel_RespreadSelectInTirangle, Mathf.CeilToInt((float)_Triangles.count / 1024), 1, 1);
+                    _SpreadLevel++;
+                }
             }
 
             public virtual void BindMaterial(Material material)
@@ -71,6 +140,7 @@ namespace ModEditor
             public void ClearSpread()
             {
                 _clearSpread = true;
+                _SpreadLevel = 0;
             }
 
             public virtual void Clear()
@@ -78,6 +148,7 @@ namespace ModEditor
                 _Vertexs.Dispose();
                 _Triangles.Dispose();
                 RW_Selects.Dispose();
+                RW_Depths.Dispose();
                 if (material != null)
                     Object.DestroyImmediate(material);
             }
@@ -149,6 +220,7 @@ namespace ModEditor
                 CalcUtil.Self.CalcVertexShader.SetInt("_ClearSpread", clearSpread ? 1 : 0);
                 CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_CalcVertexsWithScreenScope, "_Vertexs", _Vertexs);
                 CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_CalcVertexsWithScreenScope, "RW_Selects", RW_Selects);
+                CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_CalcVertexsWithScreenScope, "RW_Depths", RW_Depths);
                 CalcUtil.Self.CalcVertexShader.Dispatch(CalcUtil.Self.kernel_CalcVertexsWithScreenScope, Mathf.CeilToInt((float)_Vertexs.count / 1024), 1, 1);
             }
         }
@@ -176,6 +248,7 @@ namespace ModEditor
                 CalcUtil.Self.CalcVertexShader.SetInt("_ClearSpread", clearSpread ? 1 : 0);
                 CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_CalcVertexsWithScreenScope, "_Vertexs", _Vertexs);
                 CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_CalcVertexsWithScreenScope, "RW_Selects", RW_Selects);
+                CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_CalcVertexsWithScreenScope, "RW_Depths", RW_Depths);
                 CalcUtil.Self.CalcVertexShader.Dispatch(CalcUtil.Self.kernel_CalcVertexsWithScreenScope, Mathf.CeilToInt((float)_Vertexs.count / 1024), 1, 1);
             }
         }

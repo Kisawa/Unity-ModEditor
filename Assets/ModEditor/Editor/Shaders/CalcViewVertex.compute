@@ -1,5 +1,6 @@
 ﻿#pragma kernel CalcVertexsWithScreenScope
 #pragma kernel SpreadSelectInTirangle
+#pragma kernel RespreadSelectInTirangle
 #pragma kernel WriteVertexColorUseSelectData
 
 float4x4 _MV;
@@ -10,12 +11,14 @@ float _Depth;
 int _ClearSpread;
 StructuredBuffer<float3> _Vertexs;
 RWStructuredBuffer<float> RW_Selects;
+RWStructuredBuffer<float> RW_Depths;
 
 [numthreads(1024,1,1)]
 void CalcVertexsWithScreenScope(uint3 id : SV_DispatchThreadID)
 {
-	float3 viewPos = mul(_MV, float4(_Vertexs[id.x], 1.0));
+	float3 viewPos = mul(_MV, float4(_Vertexs[id.x], 1.0)).xyz;
 	float depth = -viewPos.z;
+	RW_Depths[id.x] = depth;
 	float4 clipPos = mul(_P, float4(viewPos, 1.0));
 	float2 screenPos = (clipPos.xy + clipPos.w) * 0.5;
 	float2 uv = screenPos / clipPos.w;
@@ -23,9 +26,7 @@ void CalcVertexsWithScreenScope(uint3 id : SV_DispatchThreadID)
 	_MouseTexcoord.x *= _MouseTexcoord.z;
 	float dis = length(uv - _MouseTexcoord.xy);
 	float res = (1 - step(_Size, dis)) * (1 - step(_Depth, depth));
-	if(_ClearSpread == 1)
-		RW_Selects[id.x] = clamp(RW_Selects[id.x], 0, 1);
-	if(RW_Selects[id.x] >= 0)
+	if(_ClearSpread == 1 || RW_Selects[id.x] >= 0)
 		RW_Selects[id.x] = res;
 }
 
@@ -43,8 +44,31 @@ void SpreadSelectInTirangle(uint3 id: SV_DispatchThreadID)
 	float res = min(select0, select1);
 	res = min(res, select2) - 1;
 	res -= (1 - any(res));
-	res = any(float3(select0, select1, select2)) * res;
-	RW_Selects[vertex_id0] += (1 - any(select0)) * res;
+	int write = any(float3(select0, select1, select2)) * (1 - select0);
+	if(write == 1)
+		RW_Selects[vertex_id0] = res;
+}
+
+float _SpreadLevel;
+[numthreads(1024,1,1)]
+void RespreadSelectInTirangle(uint3 id: SV_DispatchThreadID)
+{
+	int layer = id.x / 3;
+	int vertex_id0 = _Triangles[fmod(id.x, 3) + layer * 3];
+	int vertex_id1 = _Triangles[fmod(id.x + 1, 3) + layer * 3];
+	int vertex_id2 = _Triangles[fmod(id.x + 2, 3) + layer * 3];
+	float select0 = RW_Selects[vertex_id0];
+	float select1 = RW_Selects[vertex_id1];
+	float select2 = RW_Selects[vertex_id2];
+	if(_SpreadLevel < 0)
+	{
+		if(select0 <= _SpreadLevel)
+			RW_Selects[vertex_id0] = 0;
+		if(select1 <= _SpreadLevel)
+			RW_Selects[vertex_id1] = 0;
+		if(select2 <= _SpreadLevel)
+			RW_Selects[vertex_id2] = 0;
+	}
 }
 
 float4 _Color;

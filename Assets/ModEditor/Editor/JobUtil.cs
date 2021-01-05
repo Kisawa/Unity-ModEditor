@@ -32,4 +32,60 @@ namespace ModEditor
                 output[i] = avgNormalDic[vertexs[i]];
         }
     }
+
+    public struct MinNum : IJob
+    {
+        [ReadOnly]
+        [DeallocateOnJobCompletion]
+        public NativeArray<float> selects;
+
+        [ReadOnly]
+        [DeallocateOnJobCompletion]
+        public NativeArray<float> nums;
+
+        public NativeArray<float> min;
+
+        public void Execute()
+        {
+            for (int i = 0; i < selects.Length; i++)
+            {
+                float num = nums[i];
+                if (selects[i] != 0 && min[0] > num)
+                    min[0] = num;
+            }
+        }
+    }
+
+    public struct UnifyOverlapSelectedVertex : IJob
+    {
+        [ReadOnly]
+        [DeallocateOnJobCompletion]
+        public NativeArray<Vector3> vertexs;
+
+        public NativeArray<float> selects;
+
+        public float spreadLevel;
+
+        public void Execute()
+        {
+            Dictionary<Vector3, float> vertexDic = new Dictionary<Vector3, float>();
+            for (var i = 0; i < vertexs.Length; i++)
+            {
+                Vector3 vertex = vertexs[i];
+                float select = selects[i];
+                if (vertexDic.TryGetValue(vertex, out float res))
+                {
+                    if (res == spreadLevel || select == spreadLevel)
+                        vertexDic[vertex] = spreadLevel;
+                }
+                else
+                    vertexDic.Add(vertex, select);
+            }
+            for (int i = 0; i < selects.Length; i++)
+            {
+                if(selects[i] == 0)
+                    selects[i] = vertexDic[vertexs[i]];
+            }
+        }
+    }
 }
