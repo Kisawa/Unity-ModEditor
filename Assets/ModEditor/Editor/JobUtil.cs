@@ -50,7 +50,7 @@ namespace ModEditor
             for (int i = 0; i < selects.Length; i++)
             {
                 float num = nums[i];
-                if (selects[i] != 0 && min[0] > num)
+                if (selects[i] > 0 && min[0] > num)
                     min[0] = num;
             }
         }

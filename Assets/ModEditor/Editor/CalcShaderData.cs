@@ -65,6 +65,7 @@ namespace ModEditor
                 _Triangles = new ComputeBuffer(triangles.Length, sizeof(int));
                 _Triangles.SetData(triangles);
                 RW_Selects = new ComputeBuffer(vertexs.Length, sizeof(float));
+                RW_Selects.SetData(Enumerable.Repeat(0, RW_Selects.count).ToArray());
                 RW_Depths = new ComputeBuffer(vertexs.Length, sizeof(float));
             }
 

@@ -107,6 +107,7 @@ namespace ModEditor
                     depth = _depth;
             }
             Manager.BrushDepth = depth + 0.001f;
+            Mouse_Update();
         }
 
         private void Control_OnMouse_DragLeft()

@@ -362,7 +362,7 @@ namespace ModEditor
             meshFilter.sharedMesh = mesh;
             EditorUtility.SetDirty(target);
         }
-
+        
         public void SetEditingMesh(GameObject target, SkinnedMeshRenderer skinnedMeshRenderer)
         {
             if (skinnedMeshRenderer.sharedMesh == null)

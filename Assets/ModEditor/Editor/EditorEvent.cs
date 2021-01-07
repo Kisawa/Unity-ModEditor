@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace ModEditor
@@ -25,6 +26,7 @@ namespace ModEditor
             Key.UpdateAltState(@event.alt);
             Key.UpdateControlAndAltState(@event.control && @event.alt);
             Key.UpdateControlOrAltState(@event.control || @event.alt);
+            Key.UpdateCapsLockState(@event.capsLock);
             if (@event.isKey)
             {
                 if (@event.type == EventType.KeyDown)
@@ -110,6 +112,33 @@ namespace ModEditor
                                 @event.Use();
                         }
                     }
+                    if (@event.keyCode == KeyCode.CapsLock)
+                    {
+                        if (!@event.control && !@event.alt)
+                        {
+                            OnKey.CapsLock.InvokeDown();
+                            if (Use.OnKey.CapsLock.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.control && !@event.alt)
+                        {
+                            Control.OnKey.CapsLock.InvokeDown();
+                            if (Use.Control.OnKey.CapsLock.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.alt && !@event.control)
+                        {
+                            Alt.OnKey.CapsLock.InvokeDown();
+                            if (Use.Alt.OnKey.CapsLock.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt)
+                        {
+                            ControlAndAlt.OnKey.CapsLock.InvokeDown();
+                            if (Use.ControlAndAlt.OnKey.CapsLock.InvokeDown())
+                                @event.Use();
+                        }
+                    }
                 }
                 if (@event.type == EventType.KeyUp)
                 {
@@ -191,6 +220,33 @@ namespace ModEditor
                         {
                             ControlAndAlt.OnKey.Space.InvokeUp();
                             if (Use.ControlAndAlt.OnKey.Space.InvokeUp())
+                                @event.Use();
+                        }
+                    }
+                    if (@event.keyCode == KeyCode.CapsLock)
+                    {
+                        if (!@event.control && !@event.alt)
+                        {
+                            OnKey.CapsLock.InvokeUp();
+                            if (Use.OnKey.CapsLock.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && !@event.alt)
+                        {
+                            Control.OnKey.CapsLock.InvokeUp();
+                            if (Use.Control.OnKey.CapsLock.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.alt && !@event.control)
+                        {
+                            Alt.OnKey.CapsLock.InvokeUp();
+                            if (Use.Alt.OnKey.CapsLock.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt)
+                        {
+                            ControlAndAlt.OnKey.CapsLock.InvokeUp();
+                            if (Use.ControlAndAlt.OnKey.CapsLock.InvokeUp())
                                 @event.Use();
                         }
                     }
@@ -366,10 +422,12 @@ namespace ModEditor
         public static bool Alt { get; private set; }
         public static bool ControlAndAlt { get; private set; }
         public static bool ControlOrAlt { get; private set; }
+        public static bool CapsLock { get; private set; }
         public static event Action<bool> ControlStateChange;
         public static event Action<bool> AltStateChange;
         public static event Action<bool> ControlAndAltStateChange;
         public static event Action<bool> ControlOrAltStateChange;
+        public static event Action<bool> CapsLockStateChange;
         public static void UpdateControlState(bool res)
         {
             if (Control == res)
@@ -398,8 +456,15 @@ namespace ModEditor
             ControlOrAlt = res;
             ControlOrAltStateChange?.Invoke(ControlOrAlt);
         }
+        public static void UpdateCapsLockState(bool res)
+        {
+            if (CapsLock == res)
+                return;
+            CapsLock = res;
+            CapsLockStateChange?.Invoke(CapsLock);
+        }
 
-        public abstract class Base
+        public abstract class Key_Base
         {
             public event Action Down;
             public event Action Up;
@@ -419,20 +484,24 @@ namespace ModEditor
             }
         }
 
-        public class Tab : Base { }
+        public class Key_Tab : Key_Base { }
 
-        public class BackQuote : Base { }
+        public class Key_BackQuote : Key_Base { }
 
-        public class Space : Base { }
+        public class Key_Space : Key_Base { }
+
+        public class Key_CapsLock : Key_Base { }
     }
 
     public class OnKey
     {
-        public Key.Tab Tab = new Key.Tab();
+        public Key.Key_Tab Tab = new Key.Key_Tab();
 
-        public Key.BackQuote BackQuote = new Key.BackQuote();
+        public Key.Key_BackQuote BackQuote = new Key.Key_BackQuote();
 
-        public Key.Space Space = new Key.Space();
+        public Key.Key_Space Space = new Key.Key_Space();
+
+        public Key.Key_CapsLock CapsLock = new Key.Key_CapsLock();
     }
 
     public static class Mouse
