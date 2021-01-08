@@ -50,7 +50,8 @@ namespace ModEditor
             for (int i = 0; i < selects.Length; i++)
             {
                 float num = nums[i];
-                if (selects[i] > 0 && min[0] > num)
+                float select = selects[i];
+                if (selects[i] > 0 && select <= 1 && min[0] > num)
                     min[0] = num;
             }
         }
@@ -64,7 +65,7 @@ namespace ModEditor
 
         public NativeArray<float> selects;
 
-        public float spreadLevel;
+        public int spreadLevel;
 
         public void Execute()
         {

@@ -9,6 +9,10 @@ namespace ModEditor
 {
     public sealed class CalcShaderData
     {
+        static ModEditorWindow ModEditor => ModEditorWindow.Self;
+
+        public static Dictionary<Transform, (float[], int)> SelectCache = new Dictionary<Transform, (float[], int)>();
+
         public abstract class CalcVertexsData
         {
             public Transform trans { get; protected set; }
@@ -22,7 +26,7 @@ namespace ModEditor
             {
                 get 
                 {
-                    if (trans == null || renderer == null || material == null || !_Vertexs.IsValid() || !_Triangles.IsValid() || !RW_Selects.IsValid())
+                    if (trans == null || renderer == null || material == null || !_Vertexs.IsValid() || !_Triangles.IsValid() || !RW_Selects.IsValid() ||! RW_Depths.IsValid())
                         return false;
                     return true;
                 }
@@ -44,8 +48,8 @@ namespace ModEditor
                 }
             }
 
-            float spreadLevel = 0;
-            float _SpreadLevel
+            int spreadLevel = 0;
+            int _SpreadLevel
             {
                 get => spreadLevel;
                 set
@@ -59,14 +63,26 @@ namespace ModEditor
             public CalcVertexsData(Renderer renderer, Vector3[] vertexs, int[] triangles)
             {
                 this.renderer = renderer;
+                trans = renderer.transform;
                 _vertexs = vertexs;
                 _Vertexs = new ComputeBuffer(vertexs.Length, sizeof(float) * 3);
                 _Vertexs.SetData(vertexs);
                 _Triangles = new ComputeBuffer(triangles.Length, sizeof(int));
                 _Triangles.SetData(triangles);
-                RW_Selects = new ComputeBuffer(vertexs.Length, sizeof(float));
-                RW_Selects.SetData(Enumerable.Repeat(0, RW_Selects.count).ToArray());
                 RW_Depths = new ComputeBuffer(vertexs.Length, sizeof(float));
+                RW_Selects = new ComputeBuffer(vertexs.Length, sizeof(float));
+                if (SelectCache.TryGetValue(trans, out (float[], int) cache))
+                {
+                    if (cache.Item1.Length == RW_Depths.count)
+                    {
+                        RW_Selects.SetData(cache.Item1);
+                        spreadLevel = cache.Item2;
+                        return;
+                    }
+                    else
+                        SelectCache.Remove(trans);
+                }
+                RW_Selects.SetData(Enumerable.Repeat(0, RW_Selects.count).ToArray());
             }
 
             public abstract void Update(Camera camera, Vector3 mouseTexcoord, float brushSize, float brushDepth);
@@ -96,14 +112,14 @@ namespace ModEditor
                 return res;
             }
             
-            public virtual void SpreadSelects(bool spreadOrRespread)
+            public virtual void SpreadSelects(bool spread)
             {
                 if (!IsAvailable)
                 {
                     Clear();
                     return;
                 }
-                if (spreadOrRespread)
+                if (spread)
                 {
                     CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_SpreadSelectInTirangle, "RW_Selects", RW_Selects);
                     CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_SpreadSelectInTirangle, "_Triangles", _Triangles);
@@ -120,16 +136,38 @@ namespace ModEditor
                     JobHandle jobHandle = job.Schedule();
                     jobHandle.Complete();
                     RW_Selects.SetData(job.selects);
+                    SelectCache[trans] = (job.selects.ToArray(), _SpreadLevel);
                     job.selects.Dispose();
                 }
                 else
                 {
-                    CalcUtil.Self.CalcVertexShader.SetFloat("_SpreadLevel", _SpreadLevel);
+                    CalcUtil.Self.CalcVertexShader.SetInt("_SpreadLevel", _SpreadLevel);
                     CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_RespreadSelectInTirangle, "RW_Selects", RW_Selects);
                     CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_RespreadSelectInTirangle, "_Triangles", _Triangles);
                     CalcUtil.Self.CalcVertexShader.Dispatch(CalcUtil.Self.kernel_RespreadSelectInTirangle, Mathf.CeilToInt((float)_Triangles.count / 1024), 1, 1);
+                    float[] selects = new float[RW_Selects.count];
+                    RW_Selects.GetData(selects);
                     _SpreadLevel++;
+                    SelectCache[trans] = (selects, _SpreadLevel);
                 }
+            }
+
+            public virtual void SelectLock(bool unlock)
+            {
+                if (unlock)
+                {
+                    CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_UnlockSelects, "RW_Selects", RW_Selects);
+                    CalcUtil.Self.CalcVertexShader.Dispatch(CalcUtil.Self.kernel_UnlockSelects, Mathf.CeilToInt((float)_Triangles.count / 1024), 1, 1);
+                }
+                else
+                {
+                    CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_LockSelects, "RW_Selects", RW_Selects);
+                    CalcUtil.Self.CalcVertexShader.Dispatch(CalcUtil.Self.kernel_LockSelects, Mathf.CeilToInt((float)_Triangles.count / 1024), 1, 1);
+                }
+                _SpreadLevel = 0;
+                float[] selects = new float[RW_Selects.count];
+                RW_Selects.GetData(selects);
+                SelectCache[trans] = (selects, _SpreadLevel);
             }
 
             public virtual void BindMaterial(Material material)
@@ -142,6 +180,10 @@ namespace ModEditor
             {
                 _clearSpread = true;
                 _SpreadLevel = 0;
+                if (ModEditor.BrushLock)
+                    return;
+                if (SelectCache.ContainsKey(trans))
+                    SelectCache.Remove(trans);
             }
 
             public virtual void Clear()
@@ -163,7 +205,7 @@ namespace ModEditor
             {
                 get 
                 {
-                    if (trans == null || renderer == null || meshFilter == null || meshFilter.sharedMesh == null || material == null || !_Vertexs.IsValid() || !_Triangles.IsValid() || !RW_Selects.IsValid())
+                    if (trans == null || renderer == null || meshFilter == null || meshFilter.sharedMesh == null || material == null || !_Vertexs.IsValid() || !_Triangles.IsValid() || !RW_Selects.IsValid() || !RW_Depths.IsValid())
                         return false;
                     return true;
                 }
@@ -172,7 +214,6 @@ namespace ModEditor
             public CalcMeshVertexsData(Renderer renderer, MeshFilter meshFilter): base(renderer, meshFilter.sharedMesh.vertices, meshFilter.sharedMesh.triangles)
             {
                 this.meshFilter = meshFilter;
-                trans = meshFilter.transform;
             }
         }
 
@@ -184,7 +225,7 @@ namespace ModEditor
             {
                 get
                 {
-                    if (trans == null || renderer == null || skinnedMesh == null || skinnedMesh.sharedMesh == null || material == null || !_Vertexs.IsValid() || !_Triangles.IsValid() || !RW_Selects.IsValid())
+                    if (trans == null || renderer == null || skinnedMesh == null || skinnedMesh.sharedMesh == null || material == null || !_Vertexs.IsValid() || !_Triangles.IsValid() || !RW_Selects.IsValid() || !RW_Depths.IsValid())
                         return false;
                     return true;
                 }
@@ -195,7 +236,6 @@ namespace ModEditor
             public CalcSkinnedMeshMeshVertexsData(SkinnedMeshRenderer skinnedMesh) : base(skinnedMesh, skinnedMesh.sharedMesh.vertices, skinnedMesh.sharedMesh.triangles)
             {
                 this.skinnedMesh = skinnedMesh;
-                trans = skinnedMesh.transform;
                 bakedMesh = new Mesh();
             }
         }

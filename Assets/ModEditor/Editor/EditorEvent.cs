@@ -253,117 +253,294 @@ namespace ModEditor
                 }
             }
 
-            Mouse.UpdateMouseState(@event.isMouse);
+            Mouse.UpdateMouseState(@event.isMouse, @event.type == EventType.MouseDown || @event.type == EventType.MouseUp);
             Mouse.UpdateMousePos(@event, camera);
             if (@event.isMouse)
             {
-                if (@event.button == 0)
+                if (@event.type == EventType.MouseMove)
                 {
-                    if (@event.type == EventType.MouseDown)
+                    if (!@event.control && !@event.alt)
                     {
-                        if (!@event.control && !@event.alt)
+                        OnMouse.InvokeMove();
+                        if (Use.OnMouse.InvokeMove())
+                            @event.Use();
+                    }
+                    if (@event.control && !@event.alt)
+                    {
+                        Control.OnMouse.InvokeMove();
+                        if (Use.Control.OnMouse.InvokeMove())
+                            @event.Use();
+                    }
+                    if (@event.alt && !@event.control)
+                    {
+                        Alt.OnMouse.InvokeMove();
+                        if (Use.Alt.OnMouse.InvokeMove())
+                            @event.Use();
+                    }
+                    if (@event.control && @event.alt)
+                    {
+                        ControlAndAlt.OnMouse.InvokeMove();
+                        if (Use.ControlAndAlt.OnMouse.InvokeMove())
+                            @event.Use();
+                    }
+                }
+                if (@event.type == EventType.MouseDown)
+                {
+                    if (!@event.control && !@event.alt)
+                    {
+                        if (@event.button == 0)
                         {
                             OnMouse.InvokeDownLeft();
                             if (Use.OnMouse.InvokeDownLeft())
                                 @event.Use();
                         }
-                        if (@event.control && !@event.alt)
+                        else if (@event.button == 1)
+                        {
+                            OnMouse.InvokeDownRight();
+                            if (Use.OnMouse.InvokeDownRight())
+                                @event.Use();
+                        }
+                        else if (@event.button == 2)
+                        {
+                            OnMouse.InvokeDownScroll();
+                            if (Use.OnMouse.InvokeDownScroll())
+                                @event.Use();
+                        }
+                    }
+                    if (@event.control && !@event.alt)
+                    {
+                        if (@event.button == 0)
                         {
                             Control.OnMouse.InvokeDownLeft();
                             if (Use.Control.OnMouse.InvokeDownLeft())
                                 @event.Use();
                         }
-                        if (@event.alt && !@event.control)
+                        else if (@event.button == 1)
+                        {
+                            Control.OnMouse.InvokeDownRight();
+                            if (Use.Control.OnMouse.InvokeDownRight())
+                                @event.Use();
+                        }
+                        else if (@event.button == 2)
+                        {
+                            Control.OnMouse.InvokeDownScroll();
+                            if (Use.Control.OnMouse.InvokeDownScroll())
+                                @event.Use();
+                        }
+                    }
+                    if (@event.alt && !@event.control)
+                    {
+                        if (@event.button == 0)
                         {
                             Alt.OnMouse.InvokeDownLeft();
                             if (Use.Alt.OnMouse.InvokeDownLeft())
                                 @event.Use();
                         }
-                        if (@event.control && @event.alt)
+                        else if (@event.button == 1)
+                        {
+                            Alt.OnMouse.InvokeDownRight();
+                            if (Use.Alt.OnMouse.InvokeDownRight())
+                                @event.Use();
+                        }
+                        else if (@event.button == 2)
+                        {
+                            Alt.OnMouse.InvokeDownScroll();
+                            if (Use.Alt.OnMouse.InvokeDownScroll())
+                                @event.Use();
+                        }
+                    }
+                    if (@event.control && @event.alt)
+                    {
+                        if (@event.button == 0)
                         {
                             ControlAndAlt.OnMouse.InvokeDownLeft();
                             if (Use.ControlAndAlt.OnMouse.InvokeDownLeft())
                                 @event.Use();
                         }
+                        else if (@event.button == 1)
+                        {
+                            ControlAndAlt.OnMouse.InvokeDownRight();
+                            if (Use.ControlAndAlt.OnMouse.InvokeDownRight())
+                                @event.Use();
+                        }
+                        else if (@event.button == 2)
+                        {
+                            ControlAndAlt.OnMouse.InvokeDownScroll();
+                            if (Use.ControlAndAlt.OnMouse.InvokeDownScroll())
+                                @event.Use();
+                        }
                     }
-                    if (@event.type == EventType.MouseUp)
+                }
+                if (@event.type == EventType.MouseUp)
+                {
+                    if (!@event.control && !@event.alt)
                     {
-                        if (!@event.control && !@event.alt)
+                        if (@event.button == 0)
                         {
                             OnMouse.InvokeUpLeft();
                             if (Use.OnMouse.InvokeUpLeft())
                                 @event.Use();
                         }
-                        if (@event.control && !@event.alt)
+                        else if (@event.button == 1)
+                        {
+                            OnMouse.InvokeUpRight();
+                            if (Use.OnMouse.InvokeUpRight())
+                                @event.Use();
+                        }
+                        else if (@event.button == 2)
+                        {
+                            OnMouse.InvokeUpScroll();
+                            if (Use.OnMouse.InvokeUpScroll())
+                                @event.Use();
+                        }
+                    }
+                    if (@event.control && !@event.alt)
+                    {
+                        if (@event.button == 0)
                         {
                             Control.OnMouse.InvokeUpLeft();
                             if (Use.Control.OnMouse.InvokeUpLeft())
                                 @event.Use();
                         }
-                        if (@event.alt && !@event.control)
+                        else if (@event.button == 1)
+                        {
+                            Control.OnMouse.InvokeUpRight();
+                            if (Use.Control.OnMouse.InvokeUpRight())
+                                @event.Use();
+                        }
+                        else if (@event.button == 2)
+                        {
+                            Control.OnMouse.InvokeUpScroll();
+                            if (Use.Control.OnMouse.InvokeUpScroll())
+                                @event.Use();
+                        }
+                    }
+                    if (@event.alt && !@event.control)
+                    {
+                        if (@event.button == 0)
                         {
                             Alt.OnMouse.InvokeUpLeft();
                             if (Use.Alt.OnMouse.InvokeUpLeft())
                                 @event.Use();
                         }
-                        if (@event.control && @event.alt)
+                        else if (@event.button == 1)
+                        {
+                            Alt.OnMouse.InvokeUpRight();
+                            if (Use.Alt.OnMouse.InvokeUpRight())
+                                @event.Use();
+                        }
+                        else if (@event.button == 2)
+                        {
+                            Alt.OnMouse.InvokeUpScroll();
+                            if (Use.Alt.OnMouse.InvokeUpScroll())
+                                @event.Use();
+                        }
+                    }
+                    if (@event.control && @event.alt)
+                    {
+                        if (@event.button == 0)
                         {
                             ControlAndAlt.OnMouse.InvokeUpLeft();
                             if (Use.ControlAndAlt.OnMouse.InvokeUpLeft())
                                 @event.Use();
                         }
-                    }
-                    if (@event.type == EventType.MouseMove)
-                    {
-                        if (!@event.control && !@event.alt)
+                        else if (@event.button == 1)
                         {
-                            OnMouse.InvokeMove();
-                            if (Use.OnMouse.InvokeMove())
+                            ControlAndAlt.OnMouse.InvokeUpRight();
+                            if (Use.ControlAndAlt.OnMouse.InvokeUpRight())
                                 @event.Use();
                         }
-                        if (@event.control && !@event.alt)
+                        else if (@event.button == 2)
                         {
-                            Control.OnMouse.InvokeMove();
-                            if (Use.Control.OnMouse.InvokeMove())
-                                @event.Use();
-                        }
-                        if (@event.alt && !@event.control)
-                        {
-                            Alt.OnMouse.InvokeMove();
-                            if (Use.Alt.OnMouse.InvokeMove())
-                                @event.Use();
-                        }
-                        if (@event.control && @event.alt)
-                        {
-                            ControlAndAlt.OnMouse.InvokeMove();
-                            if (Use.ControlAndAlt.OnMouse.InvokeMove())
+                            ControlAndAlt.OnMouse.InvokeUpScroll();
+                            if (Use.ControlAndAlt.OnMouse.InvokeUpScroll())
                                 @event.Use();
                         }
                     }
-                    if (@event.type == EventType.MouseDrag)
+                }
+                if (@event.type == EventType.MouseDrag)
+                {
+                    if (!@event.control && !@event.alt)
                     {
-                        if (!@event.control && !@event.alt)
+                        if (@event.button == 0)
                         {
                             OnMouse.InvokeDragLeft();
                             if (Use.OnMouse.InvokeDragLeft())
                                 @event.Use();
                         }
-                        if (@event.control && !@event.alt)
+                        else if (@event.button == 1)
+                        {
+                            OnMouse.InvokeDragRight();
+                            if (Use.OnMouse.InvokeDragRight())
+                                @event.Use();
+                        }
+                        else if (@event.button == 2)
+                        {
+                            OnMouse.InvokeDragScroll();
+                            if (Use.OnMouse.InvokeDragScroll())
+                                @event.Use();
+                        }
+                    }
+                    if (@event.control && !@event.alt)
+                    {
+                        if (@event.button == 0)
                         {
                             Control.OnMouse.InvokeDragLeft();
                             if (Use.Control.OnMouse.InvokeDragLeft())
                                 @event.Use();
                         }
-                        if (@event.alt && !@event.control)
+                        else if (@event.button == 1)
+                        {
+                            Control.OnMouse.InvokeDragRight();
+                            if (Use.Control.OnMouse.InvokeDragRight())
+                                @event.Use();
+                        }
+                        else if (@event.button == 2)
+                        {
+                            Control.OnMouse.InvokeDragScroll();
+                            if (Use.Control.OnMouse.InvokeDragScroll())
+                                @event.Use();
+                        }
+                    }
+                    if (@event.alt && !@event.control)
+                    {
+                        if (@event.button == 0)
                         {
                             Alt.OnMouse.InvokeDragLeft();
                             if (Use.Alt.OnMouse.InvokeDragLeft())
                                 @event.Use();
                         }
-                        if (@event.control && @event.alt)
+                        else if (@event.button == 1)
+                        {
+                            Alt.OnMouse.InvokeDragRight();
+                            if (Use.Alt.OnMouse.InvokeDragRight())
+                                @event.Use();
+                        }
+                        else if (@event.button == 2)
+                        {
+                            Alt.OnMouse.InvokeDragScroll();
+                            if (Use.Alt.OnMouse.InvokeDragScroll())
+                                @event.Use();
+                        }
+                    }
+                    if (@event.control && @event.alt)
+                    {
+                        if (@event.button == 0)
                         {
                             ControlAndAlt.OnMouse.InvokeDragLeft();
                             if (Use.ControlAndAlt.OnMouse.InvokeDragLeft())
+                                @event.Use();
+                        }
+                        else if (@event.button == 1)
+                        {
+                            ControlAndAlt.OnMouse.InvokeDragRight();
+                            if (Use.ControlAndAlt.OnMouse.InvokeDragRight())
+                                @event.Use();
+                        }
+                        else if (@event.button == 2)
+                        {
+                            ControlAndAlt.OnMouse.InvokeDragScroll();
+                            if (Use.ControlAndAlt.OnMouse.InvokeDragScroll())
                                 @event.Use();
                         }
                     }
@@ -507,12 +684,14 @@ namespace ModEditor
     public static class Mouse
     {
         public static bool Is { get; private set; }
+        public static bool IsButton { get; private set; }
         public static event Action Update;
         static Vector3 screenTexcoord;
         public static Vector3 ScreenTexcoord => screenTexcoord;
-        public static void UpdateMouseState(bool res)
+        public static void UpdateMouseState(bool res, bool buttonRes)
         {
             Is = res;
+            IsButton = res && buttonRes;
             if (res)
                 Update?.Invoke();
         }
@@ -528,8 +707,14 @@ namespace ModEditor
     {
         public event Action DownLeft;
         public event Action UpLeft;
+        public event Action DownScroll;
+        public event Action UpScroll;
+        public event Action DownRight;
+        public event Action UpRight;
         public event Action Move;
         public event Action DragLeft;
+        public event Action DragScroll;
+        public event Action DragRight;
         public bool InvokeDownLeft()
         {
             if (DownLeft == null)
@@ -544,6 +729,34 @@ namespace ModEditor
             UpLeft.Invoke();
             return true;
         }
+        public bool InvokeDownScroll()
+        {
+            if (DownScroll == null)
+                return false;
+            DownScroll.Invoke();
+            return true;
+        }
+        public bool InvokeUpScroll()
+        {
+            if (UpScroll == null)
+                return false;
+            UpScroll.Invoke();
+            return true;
+        }
+        public bool InvokeDownRight()
+        {
+            if (DownRight == null)
+                return false;
+            DownRight.Invoke();
+            return true;
+        }
+        public bool InvokeUpRight()
+        {
+            if (UpRight == null)
+                return false;
+            UpRight.Invoke();
+            return true;
+        }
         public bool InvokeMove()
         {
             if (Move == null)
@@ -556,6 +769,20 @@ namespace ModEditor
             if (DragLeft == null)
                 return false;
             DragLeft.Invoke();
+            return true;
+        }
+        public bool InvokeDragScroll()
+        {
+            if (DragScroll == null)
+                return false;
+            DragScroll.Invoke();
+            return true;
+        }
+        public bool InvokeDragRight()
+        {
+            if (DragRight == null)
+                return false;
+            DragRight.Invoke();
             return true;
         }
     }

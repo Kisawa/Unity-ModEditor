@@ -14,10 +14,23 @@ namespace ModEditor
         static ModEditorWindow ModEditor => ModEditorWindow.Self;
 
         GUIContent icon;
-        public GUIContent toggleContent;
-        public GUIContent toggleOnContent;
+        GUIContent toggleContent;
+        GUIContent toggleOnContent;
+        GUIContent lockContent;
+        GUIContent unlockContent;
 
         public override GUIContent toolbarIcon => icon;
+
+        bool brushLock;
+        bool BrushLock
+        {
+            get
+            {
+                if (ModEditor != null && ModEditor.Manager != null)
+                    brushLock = ModEditor.BrushLock;
+                return brushLock;
+            }
+        }
 
         Color unselectedVertexColor = Color.white;
         Color UnselectedVertexColor
@@ -133,12 +146,16 @@ namespace ModEditor
 
         private void OnEnable()
         {
-            icon = EditorGUIUtility.IconContent("d_Mesh Icon");
-
+            if (icon == null)
+                icon = EditorGUIUtility.IconContent("d_Mesh Icon");
             if (toggleContent == null)
                 toggleContent = EditorGUIUtility.IconContent("ShurikenToggleHover");
             if (toggleOnContent == null)
                 toggleOnContent = EditorGUIUtility.IconContent("ShurikenToggleFocusedOn");
+            if (lockContent == null)
+                lockContent = EditorGUIUtility.IconContent("IN LockButton on act");
+            if (unlockContent == null)
+                unlockContent = EditorGUIUtility.IconContent("IN LockButton");
         }
 
         public override void OnToolGUI(EditorWindow window)
@@ -148,7 +165,12 @@ namespace ModEditor
             Handles.BeginGUI();
             Rect rect = new Rect(window.position.width - 250, window.position.height - 159, 240, 129);
             GUILayout.BeginArea(rect);
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label(BrushLock ? lockContent : unlockContent, "ToolbarButtonFlat");
             GUILayout.Label($"Current brush dpeth:  {BrushDepth}", "ToolbarButtonFlat");
+            EditorGUILayout.EndHorizontal();
+
             EditorGUILayout.BeginVertical("dragtabdropwindow", GUILayout.Width(rect.width), GUILayout.Height(rect.height));
             GUILayout.Label("Vertex View", "LODRenderersText");
 

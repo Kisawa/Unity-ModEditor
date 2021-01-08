@@ -30,6 +30,8 @@ namespace ModEditor
             EditorEvent.Alt.OnMouse.UpLeft += OnMouse_UpLeft;
             EditorEvent.ControlAndAlt.OnMouse.UpLeft += OnMouse_UpLeft;
             EditorEvent.OnMouse.DragLeft += OnMouse_DragLeft;
+            EditorEvent.Use.OnMouse.DownScroll += OnMouse_Scroll;
+            EditorEvent.Use.OnMouse.UpScroll += OnMouse_Scroll;
             if (brushCursor == null)
                 brushCursor = AssetDatabase.LoadAssetAtPath<Texture2D>($"{ModEditorWindow.ModEditorPath}Textures/brushCursor.png");
         }
@@ -44,6 +46,8 @@ namespace ModEditor
             EditorEvent.Alt.OnMouse.UpLeft -= OnMouse_UpLeft;
             EditorEvent.ControlAndAlt.OnMouse.UpLeft -= OnMouse_UpLeft;
             EditorEvent.OnMouse.DragLeft -= OnMouse_DragLeft;
+            EditorEvent.Use.OnMouse.DownScroll -= OnMouse_Scroll;
+            EditorEvent.Use.OnMouse.UpScroll -= OnMouse_Scroll;
             PlayerSettings.defaultCursor = defaultCursor;
             Cursor.SetCursor(defaultCursor, Vector2.zero, CursorMode.Auto);
         }
@@ -112,6 +116,8 @@ namespace ModEditor
         {
             write();
         }
+
+        private void OnMouse_Scroll() { }
 
         private void onSceneValidate(SceneView scene)
         {

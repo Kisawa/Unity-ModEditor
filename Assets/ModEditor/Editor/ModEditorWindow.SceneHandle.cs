@@ -49,6 +49,8 @@ namespace ModEditor
             private set => sceneHandleType = value;
         }
 
+        public bool BrushLock { get; private set; }
+
         public bool OnSceneGUI { get; set; }
 
         MouseCursor mouseCursor;
@@ -59,6 +61,7 @@ namespace ModEditor
             EditorEvent.Use.OnKey.Tab.Down += Tab_Down;
             EditorEvent.Use.OnKey.BackQuote.Down += BackQuote_Down;
             EditorEvent.Use.OnKey.Space.Down += Space_Down;
+            EditorEvent.Use.OnKey.CapsLock.Down += CapsLock_Down;
             EditorEvent.Use.Control.OnMouse.DragLeft += Control_OnMouse_DragLeft;
             EditorEvent.Use.Control.OnScrollWheel.Roll += Control_OnScrollWheel_Roll;
             EditorEvent.Use.Alt.OnScrollWheel.Roll += Alt_OnScrollWheel_Roll;
@@ -72,6 +75,7 @@ namespace ModEditor
             EditorEvent.Use.OnKey.Tab.Down -= Tab_Down;
             EditorEvent.Use.OnKey.BackQuote.Down -= BackQuote_Down;
             EditorEvent.Use.OnKey.Space.Down -= Space_Down;
+            EditorEvent.Use.OnKey.CapsLock.Down -= CapsLock_Down;
             EditorEvent.Use.Control.OnMouse.DragLeft -= Control_OnMouse_DragLeft;
             EditorEvent.Use.Control.OnScrollWheel.Roll -= Control_OnScrollWheel_Roll;
             EditorEvent.Use.Alt.OnScrollWheel.Roll -= Alt_OnScrollWheel_Roll;
@@ -110,6 +114,13 @@ namespace ModEditor
             Mouse_Update();
         }
 
+        private void CapsLock_Down()
+        {
+            BrushLock = !BrushLock;
+            for (int i = 0; i < CalcShaderDatas.Count; i++)
+                CalcShaderDatas[i].SelectLock(!BrushLock);
+        }
+
         private void Control_OnMouse_DragLeft()
         {
             if (TabType != ModEditorTabType.VertexBrush || !VertexView)
@@ -136,6 +147,8 @@ namespace ModEditor
 
         private void Mouse_Update()
         {
+            if (Mouse.IsButton)
+                return;
             for (int i = 0; i < CalcShaderDatas.Count; i++)
                 CalcShaderDatas[i].ClearSpread();
         }

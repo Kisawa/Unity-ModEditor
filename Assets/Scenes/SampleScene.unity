@@ -192,14 +192,15 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Mesh
       value: 
-      objectReference: {fileID: 5296098889576680553, guid: e0328b68c4af7f54e99a602820aee3e0,
+      objectReference: {fileID: 3643438412198623439, guid: e0328b68c4af7f54e99a602820aee3e0,
         type: 2}
     - target: {fileID: 919132149155446097, guid: 3f9dcd6db8a41ec4280b36e4eb2804c1,
         type: 3}
       propertyPath: m_Name
       value: teapot
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3451118302482216456, guid: 3f9dcd6db8a41ec4280b36e4eb2804c1, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 3f9dcd6db8a41ec4280b36e4eb2804c1, type: 3}
 --- !u!1 &432993020 stripped
 GameObject:
@@ -286,7 +287,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 466030893}
-  m_Mesh: {fileID: 1529779972415403203, guid: e0328b68c4af7f54e99a602820aee3e0, type: 2}
+  m_Mesh: {fileID: 5639568051874651949, guid: e0328b68c4af7f54e99a602820aee3e0, type: 2}
 --- !u!4 &466030897
 Transform:
   m_ObjectHideFlags: 0
@@ -1331,9 +1332,6 @@ MonoBehaviour:
   - '#UNKNOWN:490'
   - '#UNKNOWN:491'
   - '#UNKNOWN:492'
-  - '#UNKNOWN:493'
-  - '#UNKNOWN:494'
-  - '#UNKNOWN:495'
   vals:
   - {fileID: 963194225}
   - {fileID: 919132149155446097, guid: 92294c44128ddf54d8791606342d29e2, type: 3}
@@ -1457,9 +1455,6 @@ MonoBehaviour:
   - {fileID: 808531784}
   - {fileID: 609850242}
   - {fileID: 806345044}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
 --- !u!4 &769498143
 Transform:
   m_ObjectHideFlags: 1
@@ -1687,8 +1682,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.15263918, y: -0.6616522, z: 0.14067934, w: 0.7205047}
-  m_LocalPosition: {x: 0.24492335, y: 3.440837, z: 2.4357069}
+  m_LocalRotation: {x: -0.033097748, y: -0.94742996, z: 0.10321238, w: -0.3010453}
+  m_LocalPosition: {x: 1.4581888, y: 0.94925946, z: 1.1816959}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1792,7 +1787,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Mesh
       value: 
-      objectReference: {fileID: -1379034704880016954, guid: e0328b68c4af7f54e99a602820aee3e0,
+      objectReference: {fileID: 5464193357604012580, guid: e0328b68c4af7f54e99a602820aee3e0,
         type: 2}
     - target: {fileID: 919132149155446097, guid: 5a77f98e95fef134ca2b19e5c7411c8b,
         type: 3}

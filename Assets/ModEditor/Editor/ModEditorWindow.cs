@@ -181,6 +181,7 @@ namespace ModEditor
             tabIndex = -1;
             for (int i = 0; i < tabs.Count; i++)
                 tabs[i].OnDiable();
+            ClearCalcShaderData();
             Selection.selectionChanged -= selectionChanged;
             EditorApplication.hierarchyChanged -= hierarchyChanged;
             Undo.undoRedoPerformed -= undoRedoPerformed;
@@ -249,7 +250,8 @@ namespace ModEditor
         {
             if (currentScene != SceneManager.GetActiveScene())
                 refreshWindow();
-            refreshObjDic();
+            else
+                refreshObjDic();
             Repaint();
         }
 
@@ -345,6 +347,13 @@ namespace ModEditor
                         Manager.MeshDic.Add(obj, skinnedMeshRenderer.sharedMesh);
                 }
             }
+        }
+
+        public void ClearCalcShaderData()
+        {
+            for (int i = 0; i < CalcShaderDatas.Count; i++)
+                CalcShaderDatas[i].Clear();
+            CalcShaderDatas.Clear();
         }
 
         public void SetEditingMesh(GameObject target, MeshFilter meshFilter)

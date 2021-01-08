@@ -36,9 +36,6 @@ namespace ModEditor
             window.onVertexViewChange -= refreshBuffer;
             if (window.camera != null && buffer != null)
                 window.camera.RemoveCommandBuffer(cameraEvent, buffer);
-            for (int i = 0; i < window.CalcShaderDatas.Count; i++)
-                window.CalcShaderDatas[i].Clear();
-            window.CalcShaderDatas.Clear();
         }
 
         public override void Draw()
@@ -368,9 +365,7 @@ namespace ModEditor
         {
             if(buffer != null)
                 buffer.Clear();
-            for (int i = 0; i < window.CalcShaderDatas.Count; i++)
-                window.CalcShaderDatas[i].Clear();
-            window.CalcShaderDatas.Clear();
+            window.ClearCalcShaderData();
             if (window.camera == null || window.Manager.Target == null || window.Manager.TargetChildren.Count == 0)
                 return;
             updateMaterial();
