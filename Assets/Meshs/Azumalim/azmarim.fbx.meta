@@ -1,0 +1,202 @@
+fileFormatVersion: 2
+guid: 66dbec427603a1a4bbfeea76449c9914
+ModelImporter:
+  serializedVersion: 19301
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 0.mtl_earrings_azma
+    second: {fileID: 2100000, guid: deabaa3eda292a64e8fd5095ce3e1069, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 1.mtl_eye_azma
+    second: {fileID: 2100000, guid: 2868917400618a541860ac9445a0727c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 10.mtl_legwarmer_azma
+    second: {fileID: 2100000, guid: 313794853e8fb8b428e5232072dd705d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 11.mtl_nail_azma
+    second: {fileID: 2100000, guid: 41a5800b9688f4d409ba11be00a572e5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 12.mtl_namida_azma
+    second: {fileID: 2100000, guid: 9f68c85170562a84dad88041797084da, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 13.mtl_namida_azma1
+    second: {fileID: 2100000, guid: b6862573db420b14b96bcd875a625a02, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 14.mtl_parker_blk_azma
+    second: {fileID: 2100000, guid: 08bc87ddda67a1743842752cc1153b9a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 15.mtl_parker_white_azma
+    second: {fileID: 2100000, guid: a69d4bff2044ba14f9f6d8b131a4599d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 16.mtl_skin_hand_azma
+    second: {fileID: 2100000, guid: e4567175b611475449c1ffa9e05a3485, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 17.mtl_skirt_azma
+    second: {fileID: 2100000, guid: d7268bef67ed3ea48932d4ff31fb777e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 18.mtl_leg_azma_skin
+    second: {fileID: 2100000, guid: d8612708f4b7a37458e5cb7ddb4a33f6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 19.mtl_hair_grp_d_azma
+    second: {fileID: 2100000, guid: 87af7460cbcfa0a4cab59f5c47733be8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 2.mtl_eye_white_azma
+    second: {fileID: 2100000, guid: 83c39520ceb5cfe419683a8e91c97bb9, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 20.mtl_hair_grp_e_azma
+    second: {fileID: 2100000, guid: 7b0e77d4fcd0d6e4487432766498e379, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 3.mtl_eyeblow_azma
+    second: {fileID: 2100000, guid: 035733b708c14ba48a8137df57799911, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 4.mtl_eyelid_azma
+    second: {fileID: 2100000, guid: 54e837c0c62ff3149b3cf196bd57336d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 5.mtl_face_azma
+    second: {fileID: 2100000, guid: c2ecd2534424c9d408c413ed11590d82, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 6.mtl_hair_grp_a_azma
+    second: {fileID: 2100000, guid: 67bfc0e1792b22c42982a9167203e837, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 7.mtl_hair_grp_b_azma
+    second: {fileID: 2100000, guid: a604997c3e027ad4fadaccbc67c57634, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 8.mtl_hair_grp_c_azma
+    second: {fileID: 2100000, guid: f2aca6e272a6d8248bc8d6ed179c5e38, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 9.mtl_leg_azma_socks
+    second: {fileID: 2100000, guid: 0ce0b375ad21bb8418b9ea75910d203b, type: 2}
+  materials:
+    materialImportMode: 1
+    materialName: 0
+    materialSearch: 0
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 3
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 2
+  humanoidOversampling: 1
+  avatarSetup: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
