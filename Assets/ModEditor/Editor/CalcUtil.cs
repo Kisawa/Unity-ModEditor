@@ -27,7 +27,7 @@ namespace ModEditor
 
         public CalcUtil()
         {
-            CalcVertexShader = AssetDatabase.LoadAssetAtPath<ComputeShader>($"{ModEditorWindow.ModEditorPath}Editor/Shaders/CalcViewVertex.compute");
+            CalcVertexShader = AssetDatabase.LoadAssetAtPath<ComputeShader>($"{ModEditorWindow.ModEditorPath}/Editor/Shaders/CalcViewVertex.compute");
             kernel_CalcVertexsWithScreenScope = CalcVertexShader.FindKernel("CalcVertexsWithScreenScope");
             kernel_SpreadSelectInTirangle = CalcVertexShader.FindKernel("SpreadSelectInTirangle");
             kernel_RespreadSelectInTirangle = CalcVertexShader.FindKernel("RespreadSelectInTirangle");

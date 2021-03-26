@@ -139,7 +139,6 @@ namespace ModEditor
         [Serializable]
         public class Dictionary_Obj_Mesh
         {
-            public UnityEngine.Object parent;
             [SerializeField]
             List<PropertyName> keyList;
             [SerializeField]
@@ -152,15 +151,6 @@ namespace ModEditor
 
             public Dictionary_Obj_Mesh()
             {
-                keyList = new List<PropertyName>();
-                valList = new List<Mesh>();
-                originList = new List<Mesh>();
-                recycleBin = new List<Mesh>();
-            }
-
-            public Dictionary_Obj_Mesh(UnityEngine.Object parent)
-            {
-                this.parent = parent;
                 keyList = new List<PropertyName>();
                 valList = new List<Mesh>();
                 originList = new List<Mesh>();
@@ -204,6 +194,12 @@ namespace ModEditor
 
             public void Add(GameObject key, Mesh val, Mesh origin)
             {
+                if (val != null && string.IsNullOrEmpty(AssetDatabase.GetAssetPath(val)))
+                {
+                    string path = $"{ModEditorWindow.ModEditorPath}/{val.name}.mesh";
+                    AssetDatabase.CreateAsset(val, path);
+                    AssetDatabase.ImportAsset(ModEditorWindow.ModEditorPath);
+                }
                 int index = keyList.IndexOf(ModEditorWindow.ExposedManagement.GetKey(key));
                 if (index >= 0)
                 {
@@ -211,10 +207,9 @@ namespace ModEditor
                     if (mesh != null && mesh.name.EndsWith("-Editing"))
                     {
                         recycleBin.Add(mesh);
-                        AssetDatabase.RemoveObjectFromAsset(mesh);
+                        string path = $"{ModEditorWindow.ModEditorPath}/{val.name}.mesh";
+                        AssetDatabase.DeleteAsset(path);
                     }
-                    if (val != null && parent != null && string.IsNullOrEmpty(AssetDatabase.GetAssetPath(val)))
-                        AssetDatabase.AddObjectToAsset(val, parent);
                     valList[index] = val;
                     originList[index] = origin;
                 }
@@ -224,8 +219,6 @@ namespace ModEditor
                     valList.Add(val);
                     originList.Add(origin);
                 }
-                if (parent != null)
-                    EditorUtility.SetDirty(parent);
             }
 
             public void Add(GameObject key, Mesh val)
@@ -237,18 +230,21 @@ namespace ModEditor
                     if (mesh != null && mesh.name.EndsWith("-Editing"))
                     {
                         recycleBin.Add(mesh);
-                        AssetDatabase.RemoveObjectFromAsset(mesh);
+                        string path = $"{ModEditorWindow.ModEditorPath}/{mesh.name}.mesh";
+                        AssetDatabase.DeleteAsset(path);
                     }
-                    if (val != null && parent != null && string.IsNullOrEmpty(AssetDatabase.GetAssetPath(val)))
-                        AssetDatabase.AddObjectToAsset(val, parent);
+                    if (val != null && string.IsNullOrEmpty(AssetDatabase.GetAssetPath(val)))
+                    {
+                        string path = $"{ModEditorWindow.ModEditorPath}/{val.name}.mesh";
+                        AssetDatabase.CreateAsset(val, path);
+                        AssetDatabase.ImportAsset(ModEditorWindow.ModEditorPath);
+                    }
                     valList[index] = val;
                 }
                 else
                 {
                     throw new Exception("SerializableClass.Dictionary_Obj_Mesh: This key does not exist. Please set the origin first than go on.");
                 }
-                if (parent != null)
-                    EditorUtility.SetDirty(parent);
             }
 
             public bool TryGetValue(GameObject key, out Mesh val)
@@ -289,14 +285,15 @@ namespace ModEditor
                         keyList.RemoveAt(i);
                         Mesh mesh = valList[i];
                         if (mesh != null)
-                            AssetDatabase.RemoveObjectFromAsset(mesh);
+                        {
+                            string path = $"{ModEditorWindow.ModEditorPath}/{mesh.name}.mesh";
+                            AssetDatabase.DeleteAsset(path);
+                        }
                         valList.RemoveAt(i);
                         originList.RemoveAt(i);
                         i--;
                     }
                 }
-                if (parent != null)
-                    EditorUtility.SetDirty(parent);
             }
         }
     }

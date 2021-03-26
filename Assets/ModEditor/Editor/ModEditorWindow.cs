@@ -9,7 +9,7 @@ namespace ModEditor
 {
     public partial class ModEditorWindow : EditorWindow
     {
-        public static readonly string ModEditorPath = "Assets/ModEditor/";
+        public static readonly string ModEditorPath = "Assets/ModEditor";
 
         public static ModEditorWindow Self;
 
@@ -293,7 +293,7 @@ namespace ModEditor
         void refreshWindow()
         {
             currentScene = SceneManager.GetActiveScene();
-            string path = $"{ModEditorPath}ModEditorManager-{currentScene.name}.asset";
+            string path = $"{ModEditorPath}/ModEditorManager-{currentScene.name}.asset";
             Manager = AssetDatabase.LoadAssetAtPath<ModEditorManager>(path);
             if (Manager == null)
             {
@@ -362,14 +362,13 @@ namespace ModEditor
                 return;
             Mesh mesh = Instantiate(meshFilter.sharedMesh);
             mesh.name = target.name + "-Editing";
-            AssetDatabase.AddObjectToAsset(mesh, Manager);
+            Undo.RecordObject(meshFilter, "ModEditor MeshEditing");
+            meshFilter.sharedMesh = mesh;
+            EditorUtility.SetDirty(target);
             if (Manager.MeshDic.ContainsKey(target))
                 Manager.MeshDic.Add(target, mesh);
             else
                 Manager.MeshDic.Add(target, mesh, meshFilter.sharedMesh);
-            Undo.RecordObject(meshFilter, "ModEditor MeshEditing");
-            meshFilter.sharedMesh = mesh;
-            EditorUtility.SetDirty(target);
         }
         
         public void SetEditingMesh(GameObject target, SkinnedMeshRenderer skinnedMeshRenderer)
@@ -378,14 +377,13 @@ namespace ModEditor
                 return;
             Mesh mesh = Instantiate(skinnedMeshRenderer.sharedMesh);
             mesh.name = target.name + "-Editing";
-            AssetDatabase.AddObjectToAsset(mesh, Manager);
+            Undo.RecordObject(skinnedMeshRenderer, "ModEditor MeshEditing");
+            skinnedMeshRenderer.sharedMesh = mesh;
+            EditorUtility.SetDirty(target);
             if (Manager.MeshDic.ContainsKey(target))
                 Manager.MeshDic.Add(target, mesh);
             else
                 Manager.MeshDic.Add(target, mesh, skinnedMeshRenderer.sharedMesh);
-            Undo.RecordObject(skinnedMeshRenderer, "ModEditor MeshEditing");
-            skinnedMeshRenderer.sharedMesh = mesh;
-            EditorUtility.SetDirty(target);
         }
 
         void applyPlayModeEditing()

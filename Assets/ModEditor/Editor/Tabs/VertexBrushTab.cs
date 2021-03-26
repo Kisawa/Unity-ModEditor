@@ -33,7 +33,7 @@ namespace ModEditor
             EditorEvent.Use.OnMouse.DownScroll += OnMouse_Scroll;
             EditorEvent.Use.OnMouse.UpScroll += OnMouse_Scroll;
             if (brushCursor == null)
-                brushCursor = AssetDatabase.LoadAssetAtPath<Texture2D>($"{ModEditorWindow.ModEditorPath}Textures/brushCursor.png");
+                brushCursor = AssetDatabase.LoadAssetAtPath<Texture2D>($"{ModEditorWindow.ModEditorPath}/Textures/brushCursor.png");
         }
 
         public override void OnLostFocus()

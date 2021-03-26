@@ -537,7 +537,7 @@ namespace ModEditor
             if (actionableDic == null)
                 actionableDic = new SerializableClass.Dictionary_Obj_Bool(this);
             if (meshDic == null)
-                meshDic = new SerializableClass.Dictionary_Obj_Mesh(this);
+                meshDic = new SerializableClass.Dictionary_Obj_Mesh();
         }
 
         public void CheckAndClearExposed()
