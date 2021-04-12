@@ -58,7 +58,7 @@ namespace ModEditor
         SerializableClass.Dictionary_Obj_Mesh meshDic;
         public SerializableClass.Dictionary_Obj_Mesh MeshDic { get => meshDic; }
 
-        public List<GameObject> TargetChildren { get; set; }
+        public List<GameObject> TargetChildren { get; set; } = new List<GameObject>();
 
         [SerializeField]
         bool sceneCollectionView = true;
@@ -494,6 +494,20 @@ namespace ModEditor
                     return;
                 Undo.RecordObject(this, "ModEditor BrushColor");
                 brushColor = value;
+            }
+        }
+
+        [SerializeField]
+        Color brushViewColor = Color.black;
+        public Color BrushViewColor
+        {
+            get => brushViewColor;
+            set
+            {
+                if (value == brushViewColor)
+                    return;
+                Undo.RecordObject(this, "ModEditor BrushViewColor");
+                brushViewColor = value;
             }
         }
 

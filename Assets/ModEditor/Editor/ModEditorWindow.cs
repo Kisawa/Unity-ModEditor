@@ -63,6 +63,12 @@ namespace ModEditor
             }
             set
             {
+                if (value == 0)
+                    TabType = ModEditorTabType.SceneCollection;
+                else if (value == 1)
+                    TabType = ModEditorTabType.VertexBrush;
+                else
+                    TabType = ModEditorTabType.Other;
                 if (_tabIndex != value)
                 {
                     if (_tabIndex < tabs.Count && _tabIndex >= 0)
@@ -70,12 +76,6 @@ namespace ModEditor
                     if (value < tabs.Count && value >= 0)
                         tabs[value].OnFocus();
                 }
-                if (value == 0)
-                    TabType = ModEditorTabType.SceneCollection;
-                else if (value == 1)
-                    TabType = ModEditorTabType.VertexBrush;
-                else
-                    TabType = ModEditorTabType.Other;
                 _tabIndex = value;
             }
         }
@@ -103,14 +103,14 @@ namespace ModEditor
 
         public ModEditorTabType TabType { get; set; }
 
-        Material mat_viewUtil;
-        public Material Mat_viewUtil
+        Material mat_Util;
+        public Material Mat_Util
         {
             get
             {
-                if (mat_viewUtil == null)
-                    mat_viewUtil = new Material(Shader.Find("Hidden/ModEditorUtil"));
-                return mat_viewUtil;
+                if (mat_Util == null)
+                    mat_Util = new Material(Shader.Find("Hidden/ModEditorUtil"));
+                return mat_Util;
             }
         }
 
@@ -182,6 +182,7 @@ namespace ModEditor
             for (int i = 0; i < tabs.Count; i++)
                 tabs[i].OnDiable();
             ClearCalcShaderData();
+            CalcUtil.Self.ClearZoneCache();
             Selection.selectionChanged -= selectionChanged;
             EditorApplication.hierarchyChanged -= hierarchyChanged;
             Undo.undoRedoPerformed -= undoRedoPerformed;
@@ -189,6 +190,12 @@ namespace ModEditor
             AssetModificationManagement.onWillSaveAssets -= onWillSaveAssets;
             SceneView.beforeSceneGui -= beforeSceneGui;
             logoutEvent();
+        }
+
+        private void OnDestroy()
+        {
+            Manager.CheckAndClearExposed();
+            ExposedManagement.CheckAndClearExposed();
         }
 
         private void OnGUI()
@@ -278,12 +285,11 @@ namespace ModEditor
                     applyPlayModeEditing();
                     break;
                 case PlayModeStateChange.ExitingEditMode:
+                case PlayModeStateChange.ExitingPlayMode:
                     Manager.CheckAndClearExposed();
                     ExposedManagement.CheckAndClearExposed();
                     break;
                 case PlayModeStateChange.EnteredPlayMode:
-                    break;
-                case PlayModeStateChange.ExitingPlayMode:
                     break;
                 default:
                     break;
@@ -333,19 +339,12 @@ namespace ModEditor
                 GameObject obj = Manager.MeshDic.Resolve(i);
                 if (obj == null)
                     continue;
-                Mesh mesh = Manager.MeshDic[obj];
                 MeshFilter meshFilter = obj.GetComponent<MeshFilter>();
                 if (meshFilter != null)
-                {
-                    if (meshFilter.sharedMesh != mesh)
-                        Manager.MeshDic.Add(obj, meshFilter.sharedMesh);
-                }
+                    Manager.MeshDic.Add(obj, meshFilter.sharedMesh);
                 SkinnedMeshRenderer skinnedMeshRenderer = obj.GetComponent<SkinnedMeshRenderer>();
                 if (skinnedMeshRenderer != null)
-                {
-                    if (skinnedMeshRenderer.sharedMesh != mesh)
-                        Manager.MeshDic.Add(obj, skinnedMeshRenderer.sharedMesh);
-                }
+                    Manager.MeshDic.Add(obj, skinnedMeshRenderer.sharedMesh);
             }
         }
 
@@ -362,13 +361,13 @@ namespace ModEditor
                 return;
             Mesh mesh = Instantiate(meshFilter.sharedMesh);
             mesh.name = target.name + "-Editing";
-            Undo.RecordObject(meshFilter, "ModEditor MeshEditing");
-            meshFilter.sharedMesh = mesh;
-            EditorUtility.SetDirty(target);
             if (Manager.MeshDic.ContainsKey(target))
                 Manager.MeshDic.Add(target, mesh);
             else
                 Manager.MeshDic.Add(target, mesh, meshFilter.sharedMesh);
+            Undo.RecordObject(meshFilter, "ModEditor MeshEditing");
+            meshFilter.sharedMesh = mesh;
+            EditorUtility.SetDirty(target);
         }
         
         public void SetEditingMesh(GameObject target, SkinnedMeshRenderer skinnedMeshRenderer)
@@ -377,13 +376,13 @@ namespace ModEditor
                 return;
             Mesh mesh = Instantiate(skinnedMeshRenderer.sharedMesh);
             mesh.name = target.name + "-Editing";
-            Undo.RecordObject(skinnedMeshRenderer, "ModEditor MeshEditing");
-            skinnedMeshRenderer.sharedMesh = mesh;
-            EditorUtility.SetDirty(target);
             if (Manager.MeshDic.ContainsKey(target))
                 Manager.MeshDic.Add(target, mesh);
             else
                 Manager.MeshDic.Add(target, mesh, skinnedMeshRenderer.sharedMesh);
+            Undo.RecordObject(skinnedMeshRenderer, "ModEditor MeshEditing");
+            skinnedMeshRenderer.sharedMesh = mesh;
+            EditorUtility.SetDirty(target);
         }
 
         void applyPlayModeEditing()
@@ -395,10 +394,10 @@ namespace ModEditor
                     continue;
                 MeshFilter meshFilter = obj.GetComponent<MeshFilter>();
                 if (meshFilter != null)
-                    meshFilter.sharedMesh = Manager.MeshDic[obj];
+                    meshFilter.sharedMesh = Manager.MeshDic[obj, true];
                 SkinnedMeshRenderer skinnedMeshRenderer = obj.GetComponent<SkinnedMeshRenderer>();
                 if (skinnedMeshRenderer != null)
-                    skinnedMeshRenderer.sharedMesh = Manager.MeshDic[obj];
+                    skinnedMeshRenderer.sharedMesh = Manager.MeshDic[obj, true];
                 EditorUtility.SetDirty(obj);
             }
         }

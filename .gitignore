@@ -58,3 +58,7 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+Assets/ModEditor/ModEditorManager-SampleScene.asset
+Assets/ModEditor/ModEditorManager-SampleScene.asset.meta
+Assets/ModEditor/Meshs.meta
+Assets/ModEditor/Meshs/

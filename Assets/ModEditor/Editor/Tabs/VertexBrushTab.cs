@@ -32,6 +32,14 @@ namespace ModEditor
             EditorEvent.OnMouse.DragLeft += OnMouse_DragLeft;
             EditorEvent.Use.OnMouse.DownScroll += OnMouse_Scroll;
             EditorEvent.Use.OnMouse.UpScroll += OnMouse_Scroll;
+            EditorEvent.Shift.OnMouse.DownLeft += Shift_OnMouse_Left;
+            EditorEvent.Use.Shift.OnMouse.DragLeft += Shift_OnMouse_Left;
+            EditorEvent.ShiftAndAlt.OnMouse.DownLeft += Shift_OnMouse_Left;
+            EditorEvent.Use.ShiftAndAlt.OnMouse.DragLeft += Shift_OnMouse_Left;
+            EditorEvent.Shift.OnMouse.DownRight += Shift_OnMouse_Right;
+            EditorEvent.Use.Shift.OnMouse.DragRight += Shift_OnMouse_Right;
+            EditorEvent.ShiftAndAlt.OnMouse.DownRight += Shift_OnMouse_Right;
+            EditorEvent.Use.ShiftAndAlt.OnMouse.DragRight += Shift_OnMouse_Right;
             if (brushCursor == null)
                 brushCursor = AssetDatabase.LoadAssetAtPath<Texture2D>($"{ModEditorWindow.ModEditorPath}/Textures/brushCursor.png");
         }
@@ -48,10 +56,18 @@ namespace ModEditor
             EditorEvent.OnMouse.DragLeft -= OnMouse_DragLeft;
             EditorEvent.Use.OnMouse.DownScroll -= OnMouse_Scroll;
             EditorEvent.Use.OnMouse.UpScroll -= OnMouse_Scroll;
+            EditorEvent.Shift.OnMouse.DownLeft -= Shift_OnMouse_Left;
+            EditorEvent.Use.Shift.OnMouse.DragLeft -= Shift_OnMouse_Left;
+            EditorEvent.Shift.OnMouse.DownRight -= Shift_OnMouse_Right;
+            EditorEvent.ShiftAndAlt.OnMouse.DownLeft -= Shift_OnMouse_Left;
+            EditorEvent.Use.ShiftAndAlt.OnMouse.DragLeft -= Shift_OnMouse_Left;
+            EditorEvent.Use.Shift.OnMouse.DragRight -= Shift_OnMouse_Right;
+            EditorEvent.ShiftAndAlt.OnMouse.DownRight -= Shift_OnMouse_Right;
+            EditorEvent.Use.ShiftAndAlt.OnMouse.DragRight -= Shift_OnMouse_Right;
             PlayerSettings.defaultCursor = defaultCursor;
             Cursor.SetCursor(defaultCursor, Vector2.zero, CursorMode.Auto);
         }
-
+        Gradient gradient = new Gradient();
         public override void Draw()
         {
             if (GUILayout.Button("Write avg normals to model's tangent"))
@@ -60,6 +76,9 @@ namespace ModEditor
             }
             window.Manager.BrushType = (BrushType)EditorGUILayout.EnumPopup(window.Manager.BrushType);
             window.Manager.BrushColor = EditorGUILayout.ColorField("Brush Color", window.Manager.BrushColor);
+            window.Manager.BrushViewColor = EditorGUILayout.ColorField(new GUIContent("Brush View Color"), window.Manager.BrushViewColor, true, true, false);
+
+            gradient = EditorGUILayout.GradientField(gradient);
 
             if (GUILayout.Button("asd"))
                 func();
@@ -69,34 +88,7 @@ namespace ModEditor
         int index = 0;
         void func()
         {
-            for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
-            {
-                GameObject target = window.Manager.TargetChildren[i];
-                MeshFilter meshFilter = target.GetComponent<MeshFilter>();
-                if (meshFilter != null && meshFilter.sharedMesh != null)
-                {
-                    Mesh mesh = meshFilter.sharedMesh;
-                    CalcUtil.Self.CalcVertexShader.SetInt("_Index", index);
-                    ComputeBuffer rw_selects = new ComputeBuffer(mesh.vertexCount, sizeof(float));
-                    float[] selects = Enumerable.Repeat(0f, mesh.vertexCount).ToArray();
-                    selects[index] = 1;
-                    selects[1] = -1;
-                    rw_selects.SetData(selects);
-                    CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_SpreadSelectInTirangle, "RW_Selects", rw_selects);
-                    ComputeBuffer _triangles = new ComputeBuffer(mesh.triangles.Length, sizeof(int));
-                    _triangles.SetData(mesh.triangles);
-                    CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_SpreadSelectInTirangle, "_Triangles", _triangles);
-                    CalcUtil.Self.CalcVertexShader.Dispatch(CalcUtil.Self.kernel_SpreadSelectInTirangle, Mathf.CeilToInt((float)mesh.triangles.Length / 1024), 1, 1);
-                    float[] res = new float[mesh.vertexCount];
-                    rw_selects.GetData(res);
-                    for (int j = 0; j < res.Length; j++)
-                    {
-                        Debug.LogError(res[j]);
-                    }
-                    rw_selects.Dispose();
-                    _triangles.Dispose();
-                }
-            }
+            
         }
 
         private void OnMouse_DownLeft()
@@ -118,6 +110,16 @@ namespace ModEditor
         }
 
         private void OnMouse_Scroll() { }
+
+        private void Shift_OnMouse_Left()
+        {
+            addZone();
+        }
+
+        private void Shift_OnMouse_Right()
+        {
+            subZone();
+        }
 
         private void onSceneValidate(SceneView scene)
         {

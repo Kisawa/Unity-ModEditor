@@ -176,12 +176,12 @@ namespace ModEditor
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Unselected Vertex Color", "AboutWIndowLicenseLabel", GUILayout.Width(120));
-            UnselectedVertexColor = EditorGUILayout.ColorField(new GUIContent(), UnselectedVertexColor, true, false, false, GUILayout.Width(70));
+            UnselectedVertexColor = EditorGUILayout.ColorField(new GUIContent(), UnselectedVertexColor, true, true, false, GUILayout.Width(70));
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Selected Vertex Color", "AboutWIndowLicenseLabel", GUILayout.Width(120));
-            SelectedVertexColor = EditorGUILayout.ColorField(new GUIContent(), SelectedVertexColor, true, false, false, GUILayout.Width(70));
+            SelectedVertexColor = EditorGUILayout.ColorField(new GUIContent(), SelectedVertexColor, true, true, false, GUILayout.Width(70));
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
@@ -225,6 +225,10 @@ namespace ModEditor
         {
             if (ModEditor == null || ModEditor.camera == null)
                 return;
+            ModEditor.Mat_Util.SetVector("_MouseTexcoord", Mouse.ScreenTexcoord);
+            ModEditor.Mat_Util.SetFloat("_BrushSize", BrushSize);
+            ModEditor.Mat_Util.SetFloat("_BrushDepth", BrushDepth);
+            ModEditor.Mat_Util.SetColor("_BrushViewColor", ModEditor.Manager.BrushViewColor);
             bool brushOn = ModEditor.TabType == ModEditorTabType.VertexBrush;
             for (int i = 0; i < ModEditor.CalcShaderDatas.Count; i++)
             {
@@ -239,6 +243,7 @@ namespace ModEditor
                     data.material.SetColor("_SelectedVertexColor", SelectedVertexColor);
                     data.material.SetFloat("_VertexScale", VertexScale);
                     data.material.SetInt("_VertexWithZTest", VertexWithZTest ? (int)CompareFunction.LessEqual : (int)CompareFunction.Always);
+                    data.material.SetInt("_OnlyZone", Key.Shift ? 1 : 0);
                 }
             }
             SceneView.RepaintAll();

@@ -9,6 +9,18 @@ namespace ModEditor
 {
     public partial class VertexBrushTab
     {
+        void addZone()
+        {
+            for (int i = 0; i < window.CalcShaderDatas.Count; i++)
+                window.CalcShaderDatas[i].AddZoneFromSelect();
+        }
+
+        void subZone()
+        {
+            for (int i = 0; i < window.CalcShaderDatas.Count; i++)
+                window.CalcShaderDatas[i].SubZoneFromSelect();
+        }
+
         void write()
         {
             switch (window.Manager.BrushType)

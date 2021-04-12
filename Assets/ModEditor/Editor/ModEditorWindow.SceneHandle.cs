@@ -61,10 +61,12 @@ namespace ModEditor
             EditorEvent.Use.OnKey.Tab.Down += Tab_Down;
             EditorEvent.Use.OnKey.BackQuote.Down += BackQuote_Down;
             EditorEvent.Use.OnKey.Space.Down += Space_Down;
+            EditorEvent.Use.Shift.OnKey.Space.Down += Space_Down;
             EditorEvent.Use.OnKey.CapsLock.Down += CapsLock_Down;
             EditorEvent.Use.Control.OnMouse.DragLeft += Control_OnMouse_DragLeft;
             EditorEvent.Use.Control.OnScrollWheel.Roll += Control_OnScrollWheel_Roll;
             EditorEvent.Use.Alt.OnScrollWheel.Roll += Alt_OnScrollWheel_Roll;
+            EditorEvent.Use.ShiftAndAlt.OnScrollWheel.Roll += Alt_OnScrollWheel_Roll;
             Mouse.Update += Mouse_Update;
             ScrollWheel.Update += ScrollWheel_Update;
         }
@@ -75,10 +77,12 @@ namespace ModEditor
             EditorEvent.Use.OnKey.Tab.Down -= Tab_Down;
             EditorEvent.Use.OnKey.BackQuote.Down -= BackQuote_Down;
             EditorEvent.Use.OnKey.Space.Down -= Space_Down;
+            EditorEvent.Use.Shift.OnKey.Space.Down -= Space_Down;
             EditorEvent.Use.OnKey.CapsLock.Down -= CapsLock_Down;
             EditorEvent.Use.Control.OnMouse.DragLeft -= Control_OnMouse_DragLeft;
             EditorEvent.Use.Control.OnScrollWheel.Roll -= Control_OnScrollWheel_Roll;
             EditorEvent.Use.Alt.OnScrollWheel.Roll -= Alt_OnScrollWheel_Roll;
+            EditorEvent.Use.ShiftAndAlt.OnScrollWheel.Roll -= Alt_OnScrollWheel_Roll;
             Mouse.Update -= Mouse_Update;
             ScrollWheel.Update -= ScrollWheel_Update;
         }
@@ -110,7 +114,7 @@ namespace ModEditor
                 if (depth > _depth)
                     depth = _depth;
             }
-            Manager.BrushDepth = depth + 0.001f;
+            Manager.BrushDepth = depth + 0.0001f;
             Mouse_Update();
         }
 
@@ -118,7 +122,7 @@ namespace ModEditor
         {
             BrushLock = !BrushLock;
             for (int i = 0; i < CalcShaderDatas.Count; i++)
-                CalcShaderDatas[i].SelectLock(!BrushLock);
+                CalcShaderDatas[i].LockZoneFromSelect(BrushLock);
         }
 
         private void Control_OnMouse_DragLeft()

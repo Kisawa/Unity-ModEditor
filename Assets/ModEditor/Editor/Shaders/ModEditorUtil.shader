@@ -6,12 +6,19 @@
 		#include "UnityCG.cginc"
 		struct appdata
         {
-            float4 vertex : POSITION;
+            float4 vertex: POSITION;
 			float3 normal: NORMAL;
 			float4 tangent: TANGENT;
-			float2 texcoord : TEXCOORD0;
+			float2 texcoord: TEXCOORD0;
 			float4 color: COLOR;
         };
+
+		struct v2f
+		{
+			float4 pos: SV_POSITION;
+			float2 uv: TEXCOORD0;
+			float4 screenPos: TEXCOORD1;
+		};
 
 		struct v2g
 		{
@@ -23,8 +30,8 @@
 
         struct g2f
         {
-			float4 pos : SV_POSITION;
-			float2 uv : TEXCOORD0;
+			float4 pos: SV_POSITION;
+			float2 uv: TEXCOORD0;
 			float4 color: TEXCOORD1;
 			float4 normal: TEXCOORD2;
         };
@@ -66,6 +73,25 @@
 			o.normal.xyz = UnityObjectToWorldNormal(v.normal);
             return o;
         }
+
+		v2f vert_ScreenMesh(appdata v)
+		{
+			v2f o;
+			UNITY_INITIALIZE_OUTPUT(v2f, o);
+			o.pos = v.vertex;
+			o.uv = v.texcoord;
+			return o;
+		}
+
+		v2f vert_BrushCover(appdata v)
+		{
+			v2f o;
+			o.pos = UnityObjectToClipPos(v.vertex);
+			o.uv = v.texcoord;
+			o.screenPos = ComputeScreenPos(o.pos);
+			COMPUTE_EYEDEPTH(o.screenPos.z);
+			return o;
+		}
 
 		[maxvertexcount(6)]
 		void geom_normalView(triangle v2g input[3], inout LineStream<g2f> tristream)
@@ -142,31 +168,60 @@
             return _TangentColor;
         }
 
-		fixed4 frag_gridView (g2f i) : SV_Target
+		fixed4 frag_gridView(g2f i) : SV_Target
         {
             return _GridColor;
         }
 
-		fixed4 frag_UVView (g2f i) : SV_Target
+		fixed4 frag_UVView(g2f i) : SV_Target
         {
             return fixed4(i.uv, 0, _UVAlpha);
         }
 
-		fixed4 frag_VertexColorView (g2f i) : SV_Target
+		fixed4 frag_VertexColorView(g2f i) : SV_Target
         {
             return i.color;
         }
 
-		fixed4 frag_DepthMapView (g2f i) : SV_Target
+		fixed4 frag_DepthMapView(g2f i) : SV_Target
         {
 			float depth = i.normal.w * _DepthCompress;
             return fixed4(depth, depth, depth, 1);
         }
 
-		fixed4 frag_NormalMapView (g2f i) : SV_Target
+		fixed4 frag_NormalMapView(g2f i) : SV_Target
         {
             return fixed4(i.normal.xyz, 1);
         }
+
+		float3 _MouseTexcoord;
+		float _BrushSize;
+		fixed4 _BrushViewColor;
+		fixed4 frag_ScreenMesh(v2f i) : SV_Target
+		{
+			i.uv.x *= _MouseTexcoord.z;
+			float2 mouseTexcoord = _MouseTexcoord.xy;
+			mouseTexcoord.x *= _MouseTexcoord.z;
+			float dis = distance(i.uv, mouseTexcoord);
+			fixed4 col = _BrushViewColor;
+			col.a = .5;
+			col = lerp(0, col, min(1 - step(_BrushSize, dis), step(_BrushSize - 0.002, dis)));
+			return col;
+		}
+
+		float _BrushDepth;
+		fixed4 frag_BrushCover(v2f i) : SV_Target
+		{
+			float2 screenTexcoord = i.screenPos.xy / i.screenPos.w;
+			screenTexcoord.x *= _MouseTexcoord.z;
+			float2 mouseTexcoord = _MouseTexcoord.xy;
+			mouseTexcoord.x *= _MouseTexcoord.z;
+			float dis = distance(screenTexcoord, mouseTexcoord);
+			float res = (1 - step(_BrushSize, dis)) * (1 - step(_BrushDepth, i.screenPos.z));
+			fixed4 col = _BrushViewColor;
+			col.a *= res;
+			return col;
+		}
 		ENDCG
 
 		Pass
@@ -236,6 +291,26 @@
             CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag_NormalMapView
+			ENDCG
+        }
+
+		Pass
+        {
+			ZTest Off ZWrite Off
+			Blend SrcAlpha OneMinusSrcAlpha
+            CGPROGRAM
+			#pragma vertex vert_ScreenMesh
+			#pragma fragment frag_ScreenMesh
+			ENDCG
+        }
+
+		Pass
+        {
+			ZWrite Off
+			Blend SrcAlpha OneMinusSrcAlpha
+            CGPROGRAM
+			#pragma vertex vert_BrushCover
+			#pragma fragment frag_BrushCover
 			ENDCG
         }
     }

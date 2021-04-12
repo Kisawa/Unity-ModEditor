@@ -33,7 +33,7 @@ namespace ModEditor
         }
     }
 
-    public struct MinNum : IJob
+    public struct MinJob : IJob
     {
         [ReadOnly]
         [DeallocateOnJobCompletion]
@@ -51,21 +51,19 @@ namespace ModEditor
             {
                 float num = nums[i];
                 float select = selects[i];
-                if (selects[i] > 0 && select <= 1 && min[0] > num)
+                if (select < 0 && min[0] > num)
                     min[0] = num;
             }
         }
     }
 
-    public struct UnifyOverlapSelectedVertex : IJob
+    public struct UnifyOverlapVertexJob : IJob
     {
         [ReadOnly]
         [DeallocateOnJobCompletion]
         public NativeArray<Vector3> vertexs;
 
         public NativeArray<float> selects;
-
-        public int spreadLevel;
 
         public void Execute()
         {
@@ -76,8 +74,8 @@ namespace ModEditor
                 float select = selects[i];
                 if (vertexDic.TryGetValue(vertex, out float res))
                 {
-                    if (res == spreadLevel || select == spreadLevel)
-                        vertexDic[vertex] = spreadLevel;
+                    if (res < select)
+                        vertexDic[vertex] = select;
                 }
                 else
                     vertexDic.Add(vertex, select);

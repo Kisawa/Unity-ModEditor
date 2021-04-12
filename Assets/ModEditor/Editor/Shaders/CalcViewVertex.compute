@@ -1,8 +1,9 @@
 ﻿#pragma kernel CalcVertexsWithScreenScope
 #pragma kernel SpreadSelectInTirangle
 #pragma kernel RespreadSelectInTirangle
-#pragma kernel LockSelects
-#pragma kernel UnlockSelects
+#pragma kernel LockZone
+#pragma kernel AddZone
+#pragma kernel SubZone
 #pragma kernel WriteVertexColorUseSelectData
 
 float4x4 _MV;
@@ -10,11 +11,12 @@ float4x4 _P;
 float3 _MouseTexcoord;
 float _Size;
 float _Depth;
-int _ClearSpread;
-int _ClearLock;
+bool _ClearSpread;
+int _OnlyZone;
 StructuredBuffer<float3> _Vertexs;
 RWStructuredBuffer<float> RW_Selects;
 RWStructuredBuffer<float> RW_Depths;
+RWStructuredBuffer<int> RW_Zone;
 
 [numthreads(1024,1,1)]
 void CalcVertexsWithScreenScope(uint3 id : SV_DispatchThreadID)
@@ -26,19 +28,21 @@ void CalcVertexsWithScreenScope(uint3 id : SV_DispatchThreadID)
 	float2 screenPos = (clipPos.xy + clipPos.w) * 0.5;
 	float2 uv = screenPos / clipPos.w;
 	uv.x *= _MouseTexcoord.z;
-	_MouseTexcoord.x *= _MouseTexcoord.z;
-	float dis = length(uv - _MouseTexcoord.xy);
+	float2 mouseTexcoord = _MouseTexcoord.xy;
+	mouseTexcoord.x *= _MouseTexcoord.z;
+	float dis = distance(uv, mouseTexcoord);
 	float res = (1 - step(_Size, dis)) * (1 - step(_Depth, depth));
-	float pre = RW_Selects[id.x];
-	if(pre < 0)
+	int zone = max(RW_Zone[id.x], _OnlyZone);
+	res *= zone;
+	if(_ClearSpread)
+		RW_Selects[id.x] = -res;
+	else
 	{
-		if(_ClearSpread == 1)
-			RW_Selects[id.x] = res;
+		float pre = RW_Selects[id.x];
+		pre *= zone;
+		//if(pre == 0) RW_Selects[id.x] = -res;
+		RW_Selects[id.x] = pre - (1 - any(pre)) * res;
 	}
-	else if(pre <= 1)
-		RW_Selects[id.x] = res;
-	else if(_ClearLock)
-		RW_Selects[id.x] = res;
 }
 
 StructuredBuffer<int> _Triangles;
@@ -52,12 +56,17 @@ void SpreadSelectInTirangle(uint3 id: SV_DispatchThreadID)
 	float select0 = RW_Selects[vertex_id0];
 	float select1 = RW_Selects[vertex_id1];
 	float select2 = RW_Selects[vertex_id2];
-	float res = min(select0, select1);
-	res = min(res, select2) - 1;
-	res -= (1 - any(res));
-	int write = any(float3(select0, select1, select2)) * (1 - select0);
-	if(write == 1 && ((select1 <= 1 && select1 != 0) || (select2 <= 1 && select2 != 0)))
-		RW_Selects[vertex_id0] = res;
+
+	float res = max(select0, select1);
+	res = max(res, select2);
+	res = max(res, 0) + 1;
+	int write = any(float3(select0, select1, select2));
+	if(write == 1)
+	{
+		RW_Selects[vertex_id0] = select0 + (1 - any(select0)) * res;
+		RW_Selects[vertex_id1] = select1 + (1 - any(select1)) * res;
+		RW_Selects[vertex_id2] = select2 + (1 - any(select2)) * res;
+	}
 }
 
 int _SpreadLevel;
@@ -71,32 +80,32 @@ void RespreadSelectInTirangle(uint3 id: SV_DispatchThreadID)
 	float select0 = RW_Selects[vertex_id0];
 	float select1 = RW_Selects[vertex_id1];
 	float select2 = RW_Selects[vertex_id2];
-	if(_SpreadLevel < 0)
-	{
-		if(select0 <= _SpreadLevel)
-			RW_Selects[vertex_id0] = 0;
-		if(select1 <= _SpreadLevel)
-			RW_Selects[vertex_id1] = 0;
-		if(select2 <= _SpreadLevel)
-			RW_Selects[vertex_id2] = 0;
-	}
+	RW_Selects[vertex_id0] = select0 * step(0, _SpreadLevel - select0);
+	RW_Selects[vertex_id1] = select1 * step(0, _SpreadLevel - select1);
+	RW_Selects[vertex_id2] = select2 * step(0, _SpreadLevel - select2);
 }
 
 [numthreads(1024,1,1)]
-void LockSelects(uint3 id: SV_DispatchThreadID)
+void LockZone(uint3 id: SV_DispatchThreadID)
 {
-	float pre = RW_Selects[id.x];
-	if(pre > 0)
-		RW_Selects[id.x] = pre + 1;
-	else if(pre < 0)
-		RW_Selects[id.x] = -pre + 1;
+	int res = any(RW_Selects[id.x]);
+	RW_Zone[id.x] = res;
 }
 
 [numthreads(1024,1,1)]
-void UnlockSelects(uint3 id: SV_DispatchThreadID)
+void AddZone(uint3 id: SV_DispatchThreadID)
 {
-	if(RW_Selects[id.x] > 1)
-		RW_Selects[id.x] = 0;
+	int res = any(RW_Selects[id.x]);
+	res = max(RW_Zone[id.x], res);
+	RW_Zone[id.x] = res;
+}
+
+[numthreads(1024,1,1)]
+void SubZone(uint3 id: SV_DispatchThreadID)
+{
+	int res = 1 - any(RW_Selects[id.x]);
+	res = min(RW_Zone[id.x], res);
+	RW_Zone[id.x] = res;
 }
 
 float4 _Color;

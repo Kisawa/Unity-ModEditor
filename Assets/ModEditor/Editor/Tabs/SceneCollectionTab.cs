@@ -13,9 +13,26 @@ namespace ModEditor
         public SceneCollectionTab(EditorWindow window) : base(window)
         {
             this.window = window as ModEditorWindow;
+            screenMesh = new Mesh();
+            screenMesh.vertices = new Vector3[]
+            {
+            new Vector3(-1, -1, 0),
+            new Vector3(-1, 1, 0),
+            new Vector3(1, 1, 0),
+            new Vector3(1, -1, 0)
+            };
+            screenMesh.uv = new Vector2[]
+            {
+            new Vector2(0, 1),
+            new Vector2(0, 0),
+            new Vector2(1, 0),
+            new Vector2(1, 1)
+            };
+            screenMesh.SetIndices(new int[] { 0, 3, 2, 1 }, MeshTopology.Quads, 0);
         }
 
         Vector2 scroll;
+        Mesh screenMesh;
         CommandBuffer buffer;
         CameraEvent cameraEvent = CameraEvent.AfterForwardAlpha;
 
@@ -36,6 +53,18 @@ namespace ModEditor
             window.onVertexViewChange -= refreshBuffer;
             if (window.camera != null && buffer != null)
                 window.camera.RemoveCommandBuffer(cameraEvent, buffer);
+        }
+
+        public override void OnFocus()
+        {
+            base.OnFocus();
+            refreshBuffer();
+        }
+
+        public override void OnLostFocus()
+        {
+            base.OnLostFocus();
+            refreshBuffer();
         }
 
         public override void Draw()
@@ -379,57 +408,74 @@ namespace ModEditor
                 Renderer renderer = target.GetComponent<Renderer>();
                 if (renderer == null)
                     continue;
-                if (window.Manager.GridView || window.Manager.UVView || window.Manager.VertexColorView || window.VertexView)
-                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 0);
-                if (window.Manager.NormalView)
-                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 1);
-                if (window.Manager.TangentView)
-                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 2);
-                if (window.Manager.GridView)
-                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 3);
-                if (window.Manager.UVView)
-                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 4);
-                if (window.Manager.VertexColorView)
-                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 5);
-                if(window.Manager.DepthMapView)
-                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 6);
-                if (window.Manager.NormalMapView)
-                    buffer.DrawRenderer(renderer, window.Mat_viewUtil, 0, 7);
+                int subCount = 1;
+                MeshFilter meshFilter = target.GetComponent<MeshFilter>();
+                if (meshFilter != null && meshFilter.sharedMesh != null)
+                    subCount = meshFilter.sharedMesh.subMeshCount;
+                SkinnedMeshRenderer skinnedMesh = renderer as SkinnedMeshRenderer;
+                if (skinnedMesh != null && skinnedMesh.sharedMesh != null)
+                    subCount = skinnedMesh.sharedMesh.subMeshCount;
+                for (int j = 0; j < subCount; j++)
+                {
+                    if (window.Manager.GridView || window.Manager.UVView || window.Manager.VertexColorView || window.VertexView)
+                        buffer.DrawRenderer(renderer, window.Mat_Util, j, 0);
+                    if (window.Manager.NormalView)
+                        buffer.DrawRenderer(renderer, window.Mat_Util, j, 1);
+                    if (window.Manager.TangentView)
+                        buffer.DrawRenderer(renderer, window.Mat_Util, j, 2);
+                    if (window.Manager.GridView)
+                        buffer.DrawRenderer(renderer, window.Mat_Util, j, 3);
+                    if (window.Manager.UVView)
+                        buffer.DrawRenderer(renderer, window.Mat_Util, j, 4);
+                    if (window.Manager.VertexColorView)
+                        buffer.DrawRenderer(renderer, window.Mat_Util, j, 5);
+                    if (window.Manager.DepthMapView)
+                        buffer.DrawRenderer(renderer, window.Mat_Util, j, 6);
+                    if (window.Manager.NormalMapView)
+                        buffer.DrawRenderer(renderer, window.Mat_Util, j, 7);
+                    if (window.VertexView && window.TabType == ModEditorTabType.VertexBrush)
+                        buffer.DrawRenderer(renderer, window.Mat_Util, j, 9);
+                }
                 if (window.VertexView)
                 {
-                    MeshFilter meshFilter = target.GetComponent<MeshFilter>();
-                    addCalcShaderRender(renderer, meshFilter);
-                    addCalcShaderRender(renderer as SkinnedMeshRenderer);
+                    CalcShaderData.CalcVertexsData data = addCalcShaderRender(renderer, meshFilter);
+                    if (data == null)
+                        data = addCalcShaderRender(skinnedMesh);
+                    if (data != null)
+                    {
+                        for (int j = 0; j < subCount; j++)
+                            buffer.DrawRenderer(data.renderer, data.material, j, 0);
+                    }
                 }
             }
-            for (int i = 0; i < window.CalcShaderDatas.Count; i++)
-                buffer.DrawRenderer(window.CalcShaderDatas[i].renderer, window.CalcShaderDatas[i].material, 0, 0);
+            if (window.TabType == ModEditorTabType.VertexBrush)
+                buffer.DrawMesh(screenMesh, Matrix4x4.identity, window.Mat_Util, 0, 8);
         }
 
         void updateMaterial()
         {
-            window.Mat_viewUtil.SetColor("_NormalColor", window.Manager.NormalColor);
-            window.Mat_viewUtil.SetFloat("_NormalLength", window.Manager.NormalLength);
+            window.Mat_Util.SetColor("_NormalColor", window.Manager.NormalColor);
+            window.Mat_Util.SetFloat("_NormalLength", window.Manager.NormalLength);
 
-            window.Mat_viewUtil.SetColor("_TangentColor", window.Manager.TangentColor);
-            window.Mat_viewUtil.SetFloat("_TangentLength", window.Manager.TangentLength);
-            window.Mat_viewUtil.SetFloat("_ArrowLength", window.Manager.ArrowLength);
-            window.Mat_viewUtil.SetFloat("_ArrowSize", window.Manager.ArrowSize);
+            window.Mat_Util.SetColor("_TangentColor", window.Manager.TangentColor);
+            window.Mat_Util.SetFloat("_TangentLength", window.Manager.TangentLength);
+            window.Mat_Util.SetFloat("_ArrowLength", window.Manager.ArrowLength);
+            window.Mat_Util.SetFloat("_ArrowSize", window.Manager.ArrowSize);
 
-            window.Mat_viewUtil.SetColor("_GridColor", window.Manager.GridColor);
-            window.Mat_viewUtil.SetInt("_GridWithZTest", window.Manager.GridWithZTest ? (int)CompareFunction.LessEqual : (int)CompareFunction.Always);
+            window.Mat_Util.SetColor("_GridColor", window.Manager.GridColor);
+            window.Mat_Util.SetInt("_GridWithZTest", window.Manager.GridWithZTest ? (int)CompareFunction.LessEqual : (int)CompareFunction.Always);
 
-            window.Mat_viewUtil.SetFloat("_UVAlpha", window.Manager.UVAlpha);
+            window.Mat_Util.SetFloat("_UVAlpha", window.Manager.UVAlpha);
 
-            window.Mat_viewUtil.SetFloat("_DepthCompress", window.Manager.DepthCompress);
+            window.Mat_Util.SetFloat("_DepthCompress", window.Manager.DepthCompress);
         }
 
-        void addCalcShaderRender(Renderer renderer, MeshFilter meshFilter)
+        CalcShaderData.CalcVertexsData addCalcShaderRender(Renderer renderer, MeshFilter meshFilter)
         {
             if (renderer == null || meshFilter == null || meshFilter.sharedMesh == null)
-                return;
+                return null;
             Material material = new Material(Shader.Find("Hidden/ModEditorVertexView"));
-            CalcShaderData.CalcVertexsData data;
+            CalcShaderData.CalcVertexsData data = null;
             switch (window.Manager.BrushType)
             {
                 case BrushType.ScreenScope:
@@ -438,14 +484,15 @@ namespace ModEditor
                     window.CalcShaderDatas.Add(data);
                     break;
             }
+            return data;
         }
 
-        void addCalcShaderRender(SkinnedMeshRenderer skinnedMesh)
+        CalcShaderData.CalcVertexsData addCalcShaderRender(SkinnedMeshRenderer skinnedMesh)
         {
             if (skinnedMesh == null || skinnedMesh.sharedMesh == null)
-                return;
+                return null;
             Material material = new Material(Shader.Find("Hidden/ModEditorVertexView"));
-            CalcShaderData.CalcVertexsData data;
+            CalcShaderData.CalcVertexsData data = null;
             switch (window.Manager.BrushType)
             {
                 case BrushType.ScreenScope:
@@ -454,6 +501,7 @@ namespace ModEditor
                     window.CalcShaderDatas.Add(data);
                     break;
             }
+            return data;
         }
     }
 }

@@ -140,52 +140,34 @@ namespace ModEditor
         public class Dictionary_Obj_Mesh
         {
             [SerializeField]
-            List<PropertyName> keyList;
+            List<PropertyName> keyList = new List<PropertyName>();
             [SerializeField]
-            List<Mesh> valList;
-            [SerializeField]
-            List<Mesh> originList;
-            List<Mesh> recycleBin;
+            List<Mesh> originList = new List<Mesh>();
+            Dictionary<PropertyName, Mesh> valDic = new Dictionary<PropertyName, Mesh>();
 
             public int count => keyList.Count;
-
-            public Dictionary_Obj_Mesh()
-            {
-                keyList = new List<PropertyName>();
-                valList = new List<Mesh>();
-                originList = new List<Mesh>();
-                recycleBin = new List<Mesh>();
-            }
 
             public Mesh this[GameObject key, bool origin = false]
             {
                 get
                 {
-                    int index = keyList.IndexOf(ModEditorWindow.ExposedManagement.GetKey(key));
+                    PropertyName _key = ModEditorWindow.ExposedManagement.GetKey(key);
+                    int index = keyList.IndexOf(_key);
                     if (index >= 0)
-                    {
-                        return origin ? originList[index] : valList[index];
-                    }
+                        return origin ? originList[index] : valDic[_key];
                     else
                         throw new Exception("SerializableClass.Dictionary_Obj_Mesh: This key does not exist.");
                 }
                 set
                 {
-                    int index = keyList.IndexOf(ModEditorWindow.ExposedManagement.GetKey(key));
+                    PropertyName _key = ModEditorWindow.ExposedManagement.GetKey(key);
+                    int index = keyList.IndexOf(_key);
                     if (index >= 0)
                     {
                         if (origin)
-                        {
-                            if (originList[index] == value)
-                                return;
                             originList[index] = value;
-                        }
                         else
-                        {
-                            if (valList[index] == value)
-                                return;
-                            valList[index] = value;
-                        }
+                            valDic[_key] = value;
                     }
                     else
                         throw new Exception("SerializableClass.Dictionary_Obj_Mesh: This key does not exist.");
@@ -194,70 +176,33 @@ namespace ModEditor
 
             public void Add(GameObject key, Mesh val, Mesh origin)
             {
-                if (val != null && string.IsNullOrEmpty(AssetDatabase.GetAssetPath(val)))
-                {
-                    string path = $"{ModEditorWindow.ModEditorPath}/{val.name}.mesh";
-                    AssetDatabase.CreateAsset(val, path);
-                    AssetDatabase.ImportAsset(ModEditorWindow.ModEditorPath);
-                }
-                int index = keyList.IndexOf(ModEditorWindow.ExposedManagement.GetKey(key));
+                if(string.IsNullOrEmpty(AssetDatabase.GetAssetPath(origin)))
+                    throw new Exception("SerializableClass.Dictionary_Obj_Mesh: origin is a instance.");
+                PropertyName _key = ModEditorWindow.ExposedManagement.GetKey(key);
+                int index = keyList.IndexOf(_key);
                 if (index >= 0)
-                {
-                    Mesh mesh = valList[index];
-                    if (mesh != null && mesh.name.EndsWith("-Editing"))
-                    {
-                        recycleBin.Add(mesh);
-                        string path = $"{ModEditorWindow.ModEditorPath}/{val.name}.mesh";
-                        AssetDatabase.DeleteAsset(path);
-                    }
-                    valList[index] = val;
                     originList[index] = origin;
-                }
                 else
                 {
                     keyList.Add(ModEditorWindow.ExposedManagement.GetKey(key));
-                    valList.Add(val);
                     originList.Add(origin);
                 }
+                valDic[_key] = val;
             }
 
             public void Add(GameObject key, Mesh val)
             {
-                int index = keyList.IndexOf(ModEditorWindow.ExposedManagement.GetKey(key));
+                PropertyName _key = ModEditorWindow.ExposedManagement.GetKey(key);
+                int index = keyList.IndexOf(_key);
                 if (index >= 0)
                 {
-                    Mesh mesh = valList[index];
-                    if (mesh != null && mesh.name.EndsWith("-Editing"))
-                    {
-                        recycleBin.Add(mesh);
-                        string path = $"{ModEditorWindow.ModEditorPath}/{mesh.name}.mesh";
-                        AssetDatabase.DeleteAsset(path);
-                    }
-                    if (val != null && string.IsNullOrEmpty(AssetDatabase.GetAssetPath(val)))
-                    {
-                        string path = $"{ModEditorWindow.ModEditorPath}/{val.name}.mesh";
-                        AssetDatabase.CreateAsset(val, path);
-                        AssetDatabase.ImportAsset(ModEditorWindow.ModEditorPath);
-                    }
-                    valList[index] = val;
+                    if (val == originList[index])
+                        valDic.Remove(_key);
+                    else
+                        valDic[_key] = val;
                 }
                 else
-                {
                     throw new Exception("SerializableClass.Dictionary_Obj_Mesh: This key does not exist. Please set the origin first than go on.");
-                }
-            }
-
-            public bool TryGetValue(GameObject key, out Mesh val)
-            {
-                val = null;
-                int index = keyList.IndexOf(ModEditorWindow.ExposedManagement.GetKey(key));
-                if (index >= 0)
-                {
-                    val = valList[index];
-                    return true;
-                }
-                else
-                    return false;
             }
 
             public bool ContainsKey(GameObject key)
@@ -278,22 +223,39 @@ namespace ModEditor
 
             public void CheckAndClearExposed()
             {
-                for (int i = 0; i < count; i++)
+                checkFolder();
+                for (int i = 0; i < keyList.Count; i++)
                 {
-                    if (ModEditorWindow.ExposedManagement.CheckAndClearExposed(keyList[i]))
+                    PropertyName _key = keyList[i];
+                    if (ModEditorWindow.ExposedManagement.CheckAndClearExposed(_key))
                     {
                         keyList.RemoveAt(i);
-                        Mesh mesh = valList[i];
-                        if (mesh != null)
-                        {
-                            string path = $"{ModEditorWindow.ModEditorPath}/{mesh.name}.mesh";
-                            AssetDatabase.DeleteAsset(path);
-                        }
-                        valList.RemoveAt(i);
+                        valDic.Remove(_key);
                         originList.RemoveAt(i);
                         i--;
                     }
+                    else
+                    {
+                        if (valDic.TryGetValue(_key, out Mesh mesh) && mesh != null)
+                        {
+                            if (string.IsNullOrEmpty(AssetDatabase.GetAssetPath(mesh)))
+                            {
+                                string path = $"{ModEditorWindow.ModEditorPath}/Meshs/{mesh.name}.mesh";
+                                AssetDatabase.DeleteAsset(path);
+                                AssetDatabase.CreateAsset(mesh, path);
+                            }
+                            valDic.Remove(_key);
+                            originList[i] = mesh;
+                        }
+                    }
                 }
+                AssetDatabase.ImportAsset($"{ModEditorWindow.ModEditorPath}/Meshs");
+            }
+
+            void checkFolder()
+            {
+                if (!AssetDatabase.IsValidFolder($"{ModEditorWindow.ModEditorPath}/Meshs"))
+                    AssetDatabase.CreateFolder(ModEditorWindow.ModEditorPath, "Meshs");
             }
         }
     }
