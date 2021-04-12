@@ -67,7 +67,7 @@ namespace ModEditor
             PlayerSettings.defaultCursor = defaultCursor;
             Cursor.SetCursor(defaultCursor, Vector2.zero, CursorMode.Auto);
         }
-        Gradient gradient = new Gradient();
+
         public override void Draw()
         {
             if (GUILayout.Button("Write avg normals to model's tangent"))
@@ -78,8 +78,6 @@ namespace ModEditor
             window.Manager.BrushColor = EditorGUILayout.ColorField("Brush Color", window.Manager.BrushColor);
             window.Manager.BrushViewColor = EditorGUILayout.ColorField(new GUIContent("Brush View Color"), window.Manager.BrushViewColor, true, true, false);
 
-            gradient = EditorGUILayout.GradientField(gradient);
-
             if (GUILayout.Button("asd"))
                 func();
             index = EditorGUILayout.IntSlider(index, 0, 3);
@@ -88,7 +86,7 @@ namespace ModEditor
         int index = 0;
         void func()
         {
-            
+
         }
 
         private void OnMouse_DownLeft()
