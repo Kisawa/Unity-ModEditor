@@ -234,7 +234,10 @@ namespace ModEditor
             {
                 CalcShaderData.CalcVertexsData data = ModEditor.CalcShaderDatas[i];
                 if (brushOn)
+                {
                     data.Update(ModEditor.camera, Mouse.ScreenTexcoord, BrushSize, BrushDepth);
+                    data.Cala(ModEditor.Manager.BrushColor);
+                }
                 if (data.IsAvailable)
                 {
                     data.material.SetInt("_BrushOn", brushOn ? 1 : 0);
@@ -243,7 +246,7 @@ namespace ModEditor
                     data.material.SetColor("_SelectedVertexColor", SelectedVertexColor);
                     data.material.SetFloat("_VertexScale", VertexScale);
                     data.material.SetInt("_VertexWithZTest", VertexWithZTest ? (int)CompareFunction.LessEqual : (int)CompareFunction.Always);
-                    data.material.SetInt("_OnlyZone", Key.Shift ? 1 : 0);
+                    data.material.SetInt("_OnlyZone", BrushLock && Key.Shift ? 1 : 0);
                 }
             }
             SceneView.RepaintAll();

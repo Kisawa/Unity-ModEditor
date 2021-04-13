@@ -65,8 +65,7 @@ namespace ModEditor
             EditorEvent.Use.OnKey.CapsLock.Down += CapsLock_Down;
             EditorEvent.Use.Control.OnMouse.DragLeft += Control_OnMouse_DragLeft;
             EditorEvent.Use.Control.OnScrollWheel.Roll += Control_OnScrollWheel_Roll;
-            EditorEvent.Use.Alt.OnScrollWheel.Roll += Alt_OnScrollWheel_Roll;
-            EditorEvent.Use.ShiftAndAlt.OnScrollWheel.Roll += Alt_OnScrollWheel_Roll;
+            
             Mouse.Update += Mouse_Update;
             ScrollWheel.Update += ScrollWheel_Update;
         }
@@ -81,8 +80,7 @@ namespace ModEditor
             EditorEvent.Use.OnKey.CapsLock.Down -= CapsLock_Down;
             EditorEvent.Use.Control.OnMouse.DragLeft -= Control_OnMouse_DragLeft;
             EditorEvent.Use.Control.OnScrollWheel.Roll -= Control_OnScrollWheel_Roll;
-            EditorEvent.Use.Alt.OnScrollWheel.Roll -= Alt_OnScrollWheel_Roll;
-            EditorEvent.Use.ShiftAndAlt.OnScrollWheel.Roll -= Alt_OnScrollWheel_Roll;
+            
             Mouse.Update -= Mouse_Update;
             ScrollWheel.Update -= ScrollWheel_Update;
         }
@@ -139,14 +137,6 @@ namespace ModEditor
                 return;
             Manager.BrushDepth -= Event.current.delta.y * 0.01f;
             SceneHandleType = SceneHandleType.BrushDepth;
-        }
-
-        private void Alt_OnScrollWheel_Roll(float obj)
-        {
-            if (TabType != ModEditorTabType.VertexBrush || !VertexView)
-                return;
-            for (int i = 0; i < CalcShaderDatas.Count; i++)
-                CalcShaderDatas[i].SpreadSelects(obj < 0);
         }
 
         private void Mouse_Update()

@@ -24,6 +24,10 @@ namespace ModEditor
 
         public static ShiftAndAlt ShiftAndAlt = new ShiftAndAlt();
 
+        public static ShiftAndControl ShiftAndControl = new ShiftAndControl();
+
+        public static ShiftAndControlAndAlt ShiftAndControlAndAlt = new ShiftAndControlAndAlt();
+
         public static void Update(Event @event, Camera camera)
         {
             Key.UpdateControlState(@event.control);
@@ -74,6 +78,18 @@ namespace ModEditor
                             if (Use.ShiftAndAlt.OnKey.Tab.InvokeDown())
                                 @event.Use();
                         }
+                        if (@event.control && !@event.alt && @event.shift)
+                        {
+                            ShiftAndControl.OnKey.Tab.InvokeDown();
+                            if (Use.ShiftAndControl.OnKey.Tab.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndControlAndAlt.OnKey.Tab.InvokeDown();
+                            if (Use.ShiftAndControlAndAlt.OnKey.Tab.InvokeDown())
+                                @event.Use();
+                        }
                     }
                     if (@event.keyCode == KeyCode.BackQuote)
                     {
@@ -111,6 +127,18 @@ namespace ModEditor
                         {
                             ShiftAndAlt.OnKey.BackQuote.InvokeDown();
                             if (Use.ShiftAndAlt.OnKey.BackQuote.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.control && !@event.alt && @event.shift)
+                        {
+                            ShiftAndControl.OnKey.BackQuote.InvokeDown();
+                            if (Use.ShiftAndControl.OnKey.BackQuote.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndControlAndAlt.OnKey.BackQuote.InvokeDown();
+                            if (Use.ShiftAndControlAndAlt.OnKey.BackQuote.InvokeDown())
                                 @event.Use();
                         }
                     }
@@ -152,6 +180,18 @@ namespace ModEditor
                             if (Use.ShiftAndAlt.OnKey.Space.InvokeDown())
                                 @event.Use();
                         }
+                        if (@event.control && !@event.alt && @event.shift)
+                        {
+                            ShiftAndControl.OnKey.Space.InvokeDown();
+                            if (Use.ShiftAndControl.OnKey.Space.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndControlAndAlt.OnKey.Space.InvokeDown();
+                            if (Use.ShiftAndControlAndAlt.OnKey.Space.InvokeDown())
+                                @event.Use();
+                        }
                     }
                     if (@event.keyCode == KeyCode.CapsLock)
                     {
@@ -191,6 +231,18 @@ namespace ModEditor
                             if (Use.ShiftAndAlt.OnKey.CapsLock.InvokeDown())
                                 @event.Use();
                         }
+                        if (@event.control && !@event.alt && @event.shift)
+                        {
+                            ShiftAndControl.OnKey.CapsLock.InvokeDown();
+                            if (Use.ShiftAndControl.OnKey.CapsLock.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndControlAndAlt.OnKey.CapsLock.InvokeDown();
+                            if (Use.ShiftAndControlAndAlt.OnKey.CapsLock.InvokeDown())
+                                @event.Use();
+                        }
                     }
                 }
                 if (@event.type == EventType.KeyUp)
@@ -221,6 +273,30 @@ namespace ModEditor
                             if (Use.ControlAndAlt.OnKey.Tab.InvokeUp())
                                 @event.Use();
                         }
+                        if (!@event.control && !@event.alt && @event.shift)
+                        {
+                            Shift.OnKey.Tab.InvokeUp();
+                            if (Use.Shift.OnKey.Tab.InvokeUp())
+                                @event.Use();
+                        }
+                        if (!@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndAlt.OnKey.Tab.InvokeUp();
+                            if (Use.ShiftAndAlt.OnKey.Tab.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && !@event.alt && @event.shift)
+                        {
+                            ShiftAndControl.OnKey.Tab.InvokeUp();
+                            if (Use.ShiftAndControl.OnKey.Tab.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndControlAndAlt.OnKey.Tab.InvokeUp();
+                            if (Use.ShiftAndControlAndAlt.OnKey.Tab.InvokeUp())
+                                @event.Use();
+                        }
                     }
                     if (@event.keyCode == KeyCode.BackQuote)
                     {
@@ -246,6 +322,30 @@ namespace ModEditor
                         {
                             ControlAndAlt.OnKey.BackQuote.InvokeUp();
                             if (Use.ControlAndAlt.OnKey.BackQuote.InvokeUp())
+                                @event.Use();
+                        }
+                        if (!@event.control && !@event.alt && @event.shift)
+                        {
+                            Shift.OnKey.BackQuote.InvokeUp();
+                            if (Use.Shift.OnKey.BackQuote.InvokeUp())
+                                @event.Use();
+                        }
+                        if (!@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndAlt.OnKey.BackQuote.InvokeUp();
+                            if (Use.ShiftAndAlt.OnKey.BackQuote.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && !@event.alt && @event.shift)
+                        {
+                            ShiftAndControl.OnKey.BackQuote.InvokeUp();
+                            if (Use.ShiftAndControl.OnKey.BackQuote.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndControlAndAlt.OnKey.BackQuote.InvokeUp();
+                            if (Use.ShiftAndControlAndAlt.OnKey.BackQuote.InvokeUp())
                                 @event.Use();
                         }
                     }
@@ -275,6 +375,30 @@ namespace ModEditor
                             if (Use.ControlAndAlt.OnKey.Space.InvokeUp())
                                 @event.Use();
                         }
+                        if (!@event.control && !@event.alt && @event.shift)
+                        {
+                            Shift.OnKey.Space.InvokeUp();
+                            if (Use.Shift.OnKey.Space.InvokeUp())
+                                @event.Use();
+                        }
+                        if (!@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndAlt.OnKey.Space.InvokeUp();
+                            if (Use.ShiftAndAlt.OnKey.Space.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && !@event.alt && @event.shift)
+                        {
+                            ShiftAndControl.OnKey.Space.InvokeUp();
+                            if (Use.ShiftAndControl.OnKey.Space.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndControlAndAlt.OnKey.Space.InvokeUp();
+                            if (Use.ShiftAndControlAndAlt.OnKey.Space.InvokeUp())
+                                @event.Use();
+                        }
                     }
                     if (@event.keyCode == KeyCode.CapsLock)
                     {
@@ -300,6 +424,30 @@ namespace ModEditor
                         {
                             ControlAndAlt.OnKey.CapsLock.InvokeUp();
                             if (Use.ControlAndAlt.OnKey.CapsLock.InvokeUp())
+                                @event.Use();
+                        }
+                        if (!@event.control && !@event.alt && @event.shift)
+                        {
+                            Shift.OnKey.CapsLock.InvokeUp();
+                            if (Use.Shift.OnKey.CapsLock.InvokeUp())
+                                @event.Use();
+                        }
+                        if (!@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndAlt.OnKey.CapsLock.InvokeUp();
+                            if (Use.ShiftAndAlt.OnKey.CapsLock.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && !@event.alt && @event.shift)
+                        {
+                            ShiftAndControl.OnKey.CapsLock.InvokeUp();
+                            if (Use.ShiftAndControl.OnKey.CapsLock.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndControlAndAlt.OnKey.CapsLock.InvokeUp();
+                            if (Use.ShiftAndControlAndAlt.OnKey.CapsLock.InvokeUp())
                                 @event.Use();
                         }
                     }
@@ -346,6 +494,18 @@ namespace ModEditor
                     {
                         ShiftAndAlt.OnMouse.InvokeMove();
                         if (Use.ShiftAndAlt.OnMouse.InvokeMove())
+                            @event.Use();
+                    }
+                    if (@event.control && !@event.alt && @event.shift)
+                    {
+                        ShiftAndControl.OnMouse.InvokeMove();
+                        if (Use.ShiftAndControl.OnMouse.InvokeMove())
+                            @event.Use();
+                    }
+                    if (@event.control && @event.alt && @event.shift)
+                    {
+                        ShiftAndControlAndAlt.OnMouse.InvokeMove();
+                        if (Use.ShiftAndControlAndAlt.OnMouse.InvokeMove())
                             @event.Use();
                     }
                 }
@@ -474,6 +634,48 @@ namespace ModEditor
                         {
                             ShiftAndAlt.OnMouse.InvokeDownScroll();
                             if (Use.ShiftAndAlt.OnMouse.InvokeDownScroll())
+                                @event.Use();
+                        }
+                    }
+                    if (@event.control && !@event.alt && @event.shift)
+                    {
+                        if (@event.button == 0)
+                        {
+                            ShiftAndControl.OnMouse.InvokeDownLeft();
+                            if (Use.ShiftAndControl.OnMouse.InvokeDownLeft())
+                                @event.Use();
+                        }
+                        else if (@event.button == 1)
+                        {
+                            ShiftAndControl.OnMouse.InvokeDownRight();
+                            if (Use.ShiftAndControl.OnMouse.InvokeDownRight())
+                                @event.Use();
+                        }
+                        else if (@event.button == 2)
+                        {
+                            ShiftAndControl.OnMouse.InvokeDownScroll();
+                            if (Use.ShiftAndControl.OnMouse.InvokeDownScroll())
+                                @event.Use();
+                        }
+                    }
+                    if (@event.control && @event.alt && @event.shift)
+                    {
+                        if (@event.button == 0)
+                        {
+                            ShiftAndControlAndAlt.OnMouse.InvokeDownLeft();
+                            if (Use.ShiftAndControlAndAlt.OnMouse.InvokeDownLeft())
+                                @event.Use();
+                        }
+                        else if (@event.button == 1)
+                        {
+                            ShiftAndControlAndAlt.OnMouse.InvokeDownRight();
+                            if (Use.ShiftAndControlAndAlt.OnMouse.InvokeDownRight())
+                                @event.Use();
+                        }
+                        else if (@event.button == 2)
+                        {
+                            ShiftAndControlAndAlt.OnMouse.InvokeDownScroll();
+                            if (Use.ShiftAndControlAndAlt.OnMouse.InvokeDownScroll())
                                 @event.Use();
                         }
                     }
@@ -606,6 +808,48 @@ namespace ModEditor
                                 @event.Use();
                         }
                     }
+                    if (@event.control && !@event.alt && @event.shift)
+                    {
+                        if (@event.button == 0)
+                        {
+                            ShiftAndControl.OnMouse.InvokeUpLeft();
+                            if (Use.ShiftAndControl.OnMouse.InvokeUpLeft())
+                                @event.Use();
+                        }
+                        else if (@event.button == 1)
+                        {
+                            ShiftAndControl.OnMouse.InvokeUpRight();
+                            if (Use.ShiftAndControl.OnMouse.InvokeUpRight())
+                                @event.Use();
+                        }
+                        else if (@event.button == 2)
+                        {
+                            ShiftAndControl.OnMouse.InvokeUpScroll();
+                            if (Use.ShiftAndControl.OnMouse.InvokeUpScroll())
+                                @event.Use();
+                        }
+                    }
+                    if (@event.control && @event.alt && @event.shift)
+                    {
+                        if (@event.button == 0)
+                        {
+                            ShiftAndControlAndAlt.OnMouse.InvokeUpLeft();
+                            if (Use.ShiftAndControlAndAlt.OnMouse.InvokeUpLeft())
+                                @event.Use();
+                        }
+                        else if (@event.button == 1)
+                        {
+                            ShiftAndControlAndAlt.OnMouse.InvokeUpRight();
+                            if (Use.ShiftAndControlAndAlt.OnMouse.InvokeUpRight())
+                                @event.Use();
+                        }
+                        else if (@event.button == 2)
+                        {
+                            ShiftAndControlAndAlt.OnMouse.InvokeUpScroll();
+                            if (Use.ShiftAndControlAndAlt.OnMouse.InvokeUpScroll())
+                                @event.Use();
+                        }
+                    }
                 }
                 if (@event.type == EventType.MouseDrag)
                 {
@@ -735,6 +979,48 @@ namespace ModEditor
                                 @event.Use();
                         }
                     }
+                    if (@event.control && !@event.alt && @event.shift)
+                    {
+                        if (@event.button == 0)
+                        {
+                            ShiftAndControl.OnMouse.InvokeDragLeft();
+                            if (Use.ShiftAndControl.OnMouse.InvokeDragLeft())
+                                @event.Use();
+                        }
+                        else if (@event.button == 1)
+                        {
+                            ShiftAndControl.OnMouse.InvokeDragRight();
+                            if (Use.ShiftAndControl.OnMouse.InvokeDragRight())
+                                @event.Use();
+                        }
+                        else if (@event.button == 2)
+                        {
+                            ShiftAndControl.OnMouse.InvokeDragScroll();
+                            if (Use.ShiftAndControl.OnMouse.InvokeDragScroll())
+                                @event.Use();
+                        }
+                    }
+                    if (@event.control && @event.alt && @event.shift)
+                    {
+                        if (@event.button == 0)
+                        {
+                            ShiftAndControlAndAlt.OnMouse.InvokeDragLeft();
+                            if (Use.ShiftAndControlAndAlt.OnMouse.InvokeDragLeft())
+                                @event.Use();
+                        }
+                        else if (@event.button == 1)
+                        {
+                            ShiftAndControlAndAlt.OnMouse.InvokeDragRight();
+                            if (Use.ShiftAndControlAndAlt.OnMouse.InvokeDragRight())
+                                @event.Use();
+                        }
+                        else if (@event.button == 2)
+                        {
+                            ShiftAndControlAndAlt.OnMouse.InvokeDragScroll();
+                            if (Use.ShiftAndControlAndAlt.OnMouse.InvokeDragScroll())
+                                @event.Use();
+                        }
+                    }
                 }
             }
 
@@ -777,6 +1063,18 @@ namespace ModEditor
                     if (Use.ShiftAndAlt.OnScrollWheel.InvokeRoll(@event.delta.y))
                         @event.Use();
                 }
+                if (@event.control && !@event.alt && @event.shift)
+                {
+                    ShiftAndControl.OnScrollWheel.InvokeRoll(@event.delta.y);
+                    if (Use.ShiftAndControl.OnScrollWheel.InvokeRoll(@event.delta.y))
+                        @event.Use();
+                }
+                if (@event.control && @event.alt && @event.shift)
+                {
+                    ShiftAndControlAndAlt.OnScrollWheel.InvokeRoll(@event.delta.y);
+                    if (Use.ShiftAndControlAndAlt.OnScrollWheel.InvokeRoll(@event.delta.y))
+                        @event.Use();
+                }
             }
         }
 
@@ -797,6 +1095,10 @@ namespace ModEditor
             public static Shift Shift = new Shift();
 
             public static ShiftAndAlt ShiftAndAlt = new ShiftAndAlt();
+
+            public static ShiftAndControl ShiftAndControl = new ShiftAndControl();
+
+            public static ShiftAndControlAndAlt ShiftAndControlAndAlt = new ShiftAndControlAndAlt();
         }
     }
 
@@ -1064,6 +1366,24 @@ namespace ModEditor
     }
 
     public class ShiftAndAlt
+    {
+        public OnKey OnKey = new OnKey();
+
+        public OnMouse OnMouse = new OnMouse();
+
+        public OnScrollWheel OnScrollWheel = new OnScrollWheel();
+    }
+
+    public class ShiftAndControl
+    {
+        public OnKey OnKey = new OnKey();
+
+        public OnMouse OnMouse = new OnMouse();
+
+        public OnScrollWheel OnScrollWheel = new OnScrollWheel();
+    }
+
+    public class ShiftAndControlAndAlt
     {
         public OnKey OnKey = new OnKey();
 

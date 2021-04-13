@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Unity.Collections;
 using UnityEditor;
 using UnityEngine;
 
@@ -20,70 +19,63 @@ namespace ModEditor
         }
 
         public ComputeShader CalcVertexShader { get; private set; }
-        public int kernel_CalcVertexsWithScreenScope { get; private set; }
-        public int kernel_SpreadSelectInTirangle { get; private set; }
-        public int kernel_RespreadSelectInTirangle { get; private set; }
+        public int kernel_SelectWithScreenScope { get; private set; }
+        public int kernel_SpreadSelect { get; private set; }
+        public int kernel_RespreadSelect { get; private set; }
         public int kernel_LockZone { get; private set; }
         public int kernel_AddZone { get; private set; }
         public int kernel_SubZone { get; private set; }
-        public int kernel_WriteVertexColorUseSelectData { get; private set; }
+        public int kernel_Calc { get; private set; }
 
-        Dictionary<Transform, ComputeBuffer> ZoneCache;
+        Dictionary<Transform, CalcData.Cache> Cache;
 
         public CalcUtil()
         {
             CalcVertexShader = AssetDatabase.LoadAssetAtPath<ComputeShader>($"{ModEditorWindow.ModEditorPath}/Editor/Shaders/CalcViewVertex.compute");
-            kernel_CalcVertexsWithScreenScope = CalcVertexShader.FindKernel("CalcVertexsWithScreenScope");
-            kernel_SpreadSelectInTirangle = CalcVertexShader.FindKernel("SpreadSelectInTirangle");
-            kernel_RespreadSelectInTirangle = CalcVertexShader.FindKernel("RespreadSelectInTirangle");
+            kernel_SelectWithScreenScope = CalcVertexShader.FindKernel("SelectWithScreenScope");
+            kernel_SpreadSelect = CalcVertexShader.FindKernel("SpreadSelect");
+            kernel_RespreadSelect = CalcVertexShader.FindKernel("RespreadSelect");
             kernel_LockZone = CalcVertexShader.FindKernel("LockZone");
             kernel_AddZone = CalcVertexShader.FindKernel("AddZone");
             kernel_SubZone = CalcVertexShader.FindKernel("SubZone");
-            kernel_WriteVertexColorUseSelectData = CalcVertexShader.FindKernel("WriteVertexColorUseSelectData");
-            ZoneCache = new Dictionary<Transform, ComputeBuffer>();
+            kernel_Calc = CalcVertexShader.FindKernel("Calc");
+            Cache = new Dictionary<Transform, CalcData.Cache>();
         }
 
-        public ComputeBuffer GetZoneCache(Transform trans, int count)
+        public CalcData.Cache GetCache(Transform trans, int count)
         {
-            if (ZoneCache.TryGetValue(trans, out ComputeBuffer RW_Zone))
+            if (!Cache.TryGetValue(trans, out CalcData.Cache cache))
             {
-                if (RW_Zone.count != count)
-                {
-                    RW_Zone.Dispose();
-                    RW_Zone = new ComputeBuffer(count, sizeof(int));
-                    RW_Zone.SetData(Enumerable.Repeat(1, count).ToArray());
-                }
+                cache = new CalcData.Cache();
+                Cache.Add(trans, cache);
             }
-            else
+            if (cache.RW_Zone == null || cache.RW_Zone.count != count)
             {
-                RW_Zone = new ComputeBuffer(count, sizeof(int));
-                RW_Zone.SetData(Enumerable.Repeat(1, count).ToArray());
-                ZoneCache.Add(trans, RW_Zone);
+                if (cache.RW_Zone != null)
+                    cache.RW_Zone.Dispose();
+                cache.RW_Zone = new ComputeBuffer(count, sizeof(int));
+                cache.RW_Zone.SetData(Enumerable.Repeat(1, count).ToArray());
             }
-            return RW_Zone;
+            if (cache.RW_Selects == null || cache.RW_Selects.count != count)
+            {
+                if (cache.RW_Selects != null)
+                    cache.RW_Selects.Dispose();
+                cache.RW_Selects = new ComputeBuffer(count, sizeof(float));
+                cache.RW_Selects.SetData(Enumerable.Repeat(0, count).ToArray());
+            }
+            return cache;
         }
 
-        public void ClearZoneCache()
+        public void ClearCache()
         {
-            foreach (ComputeBuffer item in ZoneCache.Values)
-                item.Dispose();
-            ZoneCache.Clear();
-        }
-
-        public static Color[] WriteVertexColor_UseSelectData(Color color, ComputeBuffer _Selects, Color[] originColors)
-        {
-            if (originColors.Length == 0)
-                return null;
-            Self.CalcVertexShader.SetVector("_Color", color);
-            Self.CalcVertexShader.SetBuffer(Self.kernel_WriteVertexColorUseSelectData, "RW_Selects", _Selects);
-            ComputeBuffer RW_Colors = new ComputeBuffer(originColors.Length, sizeof(float) * 4);
-            RW_Colors.SetData(originColors);
-            Self.CalcVertexShader.SetBuffer(Self.kernel_WriteVertexColorUseSelectData, "RW_Colors", RW_Colors);
-            Self.CalcVertexShader.Dispatch(Self.kernel_WriteVertexColorUseSelectData, Mathf.CeilToInt((float)originColors.Length / 1024), 1, 1);
-            Color[] colors = new Color[originColors.Length];
-            RW_Colors.GetData(colors);
-            RW_Colors.Dispose();
-            return colors;
+            foreach (CalcData.Cache item in Cache.Values)
+            {
+                if (item.RW_Zone != null)
+                    item.RW_Zone.Dispose();
+                if (item.RW_Selects != null)
+                    item.RW_Selects.Dispose();
+            }
+            Cache.Clear();
         }
     }
 }

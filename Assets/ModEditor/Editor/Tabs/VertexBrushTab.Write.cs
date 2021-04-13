@@ -23,6 +23,8 @@ namespace ModEditor
 
         void write()
         {
+            if (objInOperation == null)
+                return;
             switch (window.Manager.BrushType)
             {
                 case BrushType.ScreenScope:
@@ -33,8 +35,6 @@ namespace ModEditor
 
         void writeVertexColor_ScreenScope()
         {
-            if (objInOperation == null)
-                return;
             for (int i = 0; i < objInOperation.Count; i++)
             {
                 Transform trans = objInOperation[i].Item1;
@@ -44,9 +44,11 @@ namespace ModEditor
                 CalcShaderData.CalcVertexsData data = window.CalcShaderDatas.FirstOrDefault(x => x.trans == trans);
                 if (data != null && data.IsAvailable)
                 {
-                    if (mesh.colors.Length != mesh.vertexCount)
-                        mesh.colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
-                    mesh.colors = CalcUtil.WriteVertexColor_UseSelectData(window.Manager.BrushColor, data.RW_Selects, mesh.colors);
+                    data.Cala(window.Manager.BrushColor);
+                    data.RefreshColor();
+                    Color[] colors = new Color[data.RW_Colors.count];
+                    data.RW_Colors.GetData(colors);
+                    mesh.colors = colors;
                 }
             }
         }

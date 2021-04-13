@@ -448,7 +448,7 @@ namespace ModEditor
                     }
                 }
             }
-            if (window.TabType == ModEditorTabType.VertexBrush)
+            if (window.TabType == ModEditorTabType.VertexBrush && window.VertexView)
                 buffer.DrawMesh(screenMesh, Matrix4x4.identity, window.Mat_Util, 0, 8);
         }
 

@@ -4,6 +4,23 @@ namespace ModEditor
 {
     public sealed class CalcData
     {
+        public class Cache
+        {
+            int spreadLevel = 0;
+            public int SpreadLevel
+            {
+                get => spreadLevel;
+                set
+                {
+                    if (value < 0)
+                        value = 0;
+                    spreadLevel = value;
+                }
+            }
+            public ComputeBuffer RW_Zone;
+            public ComputeBuffer RW_Selects;
+        }
+
         public abstract class CalcDataWithVertexsBase
         {
             public Vector3[] _Vertexs;

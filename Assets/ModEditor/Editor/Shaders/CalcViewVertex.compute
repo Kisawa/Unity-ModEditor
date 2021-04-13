@@ -1,10 +1,10 @@
-﻿#pragma kernel CalcVertexsWithScreenScope
-#pragma kernel SpreadSelectInTirangle
-#pragma kernel RespreadSelectInTirangle
+﻿#pragma kernel SelectWithScreenScope
+#pragma kernel SpreadSelect
+#pragma kernel RespreadSelect
 #pragma kernel LockZone
 #pragma kernel AddZone
 #pragma kernel SubZone
-#pragma kernel WriteVertexColorUseSelectData
+#pragma kernel Calc
 
 float4x4 _MV;
 float4x4 _P;
@@ -13,13 +13,14 @@ float _Size;
 float _Depth;
 bool _ClearSpread;
 int _OnlyZone;
+int _ZoneInSelect;
 StructuredBuffer<float3> _Vertexs;
 RWStructuredBuffer<float> RW_Selects;
 RWStructuredBuffer<float> RW_Depths;
 RWStructuredBuffer<int> RW_Zone;
 
 [numthreads(1024,1,1)]
-void CalcVertexsWithScreenScope(uint3 id : SV_DispatchThreadID)
+void SelectWithScreenScope(uint3 id : SV_DispatchThreadID)
 {
 	float3 viewPos = mul(_MV, float4(_Vertexs[id.x], 1.0)).xyz;
 	float depth = -viewPos.z;
@@ -32,8 +33,10 @@ void CalcVertexsWithScreenScope(uint3 id : SV_DispatchThreadID)
 	mouseTexcoord.x *= _MouseTexcoord.z;
 	float dis = distance(uv, mouseTexcoord);
 	float res = (1 - step(_Size, dis)) * (1 - step(_Depth, depth));
-	int zone = max(RW_Zone[id.x], _OnlyZone);
+	int isZone = RW_Zone[id.x];
+	int zone = max(isZone, _OnlyZone);
 	res *= zone;
+	res = lerp(res, 1, isZone * _ZoneInSelect);
 	if(_ClearSpread)
 		RW_Selects[id.x] = -res;
 	else
@@ -47,7 +50,7 @@ void CalcVertexsWithScreenScope(uint3 id : SV_DispatchThreadID)
 
 StructuredBuffer<int> _Triangles;
 [numthreads(1024,1,1)]
-void SpreadSelectInTirangle(uint3 id: SV_DispatchThreadID)
+void SpreadSelect(uint3 id: SV_DispatchThreadID)
 {
 	int layer = id.x / 3;
 	int vertex_id0 = _Triangles[fmod(id.x, 3) + layer * 3];
@@ -71,7 +74,7 @@ void SpreadSelectInTirangle(uint3 id: SV_DispatchThreadID)
 
 int _SpreadLevel;
 [numthreads(1024,1,1)]
-void RespreadSelectInTirangle(uint3 id: SV_DispatchThreadID)
+void RespreadSelect(uint3 id: SV_DispatchThreadID)
 {
 	int layer = id.x / 3;
 	int vertex_id0 = _Triangles[fmod(id.x, 3) + layer * 3];
@@ -109,9 +112,10 @@ void SubZone(uint3 id: SV_DispatchThreadID)
 }
 
 float4 _Color;
+StructuredBuffer<float4> _OriginColors;
 RWStructuredBuffer<float4> RW_Colors;
 [numthreads(1024,1,1)]
-void WriteVertexColorUseSelectData(uint3 id: SV_DispatchThreadID)
+void Calc(uint3 id: SV_DispatchThreadID)
 {
-	RW_Colors[id.x] = lerp(RW_Colors[id.x], _Color, any(RW_Selects[id.x]));
+	RW_Colors[id.x] = lerp(_OriginColors[id.x], _Color, any(RW_Selects[id.x]));
 }

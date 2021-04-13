@@ -25,11 +25,17 @@ namespace ModEditor
             base.OnFocus();
             window.onSceneValidate += onSceneValidate;
             EditorEvent.OnMouse.DownLeft += OnMouse_DownLeft;
+            EditorEvent.ShiftAndControl.OnMouse.DownLeft += OnMouse_DownLeft;
             EditorEvent.OnMouse.UpLeft += OnMouse_UpLeft;
             EditorEvent.Control.OnMouse.UpLeft += OnMouse_UpLeft;
             EditorEvent.Alt.OnMouse.UpLeft += OnMouse_UpLeft;
             EditorEvent.ControlAndAlt.OnMouse.UpLeft += OnMouse_UpLeft;
+            EditorEvent.Shift.OnMouse.UpLeft += OnMouse_UpLeft;
+            EditorEvent.ShiftAndAlt.OnMouse.UpLeft += OnMouse_UpLeft;
+            EditorEvent.ShiftAndControl.OnMouse.UpLeft += OnMouse_UpLeft;
+            EditorEvent.ShiftAndControlAndAlt.OnMouse.UpLeft += OnMouse_UpLeft;
             EditorEvent.OnMouse.DragLeft += OnMouse_DragLeft;
+            EditorEvent.ShiftAndControl.OnMouse.DragLeft += OnMouse_DragLeft;
             EditorEvent.Use.OnMouse.DownScroll += OnMouse_Scroll;
             EditorEvent.Use.OnMouse.UpScroll += OnMouse_Scroll;
             EditorEvent.Shift.OnMouse.DownLeft += Shift_OnMouse_Left;
@@ -40,6 +46,9 @@ namespace ModEditor
             EditorEvent.Use.Shift.OnMouse.DragRight += Shift_OnMouse_Right;
             EditorEvent.ShiftAndAlt.OnMouse.DownRight += Shift_OnMouse_Right;
             EditorEvent.Use.ShiftAndAlt.OnMouse.DragRight += Shift_OnMouse_Right;
+            EditorEvent.Use.Alt.OnScrollWheel.Roll += Alt_OnScrollWheel_Roll;
+            EditorEvent.Use.ShiftAndAlt.OnScrollWheel.Roll += Alt_OnScrollWheel_Roll;
+            EditorEvent.Use.ShiftAndControlAndAlt.OnScrollWheel.Roll += Alt_OnScrollWheel_Roll;
             if (brushCursor == null)
                 brushCursor = AssetDatabase.LoadAssetAtPath<Texture2D>($"{ModEditorWindow.ModEditorPath}/Textures/brushCursor.png");
         }
@@ -49,11 +58,17 @@ namespace ModEditor
             base.OnLostFocus();
             window.onSceneValidate -= onSceneValidate;
             EditorEvent.OnMouse.DownLeft -= OnMouse_DownLeft;
+            EditorEvent.ShiftAndControl.OnMouse.DownLeft -= OnMouse_DownLeft;
             EditorEvent.OnMouse.UpLeft -= OnMouse_UpLeft;
             EditorEvent.Control.OnMouse.UpLeft -= OnMouse_UpLeft;
             EditorEvent.Alt.OnMouse.UpLeft -= OnMouse_UpLeft;
             EditorEvent.ControlAndAlt.OnMouse.UpLeft -= OnMouse_UpLeft;
+            EditorEvent.Shift.OnMouse.UpLeft -= OnMouse_UpLeft;
+            EditorEvent.ShiftAndAlt.OnMouse.UpLeft -= OnMouse_UpLeft;
+            EditorEvent.ShiftAndControl.OnMouse.UpLeft -= OnMouse_UpLeft;
+            EditorEvent.ShiftAndControlAndAlt.OnMouse.UpLeft -= OnMouse_UpLeft;
             EditorEvent.OnMouse.DragLeft -= OnMouse_DragLeft;
+            EditorEvent.ShiftAndControl.OnMouse.DragLeft -= OnMouse_DragLeft;
             EditorEvent.Use.OnMouse.DownScroll -= OnMouse_Scroll;
             EditorEvent.Use.OnMouse.UpScroll -= OnMouse_Scroll;
             EditorEvent.Shift.OnMouse.DownLeft -= Shift_OnMouse_Left;
@@ -64,6 +79,9 @@ namespace ModEditor
             EditorEvent.Use.Shift.OnMouse.DragRight -= Shift_OnMouse_Right;
             EditorEvent.ShiftAndAlt.OnMouse.DownRight -= Shift_OnMouse_Right;
             EditorEvent.Use.ShiftAndAlt.OnMouse.DragRight -= Shift_OnMouse_Right;
+            EditorEvent.Use.Alt.OnScrollWheel.Roll -= Alt_OnScrollWheel_Roll;
+            EditorEvent.Use.ShiftAndAlt.OnScrollWheel.Roll -= Alt_OnScrollWheel_Roll;
+            EditorEvent.Use.ShiftAndControlAndAlt.OnScrollWheel.Roll -= Alt_OnScrollWheel_Roll;
             PlayerSettings.defaultCursor = defaultCursor;
             Cursor.SetCursor(defaultCursor, Vector2.zero, CursorMode.Auto);
         }
@@ -93,8 +111,11 @@ namespace ModEditor
         {
             if (window.OnSceneGUI)
                 return;
-            objInOperation = recordObjInOperation();
-            write();
+            if (window.VertexView)
+            {
+                objInOperation = recordObjInOperation();
+                write();
+            }
         }
 
         private void OnMouse_UpLeft()
@@ -104,18 +125,33 @@ namespace ModEditor
 
         private void OnMouse_DragLeft()
         {
-            write();
+            if (window.OnSceneGUI)
+                return;
+            if (window.VertexView)
+                write();
         }
 
         private void OnMouse_Scroll() { }
 
+        private void Alt_OnScrollWheel_Roll(float obj)
+        {
+            if (window.OnSceneGUI || !window.VertexView)
+                return;
+            for (int i = 0; i < window.CalcShaderDatas.Count; i++)
+                window.CalcShaderDatas[i].SpreadSelects(obj < 0);
+        }
+
         private void Shift_OnMouse_Left()
         {
+            if (window.OnSceneGUI || !window.BrushLock)
+                return;
             addZone();
         }
 
         private void Shift_OnMouse_Right()
         {
+            if (window.OnSceneGUI || !window.BrushLock)
+                return;
             subZone();
         }
 

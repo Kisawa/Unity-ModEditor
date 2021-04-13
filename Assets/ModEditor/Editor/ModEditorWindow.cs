@@ -182,7 +182,7 @@ namespace ModEditor
             for (int i = 0; i < tabs.Count; i++)
                 tabs[i].OnDiable();
             ClearCalcShaderData();
-            CalcUtil.Self.ClearZoneCache();
+            CalcUtil.Self.ClearCache();
             Selection.selectionChanged -= selectionChanged;
             EditorApplication.hierarchyChanged -= hierarchyChanged;
             Undo.undoRedoPerformed -= undoRedoPerformed;
