@@ -25,7 +25,9 @@ namespace ModEditor
         public int kernel_LockZone { get; private set; }
         public int kernel_AddZone { get; private set; }
         public int kernel_SubZone { get; private set; }
-        public int kernel_Calc { get; private set; }
+        public int kernel_CalcWithSize { get; private set; }
+        public int kernel_CalcWithSpread { get; private set; }
+        public int kernel_Result { get; private set; }
 
         Dictionary<Transform, CalcData.Cache> Cache;
 
@@ -38,7 +40,9 @@ namespace ModEditor
             kernel_LockZone = CalcVertexShader.FindKernel("LockZone");
             kernel_AddZone = CalcVertexShader.FindKernel("AddZone");
             kernel_SubZone = CalcVertexShader.FindKernel("SubZone");
-            kernel_Calc = CalcVertexShader.FindKernel("Calc");
+            kernel_CalcWithSize = CalcVertexShader.FindKernel("CalcWithSize");
+            kernel_CalcWithSpread = CalcVertexShader.FindKernel("CalcWithSpread");
+            kernel_Result = CalcVertexShader.FindKernel("Result");
             Cache = new Dictionary<Transform, CalcData.Cache>();
         }
 

@@ -42,6 +42,7 @@ namespace ModEditor
             window.onCameraChange += onCameraChange;
             window.onRefreshTargetDic += refreshBuffer;
             window.onVertexViewChange += refreshBuffer;
+            window.onBrushColorViewChange += refreshBuffer;
             onCameraChange(null);
         }
 
@@ -51,6 +52,7 @@ namespace ModEditor
             window.onCameraChange -= onCameraChange;
             window.onRefreshTargetDic -= refreshBuffer;
             window.onVertexViewChange -= refreshBuffer;
+            window.onBrushColorViewChange -= refreshBuffer;
             if (window.camera != null && buffer != null)
                 window.camera.RemoveCommandBuffer(cameraEvent, buffer);
         }
@@ -202,7 +204,7 @@ namespace ModEditor
                 EditorGUI.BeginDisabledGroup(!window.Manager.NormalView);
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Normal Color", labelStyle, GUILayout.Width(120));
-                window.Manager.NormalColor = EditorGUILayout.ColorField(window.Manager.NormalColor, GUILayout.Width(80));
+                window.Manager.NormalColor = EditorGUILayout.ColorField(window.Manager.NormalColor, GUILayout.Width(100));
                 EditorGUILayout.EndHorizontal();
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Normal Length", labelStyle, GUILayout.Width(120));
@@ -234,7 +236,7 @@ namespace ModEditor
                 EditorGUI.BeginDisabledGroup(!window.Manager.TangentView);
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Tangent Color", labelStyle, GUILayout.Width(120));
-                window.Manager.TangentColor = EditorGUILayout.ColorField(window.Manager.TangentColor, GUILayout.Width(80));
+                window.Manager.TangentColor = EditorGUILayout.ColorField(window.Manager.TangentColor, GUILayout.Width(100));
                 EditorGUILayout.EndHorizontal();
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Tangent Length", labelStyle, GUILayout.Width(120));
@@ -275,7 +277,7 @@ namespace ModEditor
                 EditorGUI.BeginDisabledGroup(!window.Manager.GridView);
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Grid Color", labelStyle, GUILayout.Width(120));
-                window.Manager.GridColor = EditorGUILayout.ColorField(window.Manager.GridColor, GUILayout.Width(80));
+                window.Manager.GridColor = EditorGUILayout.ColorField(window.Manager.GridColor, GUILayout.Width(100));
                 EditorGUILayout.EndHorizontal();
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Grid With ZTest", labelStyle, GUILayout.Width(150));
@@ -444,7 +446,11 @@ namespace ModEditor
                     if (data != null)
                     {
                         for (int j = 0; j < subCount; j++)
-                            buffer.DrawRenderer(data.renderer, data.material, j, 0);
+                        {
+                            if (window.BrushColorView)
+                                buffer.DrawRenderer(data.renderer, data.material, j, 0);
+                            buffer.DrawRenderer(data.renderer, data.material, j, 1);
+                        }
                     }
                 }
             }

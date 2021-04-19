@@ -8,6 +8,8 @@ namespace ModEditor
     {
         public event Action<Camera> onCameraChange;
         public event Action<SceneView> onSceneValidate;
+        public event Action onVertexViewChange;
+        public event Action onBrushColorViewChange;
 
         Camera _camera;
         public Camera camera
@@ -37,6 +39,19 @@ namespace ModEditor
             }
         }
 
+        bool brushColorView;
+        public bool BrushColorView
+        {
+            get => brushColorView;
+            set
+            {
+                if (brushColorView == value)
+                    return;
+                brushColorView = value;
+                onBrushColorViewChange?.Invoke();
+            }
+        }
+
         SceneHandleType sceneHandleType;
         public SceneHandleType SceneHandleType
         {
@@ -46,10 +61,10 @@ namespace ModEditor
                     return SceneHandleType.OnSceneGUI;
                 return sceneHandleType;
             }
-            private set => sceneHandleType = value;
+            set => sceneHandleType = value;
         }
 
-        public bool BrushLock { get; private set; }
+        public bool BrushLock { get; set; }
 
         public bool OnSceneGUI { get; set; }
 
@@ -60,14 +75,6 @@ namespace ModEditor
             Key.ControlOrAltStateChange += Key_ControlOrAltStateChange;
             EditorEvent.Use.OnKey.Tab.Down += Tab_Down;
             EditorEvent.Use.OnKey.BackQuote.Down += BackQuote_Down;
-            EditorEvent.Use.OnKey.Space.Down += Space_Down;
-            EditorEvent.Use.Shift.OnKey.Space.Down += Space_Down;
-            EditorEvent.Use.OnKey.CapsLock.Down += CapsLock_Down;
-            EditorEvent.Use.Control.OnMouse.DragLeft += Control_OnMouse_DragLeft;
-            EditorEvent.Use.Control.OnScrollWheel.Roll += Control_OnScrollWheel_Roll;
-            
-            Mouse.Update += Mouse_Update;
-            ScrollWheel.Update += ScrollWheel_Update;
         }
 
         void logoutEvent()
@@ -75,14 +82,6 @@ namespace ModEditor
             Key.ControlOrAltStateChange -= Key_ControlOrAltStateChange;
             EditorEvent.Use.OnKey.Tab.Down -= Tab_Down;
             EditorEvent.Use.OnKey.BackQuote.Down -= BackQuote_Down;
-            EditorEvent.Use.OnKey.Space.Down -= Space_Down;
-            EditorEvent.Use.Shift.OnKey.Space.Down -= Space_Down;
-            EditorEvent.Use.OnKey.CapsLock.Down -= CapsLock_Down;
-            EditorEvent.Use.Control.OnMouse.DragLeft -= Control_OnMouse_DragLeft;
-            EditorEvent.Use.Control.OnScrollWheel.Roll -= Control_OnScrollWheel_Roll;
-            
-            Mouse.Update -= Mouse_Update;
-            ScrollWheel.Update -= ScrollWheel_Update;
         }
 
         private void Key_ControlOrAltStateChange(bool obj)
@@ -99,60 +98,6 @@ namespace ModEditor
         {
             if(VertexView)
                 Manager.VertexWithZTest = !Manager.VertexWithZTest;
-        }
-
-        private void Space_Down()
-        {
-            if (!VertexView || TabType != ModEditorTabType.VertexBrush)
-                return;
-            float depth = float.MaxValue;
-            for (int i = 0; i < CalcShaderDatas.Count; i++)
-            {
-                float _depth = CalcShaderDatas[i].GetMinDepth(camera, Mouse.ScreenTexcoord, Manager.BrushSize);
-                if (depth > _depth)
-                    depth = _depth;
-            }
-            Manager.BrushDepth = depth + 0.0001f;
-            Mouse_Update();
-        }
-
-        private void CapsLock_Down()
-        {
-            BrushLock = !BrushLock;
-            for (int i = 0; i < CalcShaderDatas.Count; i++)
-                CalcShaderDatas[i].LockZoneFromSelect(BrushLock);
-        }
-
-        private void Control_OnMouse_DragLeft()
-        {
-            if (TabType != ModEditorTabType.VertexBrush || !VertexView)
-                return;
-            Manager.BrushSize += Event.current.delta.x * 0.01f;
-            SceneHandleType = SceneHandleType.BrushSize;
-        }
-
-        private void Control_OnScrollWheel_Roll(float obj)
-        {
-            if (TabType != ModEditorTabType.VertexBrush || !VertexView)
-                return;
-            Manager.BrushDepth -= Event.current.delta.y * 0.01f;
-            SceneHandleType = SceneHandleType.BrushDepth;
-        }
-
-        private void Mouse_Update()
-        {
-            if (Mouse.IsButton)
-                return;
-            for (int i = 0; i < CalcShaderDatas.Count; i++)
-                CalcShaderDatas[i].ClearSpread();
-        }
-
-        private void ScrollWheel_Update()
-        {
-            if (Key.Alt)
-                return;
-            for (int i = 0; i < CalcShaderDatas.Count; i++)
-                CalcShaderDatas[i].ClearSpread();
         }
 
         private void beforeSceneGui(SceneView obj)

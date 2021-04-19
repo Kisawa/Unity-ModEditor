@@ -36,8 +36,7 @@ namespace ModEditor
         public ModEditorManager Manager { get; private set; }
 
         public event Action onRefreshTargetDic;
-        public event Action onVertexViewChange;
-
+        
         [MenuItem("Tools/Mod Editor %#E")]
         static void Open()
         {

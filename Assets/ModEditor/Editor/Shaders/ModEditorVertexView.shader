@@ -2,6 +2,45 @@
 {
     SubShader
     {
+		Pass
+		{
+			ZWrite Off
+			Blend SrcAlpha OneMinusSrcAlpha
+			CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag
+			#include "UnityCG.cginc"
+
+			struct appdata
+			{
+				float4 vertex: POSITION;
+			};
+
+			struct v2f
+			{
+				float4 pos: SV_POSITION;
+				float4 color: TEXCOORD0;
+			};
+
+			int _Hide;
+			StructuredBuffer<float> _Selects;
+			StructuredBuffer<float4> _Colors;
+
+			v2f vert(appdata v, uint id: SV_VertexID)
+			{
+				v2f o;
+				o.pos = UnityObjectToClipPos(v.vertex);
+				o.color = _Colors[id] * any(_Selects[id]) * (1 - _Hide);
+				return o;
+			}
+
+			fixed4 frag(v2f i) : SV_Target
+			{
+				return i.color;
+			}
+			ENDCG
+		}
+
         Pass
         {
 			ZWrite Off
@@ -39,7 +78,7 @@
 			StructuredBuffer<float> _Selects;
 			StructuredBuffer<int> _Zone;
 
-            v2g vert (appdata v, uint id : SV_VertexID)
+            v2g vert (appdata v, uint id: SV_VertexID)
             {
                 v2g o;
 				o.worldPos = mul(unity_ObjectToWorld, v.vertex);

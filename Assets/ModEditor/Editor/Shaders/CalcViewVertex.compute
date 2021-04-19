@@ -4,7 +4,9 @@
 #pragma kernel LockZone
 #pragma kernel AddZone
 #pragma kernel SubZone
-#pragma kernel Calc
+#pragma kernel CalcWithSize
+#pragma kernel CalcWithSpread
+#pragma kernel Result
 
 float4x4 _MV;
 float4x4 _P;
@@ -17,6 +19,7 @@ int _ZoneInSelect;
 StructuredBuffer<float3> _Vertexs;
 RWStructuredBuffer<float> RW_Selects;
 RWStructuredBuffer<float> RW_Depths;
+RWStructuredBuffer<float> RW_Sizes;
 RWStructuredBuffer<int> RW_Zone;
 
 [numthreads(1024,1,1)]
@@ -32,6 +35,7 @@ void SelectWithScreenScope(uint3 id : SV_DispatchThreadID)
 	float2 mouseTexcoord = _MouseTexcoord.xy;
 	mouseTexcoord.x *= _MouseTexcoord.z;
 	float dis = distance(uv, mouseTexcoord);
+	RW_Sizes[id.x] = dis;
 	float res = (1 - step(_Size, dis)) * (1 - step(_Depth, depth));
 	int isZone = RW_Zone[id.x];
 	int zone = max(isZone, _OnlyZone);
@@ -39,13 +43,8 @@ void SelectWithScreenScope(uint3 id : SV_DispatchThreadID)
 	res = lerp(res, 1, isZone * _ZoneInSelect);
 	if(_ClearSpread)
 		RW_Selects[id.x] = -res;
-	else
-	{
-		float pre = RW_Selects[id.x];
-		pre *= zone;
-		//if(pre == 0) RW_Selects[id.x] = -res;
-		RW_Selects[id.x] = pre - (1 - any(pre)) * res;
-	}
+	else if(RW_Selects[id.x] * zone <= 0)
+		RW_Selects[id.x] = -res;
 }
 
 StructuredBuffer<int> _Triangles;
@@ -111,11 +110,57 @@ void SubZone(uint3 id: SV_DispatchThreadID)
 	RW_Zone[id.x] = res;
 }
 
-float4 _Color;
-StructuredBuffer<float4> _OriginColors;
+float remap(float num, float inMin, float inMax, float outMin, float outMax)
+{
+	return outMin + (num - inMin) * (outMax - outMin) / (inMax - inMin);
+}
+
+float4 _ColorFrom;
+float4 _ColorTo;
+float _FromStep;
+float _ToStep;
 RWStructuredBuffer<float4> RW_Colors;
 [numthreads(1024,1,1)]
-void Calc(uint3 id: SV_DispatchThreadID)
+void CalcWithSize(uint3 id: SV_DispatchThreadID)
 {
-	RW_Colors[id.x] = lerp(_OriginColors[id.x], _Color, any(RW_Selects[id.x]));
+	int select = any(RW_Selects[id.x]);
+	float4 col = lerp(0, _ColorFrom, select);
+	float res = RW_Sizes[id.x] / _Size * select;
+	RW_Colors[id.x] = lerp(col, _ColorTo, clamp(remap(res, _FromStep, _ToStep, 0, 1), 0, 1));
+}
+
+[numthreads(1024,1,1)]
+void CalcWithSpread(uint3 id: SV_DispatchThreadID)
+{
+	float spread = RW_Selects[id.x];
+	int select = any(spread);
+	spread -= clamp(sign(spread), -1, 0);
+	float4 col = lerp(0, _ColorFrom, select);
+	float res = spread / _SpreadLevel * select;
+	RW_Colors[id.x] = lerp(col, _ColorTo, clamp(remap(res, _FromStep, _ToStep, 0, 1), 0, 1));
+}
+
+int _Type;
+RWStructuredBuffer<float4> RW_Result;
+[numthreads(1024,1,1)]
+void Result(uint3 id: SV_DispatchThreadID)
+{
+	int select = any(RW_Selects[id.x]);
+	float4 pre = RW_Result[id.x];
+	switch(_Type)
+	{
+		case 0:
+		RW_Result[id.x] = lerp(pre, RW_Colors[id.x], select);
+		break;
+		case 1:
+		RW_Result[id.x] = pre + RW_Colors[id.x] * select;
+		break;
+		case 2:
+		RW_Result[id.x] = pre - RW_Colors[id.x] * select;
+		break;
+		case 3:
+		if(select == 1)
+			RW_Result[id.x] = pre * RW_Colors[id.x];
+		break;
+	}
 }

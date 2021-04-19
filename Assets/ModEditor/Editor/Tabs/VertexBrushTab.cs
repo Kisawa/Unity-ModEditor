@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace ModEditor
 {
@@ -17,8 +15,6 @@ namespace ModEditor
 
         Texture2D defaultCursor;
         Texture2D brushCursor;
-
-        List<(Transform, Mesh)> objInOperation;
 
         public override void OnFocus()
         {
@@ -49,6 +45,37 @@ namespace ModEditor
             EditorEvent.Use.Alt.OnScrollWheel.Roll += Alt_OnScrollWheel_Roll;
             EditorEvent.Use.ShiftAndAlt.OnScrollWheel.Roll += Alt_OnScrollWheel_Roll;
             EditorEvent.Use.ShiftAndControlAndAlt.OnScrollWheel.Roll += Alt_OnScrollWheel_Roll;
+            EditorEvent.Use.OnKey.Space.Down += Space_Down;
+            EditorEvent.Use.Shift.OnKey.Space.Down += Space_Down;
+            EditorEvent.Use.ShiftAndControl.OnKey.Space.Down += Space_Down;
+            EditorEvent.Use.OnKey.CapsLock.Down += CapsLock_Down;
+            EditorEvent.Use.Control.OnMouse.DragLeft += Control_OnMouse_DragLeft;
+            EditorEvent.Use.Control.OnScrollWheel.Roll += Control_OnScrollWheel_Roll;
+            EditorEvent.Use.OnKey.V.Down += V_Down;
+            EditorEvent.Use.Control.OnKey.V.Down += V_Down;
+            EditorEvent.Use.Shift.OnKey.V.Down += V_Down;
+            EditorEvent.Use.Alt.OnKey.V.Down += V_Down;
+            EditorEvent.Use.ShiftAndControl.OnKey.V.Down += V_Down;
+            EditorEvent.Use.ShiftAndAlt.OnKey.V.Down += V_Down;
+            EditorEvent.Use.ShiftAndControlAndAlt.OnKey.V.Down += V_Down;
+            EditorEvent.Use.OnKey.A.Down += A_Down;
+            EditorEvent.Use.OnKey.D.Down += D_Down;
+            EditorEvent.Use.OnKey.Z.Down += Z_Down;
+            EditorEvent.Use.OnKey.C.Down += C_Down;
+            EditorEvent.Use.Control.OnKey.A.Down += A_Down;
+            EditorEvent.Use.Control.OnKey.D.Down += D_Down;
+            EditorEvent.Use.Control.OnKey.Z.Down += Z_Down;
+            EditorEvent.Use.Control.OnKey.C.Down += C_Down;
+            EditorEvent.Use.ShiftAndControl.OnKey.A.Down += A_Down;
+            EditorEvent.Use.ShiftAndControl.OnKey.D.Down += D_Down;
+            EditorEvent.Use.ShiftAndControl.OnKey.Z.Down += Z_Down;
+            EditorEvent.Use.ShiftAndControl.OnKey.C.Down += C_Down;
+            EditorEvent.Use.ShiftAndControlAndAlt.OnKey.A.Down += A_Down;
+            EditorEvent.Use.ShiftAndControlAndAlt.OnKey.D.Down += D_Down;
+            EditorEvent.Use.ShiftAndControlAndAlt.OnKey.Z.Down += Z_Down;
+            EditorEvent.Use.ShiftAndControlAndAlt.OnKey.C.Down += C_Down;
+            Mouse.Update += Mouse_Update;
+            ScrollWheel.Update += ScrollWheel_Update;
             if (brushCursor == null)
                 brushCursor = AssetDatabase.LoadAssetAtPath<Texture2D>($"{ModEditorWindow.ModEditorPath}/Textures/brushCursor.png");
         }
@@ -82,77 +109,126 @@ namespace ModEditor
             EditorEvent.Use.Alt.OnScrollWheel.Roll -= Alt_OnScrollWheel_Roll;
             EditorEvent.Use.ShiftAndAlt.OnScrollWheel.Roll -= Alt_OnScrollWheel_Roll;
             EditorEvent.Use.ShiftAndControlAndAlt.OnScrollWheel.Roll -= Alt_OnScrollWheel_Roll;
+            EditorEvent.Use.OnKey.Space.Down -= Space_Down;
+            EditorEvent.Use.Shift.OnKey.Space.Down -= Space_Down;
+            EditorEvent.Use.ShiftAndControl.OnKey.Space.Down -= Space_Down;
+            EditorEvent.Use.OnKey.CapsLock.Down -= CapsLock_Down;
+            EditorEvent.Use.Control.OnMouse.DragLeft -= Control_OnMouse_DragLeft;
+            EditorEvent.Use.Control.OnScrollWheel.Roll -= Control_OnScrollWheel_Roll;
+            EditorEvent.Use.OnKey.V.Down -= V_Down;
+            EditorEvent.Use.Control.OnKey.V.Down -= V_Down;
+            EditorEvent.Use.Shift.OnKey.V.Down -= V_Down;
+            EditorEvent.Use.Alt.OnKey.V.Down -= V_Down;
+            EditorEvent.Use.ShiftAndControl.OnKey.V.Down -= V_Down;
+            EditorEvent.Use.ShiftAndAlt.OnKey.V.Down -= V_Down;
+            EditorEvent.Use.ShiftAndControlAndAlt.OnKey.V.Down -= V_Down;
+            EditorEvent.Use.OnKey.A.Down -= A_Down;
+            EditorEvent.Use.OnKey.D.Down -= D_Down;
+            EditorEvent.Use.OnKey.Z.Down -= Z_Down;
+            EditorEvent.Use.OnKey.C.Down -= C_Down;
+            EditorEvent.Use.Control.OnKey.A.Down -= A_Down;
+            EditorEvent.Use.Control.OnKey.D.Down -= D_Down;
+            EditorEvent.Use.Control.OnKey.Z.Down -= Z_Down;
+            EditorEvent.Use.Control.OnKey.C.Down -= C_Down;
+            EditorEvent.Use.ShiftAndControl.OnKey.A.Down -= A_Down;
+            EditorEvent.Use.ShiftAndControl.OnKey.D.Down -= D_Down;
+            EditorEvent.Use.ShiftAndControl.OnKey.Z.Down -= Z_Down;
+            EditorEvent.Use.ShiftAndControl.OnKey.C.Down -= C_Down;
+            EditorEvent.Use.ShiftAndControlAndAlt.OnKey.A.Down -= A_Down;
+            EditorEvent.Use.ShiftAndControlAndAlt.OnKey.D.Down -= D_Down;
+            EditorEvent.Use.ShiftAndControlAndAlt.OnKey.Z.Down -= Z_Down;
+            EditorEvent.Use.ShiftAndControlAndAlt.OnKey.C.Down -= C_Down;
+            Mouse.Update -= Mouse_Update;
+            ScrollWheel.Update -= ScrollWheel_Update;
             PlayerSettings.defaultCursor = defaultCursor;
             Cursor.SetCursor(defaultCursor, Vector2.zero, CursorMode.Auto);
         }
 
         public override void Draw()
         {
-            if (GUILayout.Button("Write avg normals to model's tangent"))
+            GUIStyle labelStyle = GUI.skin.GetStyle("LODRenderersText");
+            //if (GUILayout.Button("Write avg normals to model's tangent"))
+            //    writeAcgNormalToTangent();
+            //window.Manager.BrushType = (BrushType)EditorGUILayout.EnumPopup(window.Manager.BrushType);
+            EditorGUILayout.BeginHorizontal("Badge");
+            GUILayout.Space(15);
+            EditorGUILayout.LabelField("Brush Scope View Color:", labelStyle, GUILayout.Width(150));
+            window.Manager.BrushScopeViewColor = EditorGUILayout.ColorField(window.Manager.BrushScopeViewColor, GUILayout.Width(80));
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.Space(10);
+            drawBrush(labelStyle);
+            EditorGUILayout.Space(10);
+            drawWrite(labelStyle);
+        }
+
+        void drawBrush(GUIStyle labelStyle)
+        {
+            EditorGUILayout.BeginVertical("AnimationEventTooltip");
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Space(15);
+            if (GUILayout.Button("Brush", "AboutWIndowLicenseLabel", GUILayout.Width(150)) ||
+                GUILayout.Button(window.Manager.BrushUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 205)))
+                window.Manager.BrushUnfold = !window.Manager.BrushUnfold;
+            EditorGUILayout.EndHorizontal();
+
+            if (window.Manager.BrushUnfold)
             {
-                writeAcgNormalToTangent();
+                EditorGUI.indentLevel = 2;
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("From:", labelStyle, GUILayout.Width(80));
+                window.Manager.BrushColorFrom = EditorGUILayout.ColorField(window.Manager.BrushColorFrom, GUILayout.Width(100));
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(10);
+                EditorGUILayout.LabelField("From Step:", labelStyle, GUILayout.Width(100));
+                window.Manager.BrushColorFromStep = EditorGUILayout.Slider(window.Manager.BrushColorFromStep, 0, 1, GUILayout.Width(window.position.width - 150));
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(10);
+                EditorGUILayout.LabelField("To Step:", labelStyle, GUILayout.Width(100));
+                window.Manager.BrushColorToStep = EditorGUILayout.Slider(window.Manager.BrushColorToStep, 0, 1, GUILayout.Width(window.position.width - 150));
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("To:", labelStyle, GUILayout.Width(80));
+                window.Manager.BrushColorTo = EditorGUILayout.ColorField(window.Manager.BrushColorTo, GUILayout.Width(100));
+                EditorGUILayout.EndHorizontal();
             }
-            window.Manager.BrushType = (BrushType)EditorGUILayout.EnumPopup(window.Manager.BrushType);
-            window.Manager.BrushColor = EditorGUILayout.ColorField("Brush Color", window.Manager.BrushColor);
-            window.Manager.BrushViewColor = EditorGUILayout.ColorField(new GUIContent("Brush View Color"), window.Manager.BrushViewColor, true, true, false);
-
-            if (GUILayout.Button("asd"))
-                func();
-            index = EditorGUILayout.IntSlider(index, 0, 3);
+            
+            EditorGUILayout.EndVertical();
+            EditorGUI.indentLevel = 0;
         }
 
-        int index = 0;
-        void func()
+        void drawWrite(GUIStyle labelStyle)
         {
+            EditorGUILayout.BeginVertical("AnimationEventTooltip");
 
-        }
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Space(15);
+            if (GUILayout.Button("Write", "AboutWIndowLicenseLabel", GUILayout.Width(150)) ||
+                GUILayout.Button(window.Manager.WriteUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 205)))
+                window.Manager.WriteUnfold = !window.Manager.WriteUnfold;
+            EditorGUILayout.EndHorizontal();
 
-        private void OnMouse_DownLeft()
-        {
-            if (window.OnSceneGUI)
-                return;
-            if (window.VertexView)
+            if (window.Manager.WriteUnfold)
             {
-                objInOperation = recordObjInOperation();
-                write();
+                EditorGUI.indentLevel = 2;
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Type:", labelStyle, GUILayout.Width(100));
+                window.Manager.WriteType = (WriteType)EditorGUILayout.EnumPopup(window.Manager.WriteType, GUILayout.Width(140));
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Target Type:", labelStyle, GUILayout.Width(100));
+                window.Manager.WriteTargetType = (WriteTargetType)EditorGUILayout.EnumPopup(window.Manager.WriteTargetType, GUILayout.Width(140));
+                EditorGUILayout.EndHorizontal();
             }
-        }
 
-        private void OnMouse_UpLeft()
-        {
-            objInOperation = null;
-        }
-
-        private void OnMouse_DragLeft()
-        {
-            if (window.OnSceneGUI)
-                return;
-            if (window.VertexView)
-                write();
-        }
-
-        private void OnMouse_Scroll() { }
-
-        private void Alt_OnScrollWheel_Roll(float obj)
-        {
-            if (window.OnSceneGUI || !window.VertexView)
-                return;
-            for (int i = 0; i < window.CalcShaderDatas.Count; i++)
-                window.CalcShaderDatas[i].SpreadSelects(obj < 0);
-        }
-
-        private void Shift_OnMouse_Left()
-        {
-            if (window.OnSceneGUI || !window.BrushLock)
-                return;
-            addZone();
-        }
-
-        private void Shift_OnMouse_Right()
-        {
-            if (window.OnSceneGUI || !window.BrushLock)
-                return;
-            subZone();
+            EditorGUILayout.EndVertical();
+            EditorGUI.indentLevel = 0;
         }
 
         private void onSceneValidate(SceneView scene)
@@ -167,34 +243,6 @@ namespace ModEditor
             }
             if (window.SceneHandleType == SceneHandleType.None)
                 EditorGUIUtility.AddCursorRect(new Rect(0, 0, scene.position.width, scene.position.height), MouseCursor.CustomCursor);
-        }
-
-        List<(Transform, Mesh)> recordObjInOperation()
-        {
-            if (window.camera == null)
-                return null;
-            List<(Transform, Mesh)> _objInOperation = new List<(Transform, Mesh)>();
-            for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
-            {
-                GameObject target = window.Manager.TargetChildren[i];
-                if (target == null)
-                    continue;
-                if (!window.Manager.ActionableDic[target])
-                    continue;
-                MeshFilter meshFilter = target.GetComponent<MeshFilter>();
-                if (meshFilter != null)
-                {
-                    window.SetEditingMesh(target, meshFilter);
-                    _objInOperation.Add((target.transform, meshFilter.sharedMesh));
-                }
-                SkinnedMeshRenderer skinnedMeshRenderer = target.GetComponent<SkinnedMeshRenderer>();
-                if (skinnedMeshRenderer != null)
-                {
-                    window.SetEditingMesh(target, skinnedMeshRenderer);
-                    _objInOperation.Add((target.transform, skinnedMeshRenderer.sharedMesh));
-                }
-            }
-            return _objInOperation;
         }
     }
 }

@@ -470,6 +470,20 @@ namespace ModEditor
 
         #region Brush
         [SerializeField]
+        bool brushUnfold = true;
+        public bool BrushUnfold
+        {
+            get => brushUnfold;
+            set
+            {
+                if (value == brushUnfold)
+                    return;
+                Undo.RecordObject(this, "ModEditor BrushUnfold");
+                brushUnfold = value;
+            }
+        }
+
+        [SerializeField]
         BrushType brushType = BrushType.ScreenScope;
         public BrushType BrushType
         {
@@ -484,29 +498,79 @@ namespace ModEditor
         }
 
         [SerializeField]
-        Color brushColor = Color.red;
-        public Color BrushColor
+        Color brushColorFrom = Color.red;
+        public Color BrushColorFrom
         {
-            get => brushColor;
+            get => brushColorFrom;
             set
             {
-                if (value == brushColor)
+                if (value == brushColorFrom)
                     return;
-                Undo.RecordObject(this, "ModEditor BrushColor");
-                brushColor = value;
+                Undo.RecordObject(this, "ModEditor BrushColorFrom");
+                brushColorFrom = value;
             }
         }
 
         [SerializeField]
-        Color brushViewColor = Color.black;
-        public Color BrushViewColor
+        float brushColorFromStep = 0;
+        public float BrushColorFromStep
+        {
+            get => brushColorFromStep;
+            set
+            {
+                if (value < 0)
+                    value = 0;
+                if (value > brushColorToStep - 0.001f)
+                    value = brushColorToStep - 0.001f;
+                if (value == brushColorFromStep)
+                    return;
+                Undo.RecordObject(this, "ModEditor BrushColorFromStep");
+                brushColorFromStep = value;
+            }
+        }
+
+        [SerializeField]
+        Color brushColorTo = Color.red;
+        public Color BrushColorTo
+        {
+            get => brushColorTo;
+            set
+            {
+                if (value == brushColorTo)
+                    return;
+                Undo.RecordObject(this, "ModEditor BrushColorTo");
+                brushColorTo = value;
+            }
+        }
+
+        [SerializeField]
+        float brushColorToStep = 1;
+        public float BrushColorToStep
+        {
+            get => brushColorToStep;
+            set
+            {
+                if (value < brushColorFromStep + 0.001f)
+                    value = brushColorFromStep + 0.001f;
+                if (value > 1)
+                    value = 1;
+                if (value == brushColorToStep)
+                    return;
+                Undo.RecordObject(this, "ModEditor BrushColorToStep");
+                brushColorToStep = value;
+            }
+        }
+
+        [SerializeField]
+        Color brushViewColor = Color.black * 0.3f;
+        public Color BrushScopeViewColor
         {
             get => brushViewColor;
             set
             {
                 if (value == brushViewColor)
                     return;
-                Undo.RecordObject(this, "ModEditor BrushViewColor");
+                Undo.RecordObject(this, "ModEditor BrushSelectViewColor");
                 brushViewColor = value;
             }
         }
@@ -542,6 +606,50 @@ namespace ModEditor
                     value = ModEditorConstants.BrushMaxDepth;
                 Undo.RecordObject(this, "ModEditor BrushDepth");
                 brushDepth = value;
+            }
+        }
+        #endregion
+
+        #region Write
+        [SerializeField]
+        bool writeUnfold = true;
+        public bool WriteUnfold
+        {
+            get => writeUnfold;
+            set
+            {
+                if (value == writeUnfold)
+                    return;
+                Undo.RecordObject(this, "ModEditor WriteUnfold");
+                writeUnfold = value;
+            }
+        }
+
+        [SerializeField]
+        WriteType writeType = WriteType.Replace;
+        public WriteType WriteType
+        {
+            get => writeType;
+            set
+            {
+                if (value == writeType)
+                    return;
+                Undo.RecordObject(this, "ModEditor WriteType");
+                writeType = value;
+            }
+        }
+
+        [SerializeField]
+        WriteTargetType writeTargetType = WriteTargetType.VertexColor;
+        public WriteTargetType WriteTargetType
+        {
+            get => writeTargetType;
+            set
+            {
+                if (value == writeTargetType)
+                    return;
+                Undo.RecordObject(this, "ModEditor WriteTargetType");
+                writeTargetType = value;
             }
         }
         #endregion
