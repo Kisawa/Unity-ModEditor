@@ -13,26 +13,37 @@ namespace ModEditor
         public SceneCollectionTab(EditorWindow window) : base(window)
         {
             this.window = window as ModEditorWindow;
-            screenMesh = new Mesh();
-            screenMesh.vertices = new Vector3[]
-            {
-            new Vector3(-1, -1, 0),
-            new Vector3(-1, 1, 0),
-            new Vector3(1, 1, 0),
-            new Vector3(1, -1, 0)
-            };
-            screenMesh.uv = new Vector2[]
-            {
-            new Vector2(0, 1),
-            new Vector2(0, 0),
-            new Vector2(1, 0),
-            new Vector2(1, 1)
-            };
-            screenMesh.SetIndices(new int[] { 0, 3, 2, 1 }, MeshTopology.Quads, 0);
+            
         }
 
         Vector2 scroll;
-        Mesh screenMesh;
+        Mesh _screenMesh;
+        Mesh screenMesh
+        {
+            get
+            {
+                if (_screenMesh == null)
+                {
+                    _screenMesh = new Mesh();
+                    _screenMesh.vertices = new Vector3[]
+                    {
+                        new Vector3(-1, -1, 0),
+                        new Vector3(-1, 1, 0),
+                        new Vector3(1, 1, 0),
+                        new Vector3(1, -1, 0)
+                    };
+                    _screenMesh.uv = new Vector2[]
+                    {
+                        new Vector2(0, 1),
+                        new Vector2(0, 0),
+                        new Vector2(1, 0),
+                        new Vector2(1, 1)
+                    };
+                    _screenMesh.SetIndices(new int[] { 0, 3, 2, 1 }, MeshTopology.Quads, 0);
+                }
+                return _screenMesh;
+            }
+        }
         CommandBuffer buffer;
         CameraEvent cameraEvent = CameraEvent.AfterForwardAlpha;
 

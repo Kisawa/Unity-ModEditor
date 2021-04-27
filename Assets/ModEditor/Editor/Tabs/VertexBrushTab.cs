@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -11,7 +13,23 @@ namespace ModEditor
         public VertexBrushTab(EditorWindow window) : base(window)
         {
             this.window = window as ModEditorWindow;
+            Type[] types = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(x => x.GetTypes().Where(y => typeof(VertexCalcUtilBase).IsAssignableFrom(y) && y.IsClass && !y.IsAbstract)).ToArray();
+            utilNames = new string[types.Length];
+            utilContents = new GUIContent[types.Length];
+            utilInstances = new VertexCalcUtilBase[types.Length];
+            for (int i = 0; i < types.Length; i++)
+            {
+                VertexCalcUtilBase util = (VertexCalcUtilBase)Activator.CreateInstance(types[i]);
+                utilNames[i] = util.Name;
+                utilContents[i] = new GUIContent(util.Tip, util.Tip);
+                utilInstances[i] = util;
+            }
         }
+
+        string[] utilNames;
+        GUIContent[] utilContents;
+        VertexCalcUtilBase[] utilInstances;
 
         Texture2D defaultCursor;
         Texture2D brushCursor;
@@ -32,8 +50,6 @@ namespace ModEditor
             EditorEvent.ShiftAndControlAndAlt.OnMouse.UpLeft += OnMouse_UpLeft;
             EditorEvent.OnMouse.DragLeft += OnMouse_DragLeft;
             EditorEvent.ShiftAndControl.OnMouse.DragLeft += OnMouse_DragLeft;
-            EditorEvent.Use.OnMouse.DownScroll += OnMouse_Scroll;
-            EditorEvent.Use.OnMouse.UpScroll += OnMouse_Scroll;
             EditorEvent.Shift.OnMouse.DownLeft += Shift_OnMouse_Left;
             EditorEvent.Use.Shift.OnMouse.DragLeft += Shift_OnMouse_Left;
             EditorEvent.ShiftAndAlt.OnMouse.DownLeft += Shift_OnMouse_Left;
@@ -62,10 +78,6 @@ namespace ModEditor
             EditorEvent.Use.OnKey.D.Down += D_Down;
             EditorEvent.Use.OnKey.Z.Down += Z_Down;
             EditorEvent.Use.OnKey.C.Down += C_Down;
-            EditorEvent.Use.Control.OnKey.A.Down += A_Down;
-            EditorEvent.Use.Control.OnKey.D.Down += D_Down;
-            EditorEvent.Use.Control.OnKey.Z.Down += Z_Down;
-            EditorEvent.Use.Control.OnKey.C.Down += C_Down;
             EditorEvent.Use.ShiftAndControl.OnKey.A.Down += A_Down;
             EditorEvent.Use.ShiftAndControl.OnKey.D.Down += D_Down;
             EditorEvent.Use.ShiftAndControl.OnKey.Z.Down += Z_Down;
@@ -96,8 +108,6 @@ namespace ModEditor
             EditorEvent.ShiftAndControlAndAlt.OnMouse.UpLeft -= OnMouse_UpLeft;
             EditorEvent.OnMouse.DragLeft -= OnMouse_DragLeft;
             EditorEvent.ShiftAndControl.OnMouse.DragLeft -= OnMouse_DragLeft;
-            EditorEvent.Use.OnMouse.DownScroll -= OnMouse_Scroll;
-            EditorEvent.Use.OnMouse.UpScroll -= OnMouse_Scroll;
             EditorEvent.Shift.OnMouse.DownLeft -= Shift_OnMouse_Left;
             EditorEvent.Use.Shift.OnMouse.DragLeft -= Shift_OnMouse_Left;
             EditorEvent.Shift.OnMouse.DownRight -= Shift_OnMouse_Right;
@@ -126,10 +136,6 @@ namespace ModEditor
             EditorEvent.Use.OnKey.D.Down -= D_Down;
             EditorEvent.Use.OnKey.Z.Down -= Z_Down;
             EditorEvent.Use.OnKey.C.Down -= C_Down;
-            EditorEvent.Use.Control.OnKey.A.Down -= A_Down;
-            EditorEvent.Use.Control.OnKey.D.Down -= D_Down;
-            EditorEvent.Use.Control.OnKey.Z.Down -= Z_Down;
-            EditorEvent.Use.Control.OnKey.C.Down -= C_Down;
             EditorEvent.Use.ShiftAndControl.OnKey.A.Down -= A_Down;
             EditorEvent.Use.ShiftAndControl.OnKey.D.Down -= D_Down;
             EditorEvent.Use.ShiftAndControl.OnKey.Z.Down -= Z_Down;
@@ -158,6 +164,8 @@ namespace ModEditor
             EditorGUILayout.Space(10);
             drawBrush(labelStyle);
             EditorGUILayout.Space(10);
+            drawCalcUtil(labelStyle);
+            EditorGUILayout.Space(10);
             drawWrite(labelStyle);
         }
 
@@ -176,8 +184,17 @@ namespace ModEditor
             {
                 EditorGUI.indentLevel = 2;
                 EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Strength:", labelStyle, GUILayout.Width(80));
+                window.Manager.BrushStrength = EditorGUILayout.Slider(window.Manager.BrushStrength, 0, 10, GUILayout.Width(window.position.width - 120));
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("From:", labelStyle, GUILayout.Width(80));
                 window.Manager.BrushColorFrom = EditorGUILayout.ColorField(window.Manager.BrushColorFrom, GUILayout.Width(100));
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(80);
+                EditorGUILayout.LabelField($"( {window.Manager.BrushColorFrom.r * window.Manager.BrushStrength}, {window.Manager.BrushColorFrom.g * window.Manager.BrushStrength}, {window.Manager.BrushColorFrom.b * window.Manager.BrushStrength}, {window.Manager.BrushColorFrom.a * window.Manager.BrushStrength} )", labelStyle);
                 EditorGUILayout.EndHorizontal();
 
                 EditorGUILayout.BeginHorizontal();
@@ -196,8 +213,39 @@ namespace ModEditor
                 EditorGUILayout.LabelField("To:", labelStyle, GUILayout.Width(80));
                 window.Manager.BrushColorTo = EditorGUILayout.ColorField(window.Manager.BrushColorTo, GUILayout.Width(100));
                 EditorGUILayout.EndHorizontal();
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(80);
+                EditorGUILayout.LabelField($"( {window.Manager.BrushColorTo.r * window.Manager.BrushStrength}, {window.Manager.BrushColorTo.g * window.Manager.BrushStrength}, {window.Manager.BrushColorTo.b * window.Manager.BrushStrength}, {window.Manager.BrushColorTo.a * window.Manager.BrushStrength} )", labelStyle);
+                EditorGUILayout.EndHorizontal();
             }
             
+            EditorGUILayout.EndVertical();
+            EditorGUI.indentLevel = 0;
+        }
+
+        void drawCalcUtil(GUIStyle labelStyle)
+        {
+            EditorGUILayout.BeginVertical("AnimationEventTooltip");
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Space(15);
+            if (GUILayout.Button("Calc Util", "AboutWIndowLicenseLabel", GUILayout.Width(150)) ||
+                GUILayout.Button(window.Manager.CalcUtilUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 205)))
+                window.Manager.CalcUtilUnfold = !window.Manager.CalcUtilUnfold;
+            EditorGUILayout.EndHorizontal();
+            if (window.Manager.CalcUtilUnfold)
+            {
+                EditorGUI.indentLevel = 2;
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Util Select:", labelStyle, GUILayout.Width(100));
+                if (window.Manager.CalcUtilIndex >= utilContents.Length)
+                    window.Manager.calcUtilIndex = utilContents.Length - 1;
+                window.Manager.CalcUtilIndex = EditorGUILayout.Popup(window.Manager.CalcUtilIndex, utilNames, GUILayout.Width(140));
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.LabelField(utilContents[window.Manager.CalcUtilIndex], GUI.skin.GetStyle("LODRendererAddButton"), GUILayout.Width(window.position.width - 30));
+                utilInstances[window.Manager.CalcUtilIndex].Draw(labelStyle);
+                if (GUILayout.Button($"Execute Write - {utilInstances[window.Manager.CalcUtilIndex].PassCount} Pass", "EditModeSingleButton", GUILayout.Width(window.position.width - 30)))
+                    executeCalcUtil(utilInstances[window.Manager.CalcUtilIndex]);
+            }
             EditorGUILayout.EndVertical();
             EditorGUI.indentLevel = 0;
         }
@@ -220,15 +268,103 @@ namespace ModEditor
                 EditorGUILayout.LabelField("Type:", labelStyle, GUILayout.Width(100));
                 window.Manager.WriteType = (WriteType)EditorGUILayout.EnumPopup(window.Manager.WriteType, GUILayout.Width(140));
                 EditorGUILayout.EndHorizontal();
-
+                //if (window.Manager.WriteType == WriteType.OtherUtil)
+                //{
+                //    EditorGUILayout.BeginHorizontal();
+                //    GUILayout.Space(50);
+                //    EditorGUILayout.BeginVertical("SelectionRect");
+                //    EditorGUILayout.LabelField("Util Select:", GUI.skin.GetStyle("AnimationTimelineTick"), GUILayout.Width(window.position.width - 100));
+                //    window.Manager.CalcUtilIndex = EditorGUILayout.Popup(window.Manager.CalcUtilIndex, utilContents, GUILayout.Width(window.position.width - 120));
+                //    GUILayout.Space(5);
+                //    if (GUILayout.Button($"Execute Write - {utilInstances[window.Manager.CalcUtilIndex].PassCount} Pass", GUILayout.Width(window.position.width - 100)))
+                //        write(utilInstances[window.Manager.CalcUtilIndex]);
+                //    EditorGUILayout.EndVertical();
+                //    EditorGUILayout.EndHorizontal();
+                //}
+                GUILayout.Space(5);
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Target Type:", labelStyle, GUILayout.Width(100));
                 window.Manager.WriteTargetType = (WriteTargetType)EditorGUILayout.EnumPopup(window.Manager.WriteTargetType, GUILayout.Width(140));
                 EditorGUILayout.EndHorizontal();
+
+                if (window.Manager.WriteTargetType == WriteTargetType.Custom)
+                {
+                    EditorGUI.indentLevel = 3;
+                    customTargetDraw(labelStyle, 4);
+                }
             }
 
             EditorGUILayout.EndVertical();
             EditorGUI.indentLevel = 0;
+        }
+
+        void customTargetDraw(GUIStyle labelStyle, int passCount)
+        {
+            if (passCount < 1)
+            {
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(85);
+                EditorGUILayout.LabelField("No Pass", labelStyle);
+                EditorGUILayout.EndHorizontal();
+                return;
+            }
+            string[] pass3Str = new string[] { "X", "Y", "Z" };
+            if (passCount > 0)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("X:", labelStyle, GUILayout.Width(60));
+                window.Manager.CustomTargetType_X = (CustomTargetType)EditorGUILayout.EnumPopup(window.Manager.CustomTargetType_X, GUILayout.Width(140));
+                if (window.Manager.CustomTargetType_X != CustomTargetType.None)
+                {
+                    if (window.Manager.CustomTargetType_X == CustomTargetType.Vertex || window.Manager.CustomTargetType_X == CustomTargetType.Normal)
+                        window.Manager.CustomTargetPass_X = (TargetPassType)EditorGUILayout.Popup((int)window.Manager.CustomTargetPass_X, pass3Str, GUILayout.Width(80));
+                    else
+                        window.Manager.CustomTargetPass_X = (TargetPassType)EditorGUILayout.EnumPopup(window.Manager.CustomTargetPass_X, GUILayout.Width(80));
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+            if (passCount > 1)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Y:", labelStyle, GUILayout.Width(60));
+                window.Manager.CustomTargetType_Y = (CustomTargetType)EditorGUILayout.EnumPopup(window.Manager.CustomTargetType_Y, GUILayout.Width(140));
+                if (window.Manager.CustomTargetType_Y != CustomTargetType.None)
+                {
+                    if (window.Manager.CustomTargetType_Y == CustomTargetType.Vertex || window.Manager.CustomTargetType_Y == CustomTargetType.Normal)
+                        window.Manager.CustomTargetPass_Y = (TargetPassType)EditorGUILayout.Popup((int)window.Manager.CustomTargetPass_Y, pass3Str, GUILayout.Width(80));
+                    else
+                        window.Manager.CustomTargetPass_Y = (TargetPassType)EditorGUILayout.EnumPopup(window.Manager.CustomTargetPass_Y, GUILayout.Width(80));
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+            if (passCount > 2)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Z:", labelStyle, GUILayout.Width(60));
+                window.Manager.CustomTargetType_Z = (CustomTargetType)EditorGUILayout.EnumPopup(window.Manager.CustomTargetType_Z, GUILayout.Width(140));
+                if (window.Manager.CustomTargetType_Z != CustomTargetType.None)
+                {
+                    if (window.Manager.CustomTargetType_Z == CustomTargetType.Vertex || window.Manager.CustomTargetType_Z == CustomTargetType.Normal)
+                        window.Manager.CustomTargetPass_Z = (TargetPassType)EditorGUILayout.Popup((int)window.Manager.CustomTargetPass_Z, pass3Str, GUILayout.Width(80));
+                    else
+                        window.Manager.CustomTargetPass_Z = (TargetPassType)EditorGUILayout.EnumPopup(window.Manager.CustomTargetPass_Z, GUILayout.Width(80));
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+            if (passCount > 3)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("W:", labelStyle, GUILayout.Width(60));
+                window.Manager.CustomTargetType_W = (CustomTargetType)EditorGUILayout.EnumPopup(window.Manager.CustomTargetType_W, GUILayout.Width(140));
+                if (window.Manager.CustomTargetType_W != CustomTargetType.None)
+                {
+                    if (window.Manager.CustomTargetType_W == CustomTargetType.Vertex || window.Manager.CustomTargetType_W == CustomTargetType.Normal)
+                        window.Manager.CustomTargetPass_W = (TargetPassType)EditorGUILayout.Popup((int)window.Manager.CustomTargetPass_W, pass3Str, GUILayout.Width(80));
+                    else
+                        window.Manager.CustomTargetPass_W = (TargetPassType)EditorGUILayout.EnumPopup(window.Manager.CustomTargetPass_W, GUILayout.Width(80));
+                }
+                EditorGUILayout.EndHorizontal();
+            }
         }
 
         private void onSceneValidate(SceneView scene)

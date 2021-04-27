@@ -151,7 +151,7 @@ namespace ModEditor
             }
         }
 
-        float brushDepth = 10;
+        float brushDepth = ModEditorConstants.BrushMaxDepth;
         float BrushDepth
         {
             get
@@ -159,6 +159,17 @@ namespace ModEditor
                 if (ModEditor != null && ModEditor.Manager != null)
                     brushDepth = ModEditor.Manager.BrushDepth;
                 return brushDepth;
+            }
+        }
+
+        float brushStrength = 1;
+        float BrushStrength
+        {
+            get
+            {
+                if (ModEditor != null && ModEditor.Manager != null)
+                    brushStrength = ModEditor.Manager.BrushStrength;
+                return brushStrength;
             }
         }
 
@@ -252,6 +263,28 @@ namespace ModEditor
             }
         }
 
+        WriteType writeType = WriteType.Replace;
+        WriteType WriteType
+        {
+            get
+            {
+                if (ModEditor != null && ModEditor.Manager != null)
+                    writeType = ModEditor.Manager.WriteType;
+                return writeType;
+            }
+        }
+
+        WriteTargetType writeTargetType = WriteTargetType.VertexColor;
+        WriteTargetType WriteTargetType
+        {
+            get
+            {
+                if (ModEditor != null && ModEditor.Manager != null)
+                    writeTargetType = ModEditor.Manager.WriteTargetType;
+                return writeTargetType;
+            }
+        }
+
         private void OnEnable()
         {
             if (icon == null)
@@ -274,13 +307,15 @@ namespace ModEditor
             Rect rect = new Rect(window.position.width - 250, window.position.height - 215, 240, 185);
             GUIStyle txtStyle = GUI.skin.GetStyle("AboutWIndowLicenseLabel");
             GUIStyle hotKeyStyle = GUI.skin.GetStyle("LODSliderTextSelected");
+            GUIStyle msgStyle = GUI.skin.GetStyle("LODRendererAddButton");
             GUILayout.BeginArea(rect);
 
             EditorGUI.LabelField(new Rect(0, 0, 240, 40), "", GUI.skin.GetStyle("dockarea"));
             EditorGUI.BeginDisabledGroup(brushGradientDisabled());
             EditorGUI.LabelField(new Rect(0, 0, 20, 15), "/A", hotKeyStyle);
             BrushColorFrom = EditorGUI.ColorField(new Rect(20, 2, 70, 12), BrushColorFrom);
-            EditorGUI.LabelField(new Rect(90, 0, 30, 15), "From", txtStyle);
+            EditorGUI.LabelField(new Rect(90, -1, 30, 15), "From", txtStyle);
+            EditorGUI.LabelField(new Rect(130, 0, 80, 15), $"{BrushStrength} - {WriteType}", msgStyle);
             EditorGUI.LabelField(new Rect(223, 0, 20, 15), "/D", hotKeyStyle);
 
             EditorGUI.LabelField(new Rect(3, 12, 30, 15), $"{BrushColorFromStep}", txtStyle);
@@ -288,6 +323,7 @@ namespace ModEditor
             EditorGUI.LabelField(new Rect(210, 12, 30, 15), $"{1 - BrushColorToStep}", txtStyle);
 
             EditorGUI.LabelField(new Rect(0, 24, 20, 15), "/Z", hotKeyStyle);
+            EditorGUI.LabelField(new Rect(35, 24, 80, 15), $"to {WriteTargetType}", msgStyle);
             EditorGUI.LabelField(new Rect(130, 24, 30, 15), "To", txtStyle);
             BrushColorTo = EditorGUI.ColorField(new Rect(150, 27, 70, 12), BrushColorTo);
             EditorGUI.LabelField(new Rect(223, 24, 20, 15), "/C", hotKeyStyle);
@@ -372,7 +408,7 @@ namespace ModEditor
                 {
                     data.Update(ModEditor.camera, Mouse.ScreenTexcoord, BrushSize, BrushDepth);
                     if(BrushColorView || triggerCala)
-                        data.Cala(ModEditor.Manager.BrushColorFrom, ModEditor.Manager.BrushColorTo, ModEditor.Manager.BrushColorFromStep, ModEditor.Manager.BrushColorToStep);
+                        data.Cala(ModEditor.Manager.BrushColorFrom, ModEditor.Manager.BrushColorTo, ModEditor.Manager.BrushColorFromStep, ModEditor.Manager.BrushColorToStep, BrushStrength);
                 }
                 if (data.IsAvailable)
                 {
@@ -398,11 +434,8 @@ namespace ModEditor
                     if (Key.Control)
                         return false;
                 }
-                else
-                {
-                    if (!Key.Alt)
-                        return false;
-                }
+                else if(!Key.Alt && !Key.Control)
+                    return false;
             }
             return true;
         }

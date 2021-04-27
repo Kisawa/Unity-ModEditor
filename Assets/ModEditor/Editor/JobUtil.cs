@@ -15,7 +15,7 @@ namespace ModEditor
         [DeallocateOnJobCompletion]
         public NativeArray<Vector3> normals;
 
-        public NativeArray<Vector4> output;
+        public NativeArray<Vector3> output;
 
         public void Execute()
         {

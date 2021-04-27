@@ -354,10 +354,10 @@ namespace ModEditor
             CalcShaderDatas.Clear();
         }
 
-        public void SetEditingMesh(GameObject target, MeshFilter meshFilter)
+        public Mesh SetEditingMesh(GameObject target, MeshFilter meshFilter)
         {
             if (meshFilter.sharedMesh == null)
-                return;
+                return null;
             Mesh mesh = Instantiate(meshFilter.sharedMesh);
             mesh.name = target.name + "-Editing";
             if (Manager.MeshDic.ContainsKey(target))
@@ -367,12 +367,13 @@ namespace ModEditor
             Undo.RecordObject(meshFilter, "ModEditor MeshEditing");
             meshFilter.sharedMesh = mesh;
             EditorUtility.SetDirty(target);
+            return mesh;
         }
         
-        public void SetEditingMesh(GameObject target, SkinnedMeshRenderer skinnedMeshRenderer)
+        public Mesh SetEditingMesh(GameObject target, SkinnedMeshRenderer skinnedMeshRenderer)
         {
             if (skinnedMeshRenderer.sharedMesh == null)
-                return;
+                return null;
             Mesh mesh = Instantiate(skinnedMeshRenderer.sharedMesh);
             mesh.name = target.name + "-Editing";
             if (Manager.MeshDic.ContainsKey(target))
@@ -382,6 +383,7 @@ namespace ModEditor
             Undo.RecordObject(skinnedMeshRenderer, "ModEditor MeshEditing");
             skinnedMeshRenderer.sharedMesh = mesh;
             EditorUtility.SetDirty(target);
+            return mesh;
         }
 
         void applyPlayModeEditing()

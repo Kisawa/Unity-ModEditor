@@ -32,7 +32,7 @@ public class GUIStyleViewer : EditorWindow
             //EditorGUILayout.EndVertical();
 
             EditorGUILayout.BeginVertical();
-            GUILayout.Label($"Current brush dpeth:  5.000", style);
+            GUILayout.Button($"Current brush dpeth:  5.000", style, GUILayout.Width(200));
             if (GUILayout.Button("Game Camera Follow"))
             {
                 GUIUtility.systemCopyBuffer = style.name;

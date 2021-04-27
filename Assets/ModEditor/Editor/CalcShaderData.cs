@@ -168,38 +168,54 @@ namespace ModEditor
                 CalcUtil.Self.CalcVertexShader.Dispatch(CalcUtil.Self.kernel_SubZone, Mathf.CeilToInt((float)_Triangles.count / 1024), 1, 1);
             }
 
-            public Color[] GetResultColor(WriteType type, WriteTargetType targetType, Color[] origin)
+            public Color[] GetResultColor(WriteType type, Color[] origin)
             {
-                CalcUtil.Self.CalcVertexShader.SetInt("_Type", (int)type);
-                CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_Result, "RW_Selects", Cache.RW_Selects);
-                CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_Result, "RW_Colors", RW_Colors);
-                ComputeBuffer RW_Result = new ComputeBuffer(origin.Length, sizeof(float) * 4);
-                RW_Result.SetData(origin);
-                CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_Result, "RW_Result", RW_Result);
-                CalcUtil.Self.CalcVertexShader.Dispatch(CalcUtil.Self.kernel_Result, Mathf.CeilToInt((float)RW_Result.count / 1024), 1, 1);
-                RW_Result.GetData(origin);
-                RW_Result.Dispose();
-                return origin;
+                return CalcUtil.Self.GetResultColor(type, origin, RW_Colors, Cache.RW_Selects);
             }
 
-            public void Cala(Color from, Color to, float fromStep, float toStep)
+            public Vector3[] GetResult(WriteType type, Vector3[] origin)
             {
-                CalcUtil.Self.CalcVertexShader.SetVector("_ColorFrom", from);
-                CalcUtil.Self.CalcVertexShader.SetVector("_ColorTo", to);
+                return CalcUtil.Self.GetResult(type, origin, RW_Colors, Cache.RW_Selects);
+            }
+
+            public Vector4[] GetResult(WriteType type, Vector4[] origin)
+            {
+                return CalcUtil.Self.GetResult(type, origin, RW_Colors, Cache.RW_Selects);
+            }
+
+            public Color[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outPass, Color[] origin)
+            {
+                return CalcUtil.Self.GetResultCustom(type, inPass, outPass, origin, RW_Colors, Cache.RW_Selects);
+            }
+
+            public Vector3[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outPass, Vector3[] origin)
+            {
+                return CalcUtil.Self.GetResultCustom(type, inPass, outPass, origin, RW_Colors, Cache.RW_Selects);
+            }
+
+            public Vector4[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outPass, Vector4[] origin)
+            {
+                return CalcUtil.Self.GetResultCustom(type, inPass, outPass, origin, RW_Colors, Cache.RW_Selects);
+            }
+
+            public void Cala(Color from, Color to, float fromStep, float toStep, float strength)
+            {
+                CalcUtil.Self.CalcVertexShader.SetVector("_From", from * strength);
+                CalcUtil.Self.CalcVertexShader.SetVector("_To", to * strength);
                 CalcUtil.Self.CalcVertexShader.SetFloat("_FromStep", fromStep);
                 CalcUtil.Self.CalcVertexShader.SetFloat("_ToStep", toStep);
                 if (Cache.SpreadLevel > 0)
                 {
                     CalcUtil.Self.CalcVertexShader.SetInt("_SpreadLevel", Cache.SpreadLevel);
                     CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_CalcWithSpread, "RW_Selects", Cache.RW_Selects);
-                    CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_CalcWithSpread, "RW_Colors", RW_Colors);
+                    CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_CalcWithSpread, "RW_Result4", RW_Colors);
                     CalcUtil.Self.CalcVertexShader.Dispatch(CalcUtil.Self.kernel_CalcWithSpread, Mathf.CeilToInt((float)RW_Colors.count / 1024), 1, 1);
                 }
                 else
                 {
                     CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_CalcWithSize, "RW_Selects", Cache.RW_Selects);
                     CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_CalcWithSize, "RW_Sizes", RW_Sizes);
-                    CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_CalcWithSize, "RW_Colors", RW_Colors);
+                    CalcUtil.Self.CalcVertexShader.SetBuffer(CalcUtil.Self.kernel_CalcWithSize, "RW_Result4", RW_Colors);
                     CalcUtil.Self.CalcVertexShader.Dispatch(CalcUtil.Self.kernel_CalcWithSize, Mathf.CeilToInt((float)RW_Colors.count / 1024), 1, 1);
                 }
             }

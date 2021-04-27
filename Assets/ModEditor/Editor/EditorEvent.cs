@@ -296,6 +296,108 @@ namespace ModEditor
                                 @event.Use();
                         }
                     }
+                    if (@event.keyCode == KeyCode.Q)
+                    {
+                        if (!@event.control && !@event.alt && !@event.shift)
+                        {
+                            OnKey.Q.InvokeDown();
+                            if (Use.OnKey.Q.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.control && !@event.alt && !@event.shift)
+                        {
+                            Control.OnKey.Q.InvokeDown();
+                            if (Use.Control.OnKey.Q.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.alt && !@event.control && !@event.shift)
+                        {
+                            Alt.OnKey.Q.InvokeDown();
+                            if (Use.Alt.OnKey.Q.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt && !@event.shift)
+                        {
+                            ControlAndAlt.OnKey.Q.InvokeDown();
+                            if (Use.ControlAndAlt.OnKey.Q.InvokeDown())
+                                @event.Use();
+                        }
+                        if (!@event.control && !@event.alt && @event.shift)
+                        {
+                            Shift.OnKey.Q.InvokeDown();
+                            if (Use.Shift.OnKey.Q.InvokeDown())
+                                @event.Use();
+                        }
+                        if (!@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndAlt.OnKey.Q.InvokeDown();
+                            if (Use.ShiftAndAlt.OnKey.Q.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.control && !@event.alt && @event.shift)
+                        {
+                            ShiftAndControl.OnKey.Q.InvokeDown();
+                            if (Use.ShiftAndControl.OnKey.Q.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndControlAndAlt.OnKey.Q.InvokeDown();
+                            if (Use.ShiftAndControlAndAlt.OnKey.Q.InvokeDown())
+                                @event.Use();
+                        }
+                    }
+                    if (@event.keyCode == KeyCode.E)
+                    {
+                        if (!@event.control && !@event.alt && !@event.shift)
+                        {
+                            OnKey.E.InvokeDown();
+                            if (Use.OnKey.E.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.control && !@event.alt && !@event.shift)
+                        {
+                            Control.OnKey.E.InvokeDown();
+                            if (Use.Control.OnKey.E.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.alt && !@event.control && !@event.shift)
+                        {
+                            Alt.OnKey.E.InvokeDown();
+                            if (Use.Alt.OnKey.E.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt && !@event.shift)
+                        {
+                            ControlAndAlt.OnKey.E.InvokeDown();
+                            if (Use.ControlAndAlt.OnKey.E.InvokeDown())
+                                @event.Use();
+                        }
+                        if (!@event.control && !@event.alt && @event.shift)
+                        {
+                            Shift.OnKey.E.InvokeDown();
+                            if (Use.Shift.OnKey.E.InvokeDown())
+                                @event.Use();
+                        }
+                        if (!@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndAlt.OnKey.E.InvokeDown();
+                            if (Use.ShiftAndAlt.OnKey.E.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.control && !@event.alt && @event.shift)
+                        {
+                            ShiftAndControl.OnKey.E.InvokeDown();
+                            if (Use.ShiftAndControl.OnKey.E.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndControlAndAlt.OnKey.E.InvokeDown();
+                            if (Use.ShiftAndControlAndAlt.OnKey.E.InvokeDown())
+                                @event.Use();
+                        }
+                    }
                     if (@event.keyCode == KeyCode.A)
                     {
                         if (!@event.control && !@event.alt && !@event.shift)
@@ -755,6 +857,108 @@ namespace ModEditor
                         {
                             ShiftAndControlAndAlt.OnKey.V.InvokeUp();
                             if (Use.ShiftAndControlAndAlt.OnKey.V.InvokeUp())
+                                @event.Use();
+                        }
+                    }
+                    if (@event.keyCode == KeyCode.Q)
+                    {
+                        if (!@event.control && !@event.alt && !@event.shift)
+                        {
+                            OnKey.Q.InvokeUp();
+                            if (Use.OnKey.Q.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && !@event.alt && !@event.shift)
+                        {
+                            Control.OnKey.Q.InvokeUp();
+                            if (Use.Control.OnKey.Q.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.alt && !@event.control && !@event.shift)
+                        {
+                            Alt.OnKey.Q.InvokeUp();
+                            if (Use.Alt.OnKey.Q.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt && !@event.shift)
+                        {
+                            ControlAndAlt.OnKey.Q.InvokeUp();
+                            if (Use.ControlAndAlt.OnKey.Q.InvokeUp())
+                                @event.Use();
+                        }
+                        if (!@event.control && !@event.alt && @event.shift)
+                        {
+                            Shift.OnKey.Q.InvokeUp();
+                            if (Use.Shift.OnKey.Q.InvokeUp())
+                                @event.Use();
+                        }
+                        if (!@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndAlt.OnKey.Q.InvokeUp();
+                            if (Use.ShiftAndAlt.OnKey.Q.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && !@event.alt && @event.shift)
+                        {
+                            ShiftAndControl.OnKey.Q.InvokeUp();
+                            if (Use.ShiftAndControl.OnKey.Q.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndControlAndAlt.OnKey.Q.InvokeUp();
+                            if (Use.ShiftAndControlAndAlt.OnKey.Q.InvokeUp())
+                                @event.Use();
+                        }
+                    }
+                    if (@event.keyCode == KeyCode.E)
+                    {
+                        if (!@event.control && !@event.alt && !@event.shift)
+                        {
+                            OnKey.E.InvokeUp();
+                            if (Use.OnKey.E.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && !@event.alt && !@event.shift)
+                        {
+                            Control.OnKey.E.InvokeUp();
+                            if (Use.Control.OnKey.E.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.alt && !@event.control && !@event.shift)
+                        {
+                            Alt.OnKey.E.InvokeUp();
+                            if (Use.Alt.OnKey.E.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt && !@event.shift)
+                        {
+                            ControlAndAlt.OnKey.E.InvokeUp();
+                            if (Use.ControlAndAlt.OnKey.E.InvokeUp())
+                                @event.Use();
+                        }
+                        if (!@event.control && !@event.alt && @event.shift)
+                        {
+                            Shift.OnKey.E.InvokeUp();
+                            if (Use.Shift.OnKey.E.InvokeUp())
+                                @event.Use();
+                        }
+                        if (!@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndAlt.OnKey.E.InvokeUp();
+                            if (Use.ShiftAndAlt.OnKey.E.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && !@event.alt && @event.shift)
+                        {
+                            ShiftAndControl.OnKey.E.InvokeUp();
+                            if (Use.ShiftAndControl.OnKey.E.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndControlAndAlt.OnKey.E.InvokeUp();
+                            if (Use.ShiftAndControlAndAlt.OnKey.E.InvokeUp())
                                 @event.Use();
                         }
                     }
@@ -1709,6 +1913,10 @@ namespace ModEditor
 
         public class Key_V : Key_Base { }
 
+        public class Key_Q : Key_Base { }
+
+        public class Key_E : Key_Base { }
+
         public class Key_A : Key_Base { }
 
         public class Key_D : Key_Base { }
@@ -1729,6 +1937,10 @@ namespace ModEditor
         public Key.Key_CapsLock CapsLock = new Key.Key_CapsLock();
 
         public Key.Key_V V = new Key.Key_V();
+
+        public Key.Key_Q Q = new Key.Key_Q();
+
+        public Key.Key_E E = new Key.Key_E();
 
         public Key.Key_A A = new Key.Key_A();
 

@@ -498,6 +498,22 @@ namespace ModEditor
         }
 
         [SerializeField]
+        float brushStrength = 1;
+        public float BrushStrength
+        {
+            get => brushStrength;
+            set
+            {
+                if (value < 0)
+                    value = 0;
+                if (value == brushStrength)
+                    return;
+                Undo.RecordObject(this, "ModEditor BrushStrength");
+                brushStrength = value;
+            }
+        }
+
+        [SerializeField]
         Color brushColorFrom = Color.red;
         public Color BrushColorFrom
         {
@@ -650,6 +666,155 @@ namespace ModEditor
                     return;
                 Undo.RecordObject(this, "ModEditor WriteTargetType");
                 writeTargetType = value;
+            }
+        }
+
+        [SerializeField]
+        CustomTargetType customTargetType_X = CustomTargetType.None;
+        public CustomTargetType CustomTargetType_X
+        {
+            get => customTargetType_X;
+            set
+            {
+                if (value == customTargetType_X)
+                    return;
+                Undo.RecordObject(this, "ModEditor CustomTargetType_X");
+                if ((value == CustomTargetType.Vertex || value == CustomTargetType.Normal) && CustomTargetPass_X == TargetPassType.W)
+                    customTargetPass_X = TargetPassType.X;
+                customTargetType_X = value;
+            }
+        }
+
+        [SerializeField]
+        TargetPassType customTargetPass_X = TargetPassType.X;
+        public TargetPassType CustomTargetPass_X
+        {
+            get => customTargetPass_X;
+            set
+            {
+                if (value == customTargetPass_X)
+                    return;
+                Undo.RecordObject(this, "ModEditor CustomTargetPass_X");
+                customTargetPass_X = value;
+            }
+        }
+
+        [SerializeField]
+        CustomTargetType customTargetType_Y = CustomTargetType.None;
+        public CustomTargetType CustomTargetType_Y
+        {
+            get => customTargetType_Y;
+            set
+            {
+                if (value == customTargetType_Y)
+                    return;
+                Undo.RecordObject(this, "ModEditor CustomTargetType_Y");
+                if ((value == CustomTargetType.Vertex || value == CustomTargetType.Normal) && CustomTargetPass_Y == TargetPassType.W)
+                    customTargetPass_Y = TargetPassType.X;
+                customTargetType_Y = value;
+            }
+        }
+
+        [SerializeField]
+        TargetPassType customTargetPass_Y = TargetPassType.Y;
+        public TargetPassType CustomTargetPass_Y
+        {
+            get => customTargetPass_Y;
+            set
+            {
+                if (value == customTargetPass_Y)
+                    return;
+                Undo.RecordObject(this, "ModEditor CustomTargetPass_Y");
+                customTargetPass_Y = value;
+            }
+        }
+
+        [SerializeField]
+        CustomTargetType customTargetType_Z = CustomTargetType.None;
+        public CustomTargetType CustomTargetType_Z
+        {
+            get => customTargetType_Z;
+            set
+            {
+                if (value == customTargetType_Z)
+                    return;
+                Undo.RecordObject(this, "ModEditor CustomTargetType_Z");
+                if ((value == CustomTargetType.Vertex || value == CustomTargetType.Normal) && CustomTargetPass_Z == TargetPassType.W)
+                    customTargetPass_Z = TargetPassType.X;
+                customTargetType_Z = value;
+            }
+        }
+
+        [SerializeField]
+        TargetPassType customTargetPass_Z = TargetPassType.Z;
+        public TargetPassType CustomTargetPass_Z
+        {
+            get => customTargetPass_Z;
+            set
+            {
+                if (value == customTargetPass_Z)
+                    return;
+                Undo.RecordObject(this, "ModEditor CustomTargetPass_Z");
+                customTargetPass_Z = value;
+            }
+        }
+
+        [SerializeField]
+        CustomTargetType customTargetType_W = CustomTargetType.None;
+        public CustomTargetType CustomTargetType_W
+        {
+            get => customTargetType_W;
+            set
+            {
+                if (value == customTargetType_W)
+                    return;
+                Undo.RecordObject(this, "ModEditor CustomTargetType_W");
+                if ((value == CustomTargetType.Vertex || value == CustomTargetType.Normal) && CustomTargetPass_W == TargetPassType.W)
+                    customTargetPass_W = TargetPassType.X;
+                customTargetType_W = value;
+            }
+        }
+
+        [SerializeField]
+        TargetPassType customTargetPass_W = TargetPassType.W;
+        public TargetPassType CustomTargetPass_W
+        {
+            get => customTargetPass_W;
+            set
+            {
+                if (value == customTargetPass_W)
+                    return;
+                Undo.RecordObject(this, "ModEditor CustomTargetPass_W");
+                customTargetPass_W = value;
+            }
+        }
+        #endregion
+
+        #region Util
+        [SerializeField]
+        bool calcUtilUnfold = true;
+        public bool CalcUtilUnfold
+        {
+            get => calcUtilUnfold;
+            set
+            {
+                if (value == calcUtilUnfold)
+                    return;
+                Undo.RecordObject(this, "ModEditor CalcUtilUnfold");
+                calcUtilUnfold = value;
+            }
+        }
+
+        public int calcUtilIndex;
+        public int CalcUtilIndex
+        {
+            get => calcUtilIndex;
+            set
+            {
+                if (value == calcUtilIndex)
+                    return;
+                Undo.RecordObject(this, "ModEditor CalcUtilIndex");
+                calcUtilIndex = value;
             }
         }
         #endregion

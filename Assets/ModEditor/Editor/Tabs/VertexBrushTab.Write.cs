@@ -25,16 +25,10 @@ namespace ModEditor
                     continue;
                 MeshFilter meshFilter = target.GetComponent<MeshFilter>();
                 if (meshFilter != null)
-                {
-                    window.SetEditingMesh(target, meshFilter);
-                    _objInOperation.Add((target.transform, meshFilter.sharedMesh));
-                }
+                    _objInOperation.Add((target.transform, window.SetEditingMesh(target, meshFilter)));
                 SkinnedMeshRenderer skinnedMeshRenderer = target.GetComponent<SkinnedMeshRenderer>();
                 if (skinnedMeshRenderer != null)
-                {
-                    window.SetEditingMesh(target, skinnedMeshRenderer);
-                    _objInOperation.Add((target.transform, skinnedMeshRenderer.sharedMesh));
-                }
+                    _objInOperation.Add((target.transform, window.SetEditingMesh(target, skinnedMeshRenderer)));
             }
             return _objInOperation;
         }
@@ -43,10 +37,10 @@ namespace ModEditor
         {
             if (window.OnSceneGUI)
                 return;
-            if (window.VertexView)
+            if (window.VertexView && !BrushDisable())
             {
                 objInOperation = recordObjInOperation();
-                write();
+                brushWrite();
             }
         }
 
@@ -59,11 +53,9 @@ namespace ModEditor
         {
             if (window.OnSceneGUI)
                 return;
-            if (window.VertexView)
-                write();
+            if (window.VertexView && !BrushDisable())
+                brushWrite();
         }
-
-        private void OnMouse_Scroll() { }
 
         private void Alt_OnScrollWheel_Roll(float obj)
         {
@@ -172,19 +164,201 @@ namespace ModEditor
             Repaint();
         }
 
-        void write()
+        public bool BrushDisable()
         {
-            if (objInOperation == null)
+            if (window.Manager.WriteTargetType == WriteTargetType.None)
+                return true;
+            if (window.Manager.WriteTargetType == WriteTargetType.Custom)
+            {
+                if (window.Manager.CustomTargetType_X == CustomTargetType.None &&
+                    window.Manager.CustomTargetType_Y == CustomTargetType.None &&
+                    window.Manager.CustomTargetType_Z == CustomTargetType.None &&
+                    window.Manager.CustomTargetType_W == CustomTargetType.None)
+                    return true;
+            }
+            return false;
+        }
+
+        void brushWrite()
+        {
+            if (objInOperation == null || objInOperation.Count == 0)
                 return;
             switch (window.Manager.BrushType)
             {
                 case BrushType.ScreenScope:
-                    writeVertexColor_ScreenScope();
+                    write_ScreenScope();
                     break;
             }
         }
 
-        void writeVertexColor_ScreenScope()
+        void executeCalcUtil(VertexCalcUtilBase util)
+        {
+            for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
+            {
+                GameObject target = window.Manager.TargetChildren[i];
+                if (target == null)
+                    continue;
+                if (!window.Manager.ActionableDic[target])
+                    continue;
+                Mesh mesh = null;
+                MeshFilter meshFilter = target.GetComponent<MeshFilter>();
+                if (meshFilter != null)
+                    mesh = window.SetEditingMesh(target, meshFilter);
+                SkinnedMeshRenderer skinnedMeshRenderer = target.GetComponent<SkinnedMeshRenderer>();
+                if (skinnedMeshRenderer != null)
+                    mesh = window.SetEditingMesh(target, skinnedMeshRenderer);
+                if (mesh != null)
+                {
+                    switch (util.PassCount)
+                    {
+                        case PassCount.One:
+                            {
+                                float[] result = util.ExecuteOne(mesh);
+                                if (result != null && result.Length > 0)
+                                    write_Data(mesh, result);
+                            }
+                            break;
+                        case PassCount.Two:
+                            {
+                                Vector2[] result = util.ExecuteTwo(mesh);
+                                if (result != null && result.Length > 0)
+                                    write_Data(mesh, result);
+                            }
+                            break;
+                        case PassCount.Three:
+                            {
+                                Vector3[] result = util.ExecuteThree(mesh);
+                                if (result != null && result.Length > 0)
+                                    write_Data(mesh, result);
+                            }
+                            break;
+                        case PassCount.Four:
+                            {
+                                Vector4[] result = util.ExecuteFour(mesh);
+                                if(result != null && result.Length > 0)
+                                    write_Data(mesh, result);
+                            }
+                            break;
+                    }
+                }
+            }
+        }
+
+        void write_Data(Mesh mesh, float[] result)
+        {
+            switch (window.Manager.WriteTargetType)
+            {
+                case WriteTargetType.VertexColor:
+                    Color[] colors = mesh.colors;
+                    if (colors.Length != mesh.vertexCount)
+                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
+                    mesh.colors = CalcUtil.Self.GetResultColor(window.Manager.WriteType, colors, result);
+                    break;
+                case WriteTargetType.Vertex:
+                    mesh.vertices = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.vertices, result);
+                    break;
+                case WriteTargetType.Normal:
+                    mesh.normals = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.normals, result);
+                    break;
+                case WriteTargetType.Tangent:
+                    mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.tangents, result);
+                    break;
+                case WriteTargetType.Texture:
+                    break;
+                case WriteTargetType.Custom:
+                    setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_X, window.Manager.CustomTargetPass_X, mesh, result);
+                    break;
+            }
+        }
+
+        void write_Data(Mesh mesh, Vector2[] result)
+        {
+            switch (window.Manager.WriteTargetType)
+            {
+                case WriteTargetType.VertexColor:
+                    Color[] colors = mesh.colors;
+                    if (colors.Length != mesh.vertexCount)
+                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
+                    mesh.colors = CalcUtil.Self.GetResultColor(window.Manager.WriteType, colors, result);
+                    break;
+                case WriteTargetType.Vertex:
+                    mesh.vertices = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.vertices, result);
+                    break;
+                case WriteTargetType.Normal:
+                    mesh.normals = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.normals, result);
+                    break;
+                case WriteTargetType.Tangent:
+                    mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.tangents, result);
+                    break;
+                case WriteTargetType.Texture:
+                    break;
+                case WriteTargetType.Custom:
+                    setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_X, TargetPassType.X, window.Manager.CustomTargetPass_X, mesh, result);
+                    setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_Y, TargetPassType.Y, window.Manager.CustomTargetPass_Y, mesh, result);
+                    break;
+            }
+        }
+
+        void write_Data(Mesh mesh, Vector3[] result)
+        {
+            switch (window.Manager.WriteTargetType)
+            {
+                case WriteTargetType.VertexColor:
+                    Color[] colors = mesh.colors;
+                    if (colors.Length != mesh.vertexCount)
+                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
+                    mesh.colors = CalcUtil.Self.GetResultColor(window.Manager.WriteType, colors, result);
+                    break;
+                case WriteTargetType.Vertex:
+                    mesh.vertices = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.vertices, result);
+                    break;
+                case WriteTargetType.Normal:
+                    mesh.normals = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.normals, result);
+                    break;
+                case WriteTargetType.Tangent:
+                    mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.tangents, result);
+                    break;
+                case WriteTargetType.Texture:
+                    break;
+                case WriteTargetType.Custom:
+                    setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_X, TargetPassType.X, window.Manager.CustomTargetPass_X, mesh, result);
+                    setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_Y, TargetPassType.Y, window.Manager.CustomTargetPass_Y, mesh, result);
+                    setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_Z, TargetPassType.Z, window.Manager.CustomTargetPass_Z, mesh, result);
+                    break;
+            }
+        }
+
+        void write_Data(Mesh mesh, Vector4[] result)
+        {
+            switch (window.Manager.WriteTargetType)
+            {
+                case WriteTargetType.VertexColor:
+                    Color[] colors = mesh.colors;
+                    if (colors.Length != mesh.vertexCount)
+                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
+                    mesh.colors = CalcUtil.Self.GetResultColor(window.Manager.WriteType, colors, result);
+                    break;
+                case WriteTargetType.Vertex:
+                    mesh.vertices = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.vertices, result);
+                    break;
+                case WriteTargetType.Normal:
+                    mesh.normals = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.normals, result);
+                    break;
+                case WriteTargetType.Tangent:
+                    mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.tangents, result);
+                    break;
+                case WriteTargetType.Texture:
+                    break;
+                case WriteTargetType.Custom:
+                    setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_X, TargetPassType.X, window.Manager.CustomTargetPass_X, mesh, result);
+                    setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_Y, TargetPassType.Y, window.Manager.CustomTargetPass_Y, mesh, result);
+                    setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_Z, TargetPassType.Z, window.Manager.CustomTargetPass_Z, mesh, result);
+                    setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_W, TargetPassType.W, window.Manager.CustomTargetPass_W, mesh, result);
+                    break;
+            }
+        }
+
+        void write_ScreenScope()
         {
             for (int i = 0; i < objInOperation.Count; i++)
             {
@@ -195,53 +369,155 @@ namespace ModEditor
                 CalcShaderData.CalcVertexsData data = window.CalcShaderDatas.FirstOrDefault(x => x.trans == trans);
                 if (data != null && data.IsAvailable)
                 {
-                    data.Cala(window.Manager.BrushColorFrom, window.Manager.BrushColorTo, window.Manager.BrushColorFromStep, window.Manager.BrushColorToStep);
+                    data.Cala(window.Manager.BrushColorFrom, window.Manager.BrushColorTo, window.Manager.BrushColorFromStep, window.Manager.BrushColorToStep, window.Manager.BrushStrength);
+                    switch (window.Manager.WriteTargetType)
+                    {
+                        case WriteTargetType.VertexColor:
+                            Color[] colors = mesh.colors;
+                            if (colors.Length != mesh.vertexCount)
+                                colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
+                            mesh.colors = data.GetResultColor(window.Manager.WriteType, colors);
+                            break;
+                        case WriteTargetType.Vertex:
+                            mesh.vertices = data.GetResult(window.Manager.WriteType, mesh.vertices);
+                            break;
+                        case WriteTargetType.Normal:
+                            mesh.normals = data.GetResult(window.Manager.WriteType, mesh.normals);
+                            break;
+                        case WriteTargetType.Tangent:
+                            mesh.tangents = data.GetResult(window.Manager.WriteType, mesh.tangents);
+                            break;
+                        case WriteTargetType.Texture:
+                            break;
+                        case WriteTargetType.Custom:
+                            setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_X, TargetPassType.X, window.Manager.CustomTargetPass_X, mesh, data);
+                            setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_Y, TargetPassType.Y, window.Manager.CustomTargetPass_Y, mesh, data);
+                            setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_Z, TargetPassType.Z, window.Manager.CustomTargetPass_Z, mesh, data);
+                            setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_W, TargetPassType.W, window.Manager.CustomTargetPass_W, mesh, data);
+                            break;
+                    }
+                }
+            }
+        }
+
+        void setCustomData(WriteType writeType, CustomTargetType customTarget, TargetPassType inPass, TargetPassType outPass, Mesh mesh, CalcShaderData.CalcVertexsData data)
+        {
+            switch (customTarget)
+            {
+                case CustomTargetType.VertexColor:
                     Color[] colors = mesh.colors;
                     if (colors.Length != mesh.vertexCount)
                         colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
-                    mesh.colors = data.GetResultColor(window.Manager.WriteType, window.Manager.WriteTargetType, colors);
-                }
+                    mesh.colors = data.GetResultCustom(writeType, inPass, outPass, colors);
+                    break;
+                case CustomTargetType.Vertex:
+                    mesh.vertices = data.GetResultCustom(writeType, inPass, outPass, mesh.vertices);
+                    break;
+                case CustomTargetType.Normal:
+                    mesh.normals = data.GetResultCustom(writeType, inPass, outPass, mesh.normals);
+                    break;
+                case CustomTargetType.Tangent:
+                    mesh.tangents = data.GetResultCustom(writeType, inPass, outPass, mesh.tangents);
+                    break;
             }
         }
 
-        void writeAcgNormalToTangent()
+        void setCustomData(WriteType writeType, CustomTargetType customTarget, TargetPassType outPass, Mesh mesh, float[] result)
         {
-            for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
+            switch (customTarget)
             {
-                GameObject target = window.Manager.TargetChildren[i];
-                if (target == null)
-                    continue;
-                if (!window.Manager.ActionableDic[target])
-                    continue;
-                MeshFilter meshFilter = target.GetComponent<MeshFilter>();
-                if (meshFilter != null)
-                {
-                    window.SetEditingMesh(target, meshFilter);
-                    writeAcgNormalToTangent(meshFilter.sharedMesh);
-                }
-                SkinnedMeshRenderer skinnedMeshRenderer = target.GetComponent<SkinnedMeshRenderer>();
-                if (skinnedMeshRenderer != null)
-                {
-                    window.SetEditingMesh(target, skinnedMeshRenderer);
-                    writeAcgNormalToTangent(skinnedMeshRenderer.sharedMesh);
-                }
+                case CustomTargetType.VertexColor:
+                    Color[] colors = mesh.colors;
+                    if (colors.Length != mesh.vertexCount)
+                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
+                    mesh.colors = CalcUtil.Self.GetResultCustom(writeType, TargetPassType.X, outPass, colors, result);
+                    break;
+                case CustomTargetType.Vertex:
+                    mesh.vertices = CalcUtil.Self.GetResultCustom(writeType, TargetPassType.X, outPass, mesh.vertices, result);
+                    break;
+                case CustomTargetType.Normal:
+                    mesh.normals = CalcUtil.Self.GetResultCustom(writeType, TargetPassType.X, outPass, mesh.normals, result);
+                    break;
+                case CustomTargetType.Tangent:
+                    mesh.tangents = CalcUtil.Self.GetResultCustom(writeType, TargetPassType.X, outPass, mesh.tangents, result);
+                    break;
             }
         }
 
-        void writeAcgNormalToTangent(Mesh mesh)
+        void setCustomData(WriteType writeType, CustomTargetType customTarget, TargetPassType inPass, TargetPassType outPass, Mesh mesh, Vector2[] result)
         {
-            if (mesh == null)
+            if (inPass == TargetPassType.Z || inPass == TargetPassType.W)
+            {
+                Debug.LogWarning($"ModEditor VertexBrush: CustomData dont have \"{inPass}\" pass");
                 return;
-            AvgNormalJob job = new AvgNormalJob()
+            }
+            switch (customTarget)
             {
-                vertexs = new NativeArray<Vector3>(mesh.vertices, Allocator.TempJob),
-                normals = new NativeArray<Vector3>(mesh.normals, Allocator.TempJob),
-                output = new NativeArray<Vector4>(mesh.vertexCount, Allocator.TempJob)
-            };
-            JobHandle jobHandle = job.Schedule();
-            jobHandle.Complete();
-            mesh.tangents = job.output.ToArray();
-            job.output.Dispose();
+                case CustomTargetType.VertexColor:
+                    Color[] colors = mesh.colors;
+                    if (colors.Length != mesh.vertexCount)
+                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
+                    mesh.colors = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, colors, result);
+                    break;
+                case CustomTargetType.Vertex:
+                    mesh.vertices = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.vertices, result);
+                    break;
+                case CustomTargetType.Normal:
+                    mesh.normals = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.normals, result);
+                    break;
+                case CustomTargetType.Tangent:
+                    mesh.tangents = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.tangents, result);
+                    break;
+            }
+        }
+
+        void setCustomData(WriteType writeType, CustomTargetType customTarget, TargetPassType inPass, TargetPassType outPass, Mesh mesh, Vector3[] result)
+        {
+            if (inPass == TargetPassType.W)
+            {
+                Debug.LogWarning($"ModEditor VertexBrush: CustomData dont have \"{inPass}\" pass");
+                return;
+            }
+            switch (customTarget)
+            {
+                case CustomTargetType.VertexColor:
+                    Color[] colors = mesh.colors;
+                    if (colors.Length != mesh.vertexCount)
+                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
+                    mesh.colors = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, colors, result);
+                    break;
+                case CustomTargetType.Vertex:
+                    mesh.vertices = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.vertices, result);
+                    break;
+                case CustomTargetType.Normal:
+                    mesh.normals = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.normals, result);
+                    break;
+                case CustomTargetType.Tangent:
+                    mesh.tangents = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.tangents, result);
+                    break;
+            }
+        }
+
+        void setCustomData(WriteType writeType, CustomTargetType customTarget, TargetPassType inPass, TargetPassType outPass, Mesh mesh, Vector4[] result)
+        {
+            switch (customTarget)
+            {
+                case CustomTargetType.VertexColor:
+                    Color[] colors = mesh.colors;
+                    if (colors.Length != mesh.vertexCount)
+                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
+                    mesh.colors = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, colors, result);
+                    break;
+                case CustomTargetType.Vertex:
+                    mesh.vertices = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.vertices, result);
+                    break;
+                case CustomTargetType.Normal:
+                    mesh.normals = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.normals, result);
+                    break;
+                case CustomTargetType.Tangent:
+                    mesh.tangents = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.tangents, result);
+                    break;
+            }
         }
     }
 }

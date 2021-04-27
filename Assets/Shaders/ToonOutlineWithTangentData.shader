@@ -24,6 +24,7 @@
 			{
 				float4 vertex: POSITION;
 				float4 tangent: TANGENT;
+				float3 normal: NORMAL;
 				float4 color: COLOR;
 			};
 
@@ -32,7 +33,7 @@
 				float depth;
 				COMPUTE_EYEDEPTH(depth);
 				float outlineWidth = clamp(_OutlineWidth * 0.01 * depth, 0.001, 0.03);
-				float3 pos = v.vertex + v.tangent.xyz * outlineWidth;
+				float3 pos = v.vertex + v.tangent.xyz * outlineWidth * v.color.x;
 				return UnityObjectToClipPos(pos);
 			}
 

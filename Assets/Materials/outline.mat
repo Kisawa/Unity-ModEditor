@@ -34,7 +34,7 @@ Material:
     m_Floats:
     - _OpenAO: 0
     - _Outline: 0.1
-    - _OutlineWidth: 0.105
+    - _OutlineWidth: 0.205
     - _ShadowBlend: 0.344
     - _ShadowRange: 0.087
     - _ShadowSmooth: 0.399
