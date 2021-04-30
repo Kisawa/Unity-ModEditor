@@ -67,7 +67,7 @@ namespace ModEditor
                 else if (value == 1)
                     TabType = ModEditorTabType.VertexBrush;
                 else
-                    TabType = ModEditorTabType.Other;
+                    TabType = ModEditorTabType.TextureBrush;
                 if (_tabIndex != value)
                 {
                     if (_tabIndex < tabs.Count && _tabIndex >= 0)
@@ -97,6 +97,16 @@ namespace ModEditor
                 if (tabs == null || tabs.Count < 2)
                     return null;
                 return tabs[1] as VertexBrushTab;
+            }
+        }
+
+        public TextureBrushTab Tab_TextureBrush
+        {
+            get
+            {
+                if (tabs == null || tabs.Count < 3)
+                    return null;
+                return tabs[2] as TextureBrushTab;
             }
         }
 
@@ -141,6 +151,7 @@ namespace ModEditor
             tabs = new List<WindowTabBase>();
             tabs.Add(new SceneCollectionTab(this));
             tabs.Add(new VertexBrushTab(this));
+            tabs.Add(new TextureBrushTab(this));
             if (lockContent == null)
                 lockContent = EditorGUIUtility.IconContent("IN LockButton on act");
             if (unlockContent == null)
@@ -220,7 +231,7 @@ namespace ModEditor
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Space(10);
-            tabIndex = GUILayout.Toolbar(tabIndex, new string[] { "Scene Collection", "Vertex Brush", "Other" }, "SearchModeFilter");
+            tabIndex = GUILayout.Toolbar(tabIndex, new string[] { "Scene Collection", "Vertex Brush", "Texture Brush" }, "SearchModeFilter");
             EditorGUILayout.Space(10);
 
             if (tabIndex < tabs.Count)

@@ -162,6 +162,17 @@ namespace ModEditor
             }
         }
 
+        VertexBrushType vertexBrushType = VertexBrushType.Color;
+        VertexBrushType VertexBrushType
+        {
+            get
+            {
+                if (ModEditor != null && ModEditor.Manager != null)
+                    vertexBrushType = ModEditor.Manager.VertexBrushType;
+                return vertexBrushType;
+            }
+        }
+
         float brushStrength = 1;
         float BrushStrength
         {
@@ -170,6 +181,24 @@ namespace ModEditor
                 if (ModEditor != null && ModEditor.Manager != null)
                     brushStrength = ModEditor.Manager.BrushStrength;
                 return brushStrength;
+            }
+        }
+
+        Color brushColor = Color.white;
+        Color BrushColor
+        {
+            get
+            {
+                if (ModEditor != null && ModEditor.Manager != null)
+                    brushColor = ModEditor.Manager.BrushColor;
+                return brushColor;
+            }
+            set
+            {
+                if (ModEditor == null || ModEditor.Manager == null)
+                    return;
+                brushColor = value;
+                ModEditor.Manager.BrushColor = brushColor;
             }
         }
 
@@ -304,32 +333,44 @@ namespace ModEditor
             base.OnToolGUI(window);
             HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Keyboard));
             Handles.BeginGUI();
-            Rect rect = new Rect(window.position.width - 250, window.position.height - 215, 240, 185);
             GUIStyle txtStyle = GUI.skin.GetStyle("AboutWIndowLicenseLabel");
             GUIStyle hotKeyStyle = GUI.skin.GetStyle("LODSliderTextSelected");
             GUIStyle msgStyle = GUI.skin.GetStyle("LODRendererAddButton");
+
+            Rect rect = new Rect(window.position.width - 250, window.position.height - 175, 240, 145);
+            switch (VertexBrushType)
+            {
+                case VertexBrushType.TwoColorGradient:
+                    rect = new Rect(window.position.width - 250, window.position.height - 215, 240, 185);
+                    break;
+            }
             GUILayout.BeginArea(rect);
+            switch (VertexBrushType)
+            {
+                case VertexBrushType.Color:
+                    break;
+                case VertexBrushType.TwoColorGradient:
+                    EditorGUI.LabelField(new Rect(0, 0, 240, 40), "", GUI.skin.GetStyle("dockarea"));
+                    EditorGUI.BeginDisabledGroup(brushGradientDisabled());
+                    EditorGUI.LabelField(new Rect(0, 0, 20, 15), "/A", hotKeyStyle);
+                    BrushColorFrom = EditorGUI.ColorField(new Rect(20, 2, 70, 12), BrushColorFrom);
+                    EditorGUI.LabelField(new Rect(90, -1, 30, 15), "From", txtStyle);
+                    EditorGUI.LabelField(new Rect(130, 0, 80, 15), $"{BrushStrength} - {WriteType}", msgStyle);
+                    EditorGUI.LabelField(new Rect(223, 0, 20, 15), "/D", hotKeyStyle);
 
-            EditorGUI.LabelField(new Rect(0, 0, 240, 40), "", GUI.skin.GetStyle("dockarea"));
-            EditorGUI.BeginDisabledGroup(brushGradientDisabled());
-            EditorGUI.LabelField(new Rect(0, 0, 20, 15), "/A", hotKeyStyle);
-            BrushColorFrom = EditorGUI.ColorField(new Rect(20, 2, 70, 12), BrushColorFrom);
-            EditorGUI.LabelField(new Rect(90, -1, 30, 15), "From", txtStyle);
-            EditorGUI.LabelField(new Rect(130, 0, 80, 15), $"{BrushStrength} - {WriteType}", msgStyle);
-            EditorGUI.LabelField(new Rect(223, 0, 20, 15), "/D", hotKeyStyle);
+                    EditorGUI.LabelField(new Rect(3, 12, 30, 15), $"{BrushColorFromStep}", txtStyle);
+                    EditorGUI.GradientField(new Rect(30, 15, 180, 12), BrushGradient);
+                    EditorGUI.LabelField(new Rect(210, 12, 30, 15), $"{1 - BrushColorToStep}", txtStyle);
 
-            EditorGUI.LabelField(new Rect(3, 12, 30, 15), $"{BrushColorFromStep}", txtStyle);
-            EditorGUI.GradientField(new Rect(30, 15, 180, 12), BrushGradient);
-            EditorGUI.LabelField(new Rect(210, 12, 30, 15), $"{1 - BrushColorToStep}", txtStyle);
-
-            EditorGUI.LabelField(new Rect(0, 24, 20, 15), "/Z", hotKeyStyle);
-            EditorGUI.LabelField(new Rect(35, 24, 80, 15), $"to {WriteTargetType}", msgStyle);
-            EditorGUI.LabelField(new Rect(130, 24, 30, 15), "To", txtStyle);
-            BrushColorTo = EditorGUI.ColorField(new Rect(150, 27, 70, 12), BrushColorTo);
-            EditorGUI.LabelField(new Rect(223, 24, 20, 15), "/C", hotKeyStyle);
-            EditorGUI.EndDisabledGroup();
-
-            GUILayout.Space(40);
+                    EditorGUI.LabelField(new Rect(0, 24, 20, 15), "/Z", hotKeyStyle);
+                    EditorGUI.LabelField(new Rect(35, 24, 80, 15), $"to {WriteTargetType}", msgStyle);
+                    EditorGUI.LabelField(new Rect(130, 24, 30, 15), "To", txtStyle);
+                    BrushColorTo = EditorGUI.ColorField(new Rect(150, 27, 70, 12), BrushColorTo);
+                    EditorGUI.LabelField(new Rect(223, 24, 20, 15), "/C", hotKeyStyle);
+                    EditorGUI.EndDisabledGroup();
+                    GUILayout.Space(40);
+                    break;
+            }
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label(BrushLock ? lockContent : unlockContent, "ToolbarButtonFlat");
             GUILayout.Label($"Current brush dpeth:  {BrushDepth}", "ToolbarButtonFlat");
@@ -392,7 +433,7 @@ namespace ModEditor
             return false;
         }
 
-        void updateVertexViewBuffer(bool triggerCala = false)
+        void updateVertexViewBuffer()
         {
             if (ModEditor == null || ModEditor.camera == null)
                 return;
@@ -407,8 +448,18 @@ namespace ModEditor
                 if (brushOn)
                 {
                     data.Update(ModEditor.camera, Mouse.ScreenTexcoord, BrushSize, BrushDepth);
-                    if(BrushColorView || triggerCala)
-                        data.Cala(ModEditor.Manager.BrushColorFrom, ModEditor.Manager.BrushColorTo, ModEditor.Manager.BrushColorFromStep, ModEditor.Manager.BrushColorToStep, BrushStrength);
+                    if (BrushColorView)
+                    {
+                        switch (VertexBrushType)
+                        {
+                            case VertexBrushType.Color:
+                                data.Cala(BrushColor, BrushStrength);
+                                break;
+                            case VertexBrushType.TwoColorGradient:
+                                data.Cala(BrushColorFrom, BrushColorTo, BrushColorFromStep, BrushColorToStep, BrushStrength);
+                                break;
+                        }
+                    }
                 }
                 if (data.IsAvailable)
                 {

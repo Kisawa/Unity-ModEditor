@@ -40,7 +40,7 @@ namespace ModEditor
             if (window.VertexView && !BrushDisable())
             {
                 objInOperation = recordObjInOperation();
-                brushWrite();
+                write_ScreenScope();
             }
         }
 
@@ -54,7 +54,7 @@ namespace ModEditor
             if (window.OnSceneGUI)
                 return;
             if (window.VertexView && !BrushDisable())
-                brushWrite();
+                write_ScreenScope();
         }
 
         private void Alt_OnScrollWheel_Roll(float obj)
@@ -142,26 +142,38 @@ namespace ModEditor
 
         private void C_Down()
         {
-            window.Manager.BrushColorToStep += 0.01f;
-            Repaint();
+            if (window.Manager.VertexBrushType == VertexBrushType.TwoColorGradient)
+            {
+                window.Manager.BrushColorToStep += 0.01f;
+                Repaint();
+            }
         }
 
         private void Z_Down()
         {
-            window.Manager.BrushColorToStep -= 0.01f;
-            Repaint();
+            if (window.Manager.VertexBrushType == VertexBrushType.TwoColorGradient)
+            {
+                window.Manager.BrushColorToStep -= 0.01f;
+                Repaint();
+            }
         }
 
         private void D_Down()
         {
-            window.Manager.BrushColorFromStep += 0.01f;
-            Repaint();
+            if (window.Manager.VertexBrushType == VertexBrushType.TwoColorGradient)
+            {
+                window.Manager.BrushColorFromStep += 0.01f;
+                Repaint();
+            }
         }
 
         private void A_Down()
         {
-            window.Manager.BrushColorFromStep -= 0.01f;
-            Repaint();
+            if (window.Manager.VertexBrushType == VertexBrushType.TwoColorGradient)
+            {
+                window.Manager.BrushColorFromStep -= 0.01f;
+                Repaint();
+            }
         }
 
         public bool BrushDisable()
@@ -177,18 +189,6 @@ namespace ModEditor
                     return true;
             }
             return false;
-        }
-
-        void brushWrite()
-        {
-            if (objInOperation == null || objInOperation.Count == 0)
-                return;
-            switch (window.Manager.BrushType)
-            {
-                case BrushType.ScreenScope:
-                    write_ScreenScope();
-                    break;
-            }
         }
 
         void executeCalcUtil(VertexCalcUtilBase util)
@@ -387,6 +387,8 @@ namespace ModEditor
 
         void write_ScreenScope()
         {
+            if (objInOperation == null || objInOperation.Count == 0)
+                return;
             for (int i = 0; i < objInOperation.Count; i++)
             {
                 Transform trans = objInOperation[i].Item1;
@@ -396,7 +398,15 @@ namespace ModEditor
                 CalcShaderData.CalcVertexsData data = window.CalcShaderDatas.FirstOrDefault(x => x.trans == trans);
                 if (data != null && data.IsAvailable)
                 {
-                    data.Cala(window.Manager.BrushColorFrom, window.Manager.BrushColorTo, window.Manager.BrushColorFromStep, window.Manager.BrushColorToStep, window.Manager.BrushStrength);
+                    switch (window.Manager.VertexBrushType)
+                    {
+                        case VertexBrushType.Color:
+                            data.Cala(window.Manager.BrushColor, window.Manager.BrushStrength);
+                            break;
+                        case VertexBrushType.TwoColorGradient:
+                            data.Cala(window.Manager.BrushColorFrom, window.Manager.BrushColorTo, window.Manager.BrushColorFromStep, window.Manager.BrushColorToStep, window.Manager.BrushStrength);
+                            break;
+                    }
                     WriteType writeType = window.Manager.WriteType;
                     if (writeType == WriteType.OtherUtil)
                     {

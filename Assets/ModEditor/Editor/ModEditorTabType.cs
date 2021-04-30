@@ -8,6 +8,6 @@ namespace ModEditor
     {
         SceneCollection,
         VertexBrush,
-        Other
+        TextureBrush
     }
 }

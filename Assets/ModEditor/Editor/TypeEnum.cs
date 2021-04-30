@@ -4,9 +4,10 @@ using UnityEngine;
 
 namespace ModEditor
 {
-    public enum BrushType
+    public enum VertexBrushType
     {
-        ScreenScope
+        Color,
+        TwoColorGradient,
     }
 
     public enum WriteType

@@ -224,6 +224,28 @@ namespace ModEditor
                 return CalcUtil.Self.GetResultCustom(type, inPass, outPass, origin, RW_BrushResult, Cache.RW_Selects);
             }
 
+            public void Cala(Color col, float strength)
+            {
+                CalcUtil.Self.CalcShader.SetVector("_From", col * strength);
+                CalcUtil.Self.CalcShader.SetVector("_To", col * strength);
+                CalcUtil.Self.CalcShader.SetFloat("_FromStep", 0f);
+                CalcUtil.Self.CalcShader.SetFloat("_ToStep", 1f);
+                if (Cache.SpreadLevel > 0)
+                {
+                    CalcUtil.Self.CalcShader.SetInt("_SpreadLevel", Cache.SpreadLevel);
+                    CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_CalcWithSpread, "RW_Selects", Cache.RW_Selects);
+                    CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_CalcWithSpread, "RW_Result4", RW_BrushResult);
+                    CalcUtil.Self.CalcShader.Dispatch(CalcUtil.Self.kernel_CalcWithSpread, Mathf.CeilToInt((float)RW_BrushResult.count / 1024), 1, 1);
+                }
+                else
+                {
+                    CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_CalcWithSize, "RW_Selects", Cache.RW_Selects);
+                    CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_CalcWithSize, "RW_Sizes", RW_Sizes);
+                    CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_CalcWithSize, "RW_Result4", RW_BrushResult);
+                    CalcUtil.Self.CalcShader.Dispatch(CalcUtil.Self.kernel_CalcWithSize, Mathf.CeilToInt((float)RW_BrushResult.count / 1024), 1, 1);
+                }
+            }
+
             public void Cala(Color from, Color to, float fromStep, float toStep, float strength)
             {
                 CalcUtil.Self.CalcShader.SetVector("_From", from * strength);

@@ -492,15 +492,9 @@ namespace ModEditor
             if (renderer == null || meshFilter == null || meshFilter.sharedMesh == null)
                 return null;
             Material material = new Material(Shader.Find("Hidden/ModEditorVertexView"));
-            CalcShaderData.CalcVertexsData data = null;
-            switch (window.Manager.BrushType)
-            {
-                case BrushType.ScreenScope:
-                    data = new CalcShaderData.CalcMeshVertexsData_ScreenScope(renderer, meshFilter);
-                    data.BindMaterial(material);
-                    window.CalcShaderDatas.Add(data);
-                    break;
-            }
+            CalcShaderData.CalcVertexsData data = new CalcShaderData.CalcMeshVertexsData_ScreenScope(renderer, meshFilter);
+            data.BindMaterial(material);
+            window.CalcShaderDatas.Add(data);
             return data;
         }
 
@@ -509,15 +503,9 @@ namespace ModEditor
             if (skinnedMesh == null || skinnedMesh.sharedMesh == null)
                 return null;
             Material material = new Material(Shader.Find("Hidden/ModEditorVertexView"));
-            CalcShaderData.CalcVertexsData data = null;
-            switch (window.Manager.BrushType)
-            {
-                case BrushType.ScreenScope:
-                    data = new CalcShaderData.CalcSkinnedMeshVertexsData_ScreenScope(skinnedMesh);
-                    data.BindMaterial(material);
-                    window.CalcShaderDatas.Add(data);
-                    break;
-            }
+            CalcShaderData.CalcVertexsData data = new CalcShaderData.CalcSkinnedMeshVertexsData_ScreenScope(skinnedMesh);
+            data.BindMaterial(material);
+            window.CalcShaderDatas.Add(data);
             return data;
         }
     }

@@ -484,16 +484,16 @@ namespace ModEditor
         }
 
         [SerializeField]
-        BrushType brushType = BrushType.ScreenScope;
-        public BrushType BrushType
+        VertexBrushType vertexBrushType = VertexBrushType.Color;
+        public VertexBrushType VertexBrushType
         {
-            get => brushType;
+            get => vertexBrushType;
             set
             {
-                if (value == brushType)
+                if (value == vertexBrushType)
                     return;
-                Undo.RecordObject(this, "ModEditor BrushType");
-                brushType = value;
+                Undo.RecordObject(this, "ModEditor VertexBrushType");
+                vertexBrushType = value;
             }
         }
 
@@ -510,6 +510,20 @@ namespace ModEditor
                     return;
                 Undo.RecordObject(this, "ModEditor BrushStrength");
                 brushStrength = value;
+            }
+        }
+
+        [SerializeField]
+        Color brushColor = Color.white;
+        public Color BrushColor
+        {
+            get => brushColor;
+            set
+            {
+                if (value == brushColor)
+                    return;
+                Undo.RecordObject(this, "ModEditor BrushColor");
+                brushColor = value;
             }
         }
 

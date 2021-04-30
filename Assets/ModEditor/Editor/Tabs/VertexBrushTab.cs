@@ -199,34 +199,57 @@ namespace ModEditor
                 EditorGUILayout.EndHorizontal();
 
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("From:", labelStyle, GUILayout.Width(80));
-                window.Manager.BrushColorFrom = EditorGUILayout.ColorField(window.Manager.BrushColorFrom, GUILayout.Width(100));
-                EditorGUILayout.EndHorizontal();
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.Space(80);
-                EditorGUILayout.LabelField($"( {window.Manager.BrushColorFrom.r * window.Manager.BrushStrength}, {window.Manager.BrushColorFrom.g * window.Manager.BrushStrength}, {window.Manager.BrushColorFrom.b * window.Manager.BrushStrength}, {window.Manager.BrushColorFrom.a * window.Manager.BrushStrength} )", labelStyle);
+                EditorGUILayout.LabelField("Brush Type:", labelStyle, GUILayout.Width(100));
+                window.Manager.VertexBrushType = (VertexBrushType)EditorGUILayout.EnumPopup(window.Manager.VertexBrushType, GUILayout.Width(window.position.width - 140));
                 EditorGUILayout.EndHorizontal();
 
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.Space(10);
-                EditorGUILayout.LabelField("From Step:", labelStyle, GUILayout.Width(100));
-                window.Manager.BrushColorFromStep = EditorGUILayout.Slider(window.Manager.BrushColorFromStep, 0, 1, GUILayout.Width(window.position.width - 150));
-                EditorGUILayout.EndHorizontal();
+                GUILayout.Space(5);
+                EditorGUILayout.BeginVertical("SelectionRect", GUILayout.Width(window.position.width - 100));
+                switch (window.Manager.VertexBrushType)
+                {
+                    case VertexBrushType.Color:
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUILayout.LabelField("Brush Color:", labelStyle, GUILayout.Width(100));
+                        window.Manager.BrushColor = EditorGUILayout.ColorField(window.Manager.BrushColor, GUILayout.Width(100));
+                        EditorGUILayout.EndHorizontal();
+                        EditorGUILayout.BeginHorizontal();
+                        GUILayout.Space(80);
+                        EditorGUILayout.LabelField($"( {window.Manager.BrushColor.r * window.Manager.BrushStrength}, {window.Manager.BrushColor.g * window.Manager.BrushStrength}, {window.Manager.BrushColor.b * window.Manager.BrushStrength}, {window.Manager.BrushColor.a * window.Manager.BrushStrength} )", labelStyle);
+                        EditorGUILayout.EndHorizontal();
+                        break;
+                    case VertexBrushType.TwoColorGradient:
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUILayout.LabelField("From:", labelStyle, GUILayout.Width(80));
+                        window.Manager.BrushColorFrom = EditorGUILayout.ColorField(window.Manager.BrushColorFrom, GUILayout.Width(100));
+                        EditorGUILayout.EndHorizontal();
+                        EditorGUILayout.BeginHorizontal();
+                        GUILayout.Space(80);
+                        EditorGUILayout.LabelField($"( {window.Manager.BrushColorFrom.r * window.Manager.BrushStrength}, {window.Manager.BrushColorFrom.g * window.Manager.BrushStrength}, {window.Manager.BrushColorFrom.b * window.Manager.BrushStrength}, {window.Manager.BrushColorFrom.a * window.Manager.BrushStrength} )", labelStyle);
+                        EditorGUILayout.EndHorizontal();
 
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.Space(10);
-                EditorGUILayout.LabelField("To Step:", labelStyle, GUILayout.Width(100));
-                window.Manager.BrushColorToStep = EditorGUILayout.Slider(window.Manager.BrushColorToStep, 0, 1, GUILayout.Width(window.position.width - 150));
-                EditorGUILayout.EndHorizontal();
+                        EditorGUILayout.BeginHorizontal();
+                        GUILayout.Space(10);
+                        EditorGUILayout.LabelField("From Step:", labelStyle, GUILayout.Width(100));
+                        window.Manager.BrushColorFromStep = EditorGUILayout.Slider(window.Manager.BrushColorFromStep, 0, 1, GUILayout.Width(window.position.width - 150));
+                        EditorGUILayout.EndHorizontal();
 
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("To:", labelStyle, GUILayout.Width(80));
-                window.Manager.BrushColorTo = EditorGUILayout.ColorField(window.Manager.BrushColorTo, GUILayout.Width(100));
-                EditorGUILayout.EndHorizontal();
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.Space(80);
-                EditorGUILayout.LabelField($"( {window.Manager.BrushColorTo.r * window.Manager.BrushStrength}, {window.Manager.BrushColorTo.g * window.Manager.BrushStrength}, {window.Manager.BrushColorTo.b * window.Manager.BrushStrength}, {window.Manager.BrushColorTo.a * window.Manager.BrushStrength} )", labelStyle);
-                EditorGUILayout.EndHorizontal();
+                        EditorGUILayout.BeginHorizontal();
+                        GUILayout.Space(10);
+                        EditorGUILayout.LabelField("To Step:", labelStyle, GUILayout.Width(100));
+                        window.Manager.BrushColorToStep = EditorGUILayout.Slider(window.Manager.BrushColorToStep, 0, 1, GUILayout.Width(window.position.width - 150));
+                        EditorGUILayout.EndHorizontal();
+
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUILayout.LabelField("To:", labelStyle, GUILayout.Width(80));
+                        window.Manager.BrushColorTo = EditorGUILayout.ColorField(window.Manager.BrushColorTo, GUILayout.Width(100));
+                        EditorGUILayout.EndHorizontal();
+                        EditorGUILayout.BeginHorizontal();
+                        GUILayout.Space(80);
+                        EditorGUILayout.LabelField($"( {window.Manager.BrushColorTo.r * window.Manager.BrushStrength}, {window.Manager.BrushColorTo.g * window.Manager.BrushStrength}, {window.Manager.BrushColorTo.b * window.Manager.BrushStrength}, {window.Manager.BrushColorTo.a * window.Manager.BrushStrength} )", labelStyle);
+                        EditorGUILayout.EndHorizontal();
+                        break;
+                }
+                EditorGUILayout.EndVertical();
             }
             
             EditorGUILayout.EndVertical();
