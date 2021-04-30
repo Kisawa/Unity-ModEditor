@@ -414,7 +414,7 @@ namespace ModEditor
             for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
             {
                 GameObject target = window.Manager.TargetChildren[i];
-                if (target == null)
+                if (target == null || !target.activeSelf)
                     continue;
                 if (!window.Manager.ActionableDic[target])
                     continue;

@@ -13,23 +13,36 @@ namespace ModEditor
         public VertexBrushTab(EditorWindow window) : base(window)
         {
             this.window = window as ModEditorWindow;
-            Type[] types = AppDomain.CurrentDomain.GetAssemblies()
+            Type[] calcTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes().Where(y => typeof(VertexCalcUtilBase).IsAssignableFrom(y) && y.IsClass && !y.IsAbstract)).ToArray();
-            utilNames = new string[types.Length];
-            utilContents = new GUIContent[types.Length];
-            utilInstances = new VertexCalcUtilBase[types.Length];
-            for (int i = 0; i < types.Length; i++)
+            calcUtilNames = new string[calcTypes.Length];
+            calcUtilContents = new GUIContent[calcTypes.Length];
+            calcUtilInstances = new VertexCalcUtilBase[calcTypes.Length];
+            for (int i = 0; i < calcTypes.Length; i++)
             {
-                VertexCalcUtilBase util = (VertexCalcUtilBase)Activator.CreateInstance(types[i]);
-                utilNames[i] = util.Name;
-                utilContents[i] = new GUIContent(util.Tip, util.Tip);
-                utilInstances[i] = util;
+                VertexCalcUtilBase util = (VertexCalcUtilBase)Activator.CreateInstance(calcTypes[i]);
+                calcUtilNames[i] = util.Name;
+                calcUtilContents[i] = new GUIContent(util.Tip, util.Tip);
+                calcUtilInstances[i] = util;
+            }
+
+            Type[] brushTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(x => x.GetTypes().Where(y => typeof(VertexBrushUtilBase).IsAssignableFrom(y) && y.IsClass && !y.IsAbstract)).ToArray();
+            brushUtilContents = new GUIContent[brushTypes.Length];
+            brushUtilInstances = new VertexBrushUtilBase[brushTypes.Length];
+            for (int i = 0; i < brushTypes.Length; i++)
+            {
+                VertexBrushUtilBase util = (VertexBrushUtilBase)Activator.CreateInstance(brushTypes[i]);
+                brushUtilContents[i] = new GUIContent(util.Name, util.Tip);
+                brushUtilInstances[i] = util;
             }
         }
 
-        string[] utilNames;
-        GUIContent[] utilContents;
-        VertexCalcUtilBase[] utilInstances;
+        string[] calcUtilNames;
+        GUIContent[] calcUtilContents;
+        VertexCalcUtilBase[] calcUtilInstances;
+        GUIContent[] brushUtilContents;
+        VertexBrushUtilBase[] brushUtilInstances;
 
         Texture2D defaultCursor;
         Texture2D brushCursor;
@@ -153,9 +166,6 @@ namespace ModEditor
         public override void Draw()
         {
             GUIStyle labelStyle = GUI.skin.GetStyle("LODRenderersText");
-            //if (GUILayout.Button("Write avg normals to model's tangent"))
-            //    writeAcgNormalToTangent();
-            //window.Manager.BrushType = (BrushType)EditorGUILayout.EnumPopup(window.Manager.BrushType);
             EditorGUILayout.BeginHorizontal("Badge");
             GUILayout.Space(15);
             EditorGUILayout.LabelField("Brush Scope View Color:", labelStyle, GUILayout.Width(150));
@@ -237,14 +247,15 @@ namespace ModEditor
                 EditorGUI.indentLevel = 2;
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Util Select:", labelStyle, GUILayout.Width(100));
-                if (window.Manager.CalcUtilIndex >= utilContents.Length)
-                    window.Manager.calcUtilIndex = utilContents.Length - 1;
-                window.Manager.CalcUtilIndex = EditorGUILayout.Popup(window.Manager.CalcUtilIndex, utilNames, GUILayout.Width(140));
+                if (window.Manager.CalcUtilIndex >= calcUtilContents.Length)
+                    window.Manager.calcUtilIndex = calcUtilContents.Length - 1;
+                window.Manager.CalcUtilIndex = EditorGUILayout.Popup(window.Manager.CalcUtilIndex, calcUtilNames, GUILayout.Width(140));
                 EditorGUILayout.EndHorizontal();
-                EditorGUILayout.LabelField(utilContents[window.Manager.CalcUtilIndex], GUI.skin.GetStyle("LODRendererAddButton"), GUILayout.Width(window.position.width - 30));
-                utilInstances[window.Manager.CalcUtilIndex].Draw(labelStyle);
-                if (GUILayout.Button($"Execute Write - {utilInstances[window.Manager.CalcUtilIndex].PassCount} Pass", "EditModeSingleButton", GUILayout.Width(window.position.width - 30)))
-                    executeCalcUtil(utilInstances[window.Manager.CalcUtilIndex]);
+                EditorGUILayout.LabelField(calcUtilContents[window.Manager.CalcUtilIndex], GUI.skin.GetStyle("LODRendererAddButton"), GUILayout.Width(window.position.width - 30));
+                calcUtilInstances[window.Manager.CalcUtilIndex].Draw(labelStyle, window.position.width - 30);
+                GUILayout.Space(5);
+                if (GUILayout.Button($"Execute Write - {passCountStr(calcUtilInstances[window.Manager.CalcUtilIndex].PassCount)} Pass", "EditModeSingleButton", GUILayout.Width(window.position.width - 30)))
+                    executeCalcUtil(calcUtilInstances[window.Manager.CalcUtilIndex]);
             }
             EditorGUILayout.EndVertical();
             EditorGUI.indentLevel = 0;
@@ -268,19 +279,19 @@ namespace ModEditor
                 EditorGUILayout.LabelField("Type:", labelStyle, GUILayout.Width(100));
                 window.Manager.WriteType = (WriteType)EditorGUILayout.EnumPopup(window.Manager.WriteType, GUILayout.Width(140));
                 EditorGUILayout.EndHorizontal();
-                //if (window.Manager.WriteType == WriteType.OtherUtil)
-                //{
-                //    EditorGUILayout.BeginHorizontal();
-                //    GUILayout.Space(50);
-                //    EditorGUILayout.BeginVertical("SelectionRect");
-                //    EditorGUILayout.LabelField("Util Select:", GUI.skin.GetStyle("AnimationTimelineTick"), GUILayout.Width(window.position.width - 100));
-                //    window.Manager.CalcUtilIndex = EditorGUILayout.Popup(window.Manager.CalcUtilIndex, utilContents, GUILayout.Width(window.position.width - 120));
-                //    GUILayout.Space(5);
-                //    if (GUILayout.Button($"Execute Write - {utilInstances[window.Manager.CalcUtilIndex].PassCount} Pass", GUILayout.Width(window.position.width - 100)))
-                //        write(utilInstances[window.Manager.CalcUtilIndex]);
-                //    EditorGUILayout.EndVertical();
-                //    EditorGUILayout.EndHorizontal();
-                //}
+                if (window.Manager.WriteType == WriteType.OtherUtil)
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    GUILayout.Space(50);
+                    EditorGUILayout.BeginVertical("SelectionRect");
+                    EditorGUILayout.LabelField("Util Select:", GUI.skin.GetStyle("AnimationTimelineTick"), GUILayout.Width(window.position.width - 100));
+                    if (window.Manager.BrushUtilIndex >= brushUtilContents.Length)
+                        window.Manager.brushUtilIndex = brushUtilContents.Length - 1;
+                    window.Manager.BrushUtilIndex = EditorGUILayout.Popup(window.Manager.BrushUtilIndex, brushUtilContents, GUILayout.Width(window.position.width - 120));
+                    brushUtilInstances[window.Manager.BrushUtilIndex].Draw(labelStyle, window.position.width - 120);
+                    EditorGUILayout.EndVertical();
+                    EditorGUILayout.EndHorizontal();
+                }
                 GUILayout.Space(5);
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Target Type:", labelStyle, GUILayout.Width(100));
@@ -379,6 +390,23 @@ namespace ModEditor
             }
             if (window.SceneHandleType == SceneHandleType.None)
                 EditorGUIUtility.AddCursorRect(new Rect(0, 0, scene.position.width, scene.position.height), MouseCursor.CustomCursor);
+        }
+
+        string passCountStr(PassCount pass)
+        {
+            switch (pass)
+            {
+                case PassCount.One:
+                    return "One";
+                case PassCount.Two:
+                    return "Two";
+                case PassCount.Three:
+                    return "Three";
+                case PassCount.Four:
+                case PassCount.Color:
+                    return "Four";
+            }
+            return "No";
         }
     }
 }

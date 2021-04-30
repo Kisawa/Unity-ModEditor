@@ -817,6 +817,19 @@ namespace ModEditor
                 calcUtilIndex = value;
             }
         }
+
+        public int brushUtilIndex;
+        public int BrushUtilIndex
+        {
+            get => brushUtilIndex;
+            set
+            {
+                if (value == brushUtilIndex)
+                    return;
+                Undo.RecordObject(this, "ModEditor BrushUtilIndex");
+                brushUtilIndex = value;
+            }
+        }
         #endregion
 
         private void Awake()

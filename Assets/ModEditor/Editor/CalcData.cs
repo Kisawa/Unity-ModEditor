@@ -17,7 +17,13 @@ namespace ModEditor
                     spreadLevel = value;
                 }
             }
+            /// <summary>
+            /// Buffer type is "int"
+            /// </summary>
             public ComputeBuffer RW_Zone;
+            /// <summary>
+            /// Buffer type is "float"
+            /// </summary>
             public ComputeBuffer RW_Selects;
         }
 

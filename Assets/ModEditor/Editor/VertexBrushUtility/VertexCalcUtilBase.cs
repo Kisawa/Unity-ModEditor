@@ -34,7 +34,12 @@ namespace ModEditor
             return null;
         }
 
-        public virtual void Draw(GUIStyle labelStyle)
+        public virtual Color[] ExecuteColor(Mesh mesh)
+        {
+            return null;
+        }
+
+        public virtual void Draw(GUIStyle labelStyle, float maxWidth)
         { 
             
         }

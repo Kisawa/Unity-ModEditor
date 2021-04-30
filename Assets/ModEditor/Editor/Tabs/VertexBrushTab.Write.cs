@@ -19,7 +19,7 @@ namespace ModEditor
             for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
             {
                 GameObject target = window.Manager.TargetChildren[i];
-                if (target == null)
+                if (target == null || !target.activeSelf)
                     continue;
                 if (!window.Manager.ActionableDic[target])
                     continue;
@@ -196,7 +196,7 @@ namespace ModEditor
             for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
             {
                 GameObject target = window.Manager.TargetChildren[i];
-                if (target == null)
+                if (target == null || !target.activeSelf)
                     continue;
                 if (!window.Manager.ActionableDic[target])
                     continue;
@@ -239,6 +239,13 @@ namespace ModEditor
                                     write_Data(mesh, result);
                             }
                             break;
+                        case PassCount.Color:
+                            {
+                                Color[] result = util.ExecuteColor(mesh);
+                                if (result != null && result.Length > 0)
+                                    write_Data(mesh, result);
+                            }
+                            break;
                     }
                 }
             }
@@ -262,8 +269,6 @@ namespace ModEditor
                     break;
                 case WriteTargetType.Tangent:
                     mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.tangents, result);
-                    break;
-                case WriteTargetType.Texture:
                     break;
                 case WriteTargetType.Custom:
                     setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_X, window.Manager.CustomTargetPass_X, mesh, result);
@@ -290,8 +295,6 @@ namespace ModEditor
                 case WriteTargetType.Tangent:
                     mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.tangents, result);
                     break;
-                case WriteTargetType.Texture:
-                    break;
                 case WriteTargetType.Custom:
                     setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_X, TargetPassType.X, window.Manager.CustomTargetPass_X, mesh, result);
                     setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_Y, TargetPassType.Y, window.Manager.CustomTargetPass_Y, mesh, result);
@@ -317,8 +320,6 @@ namespace ModEditor
                     break;
                 case WriteTargetType.Tangent:
                     mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.tangents, result);
-                    break;
-                case WriteTargetType.Texture:
                     break;
                 case WriteTargetType.Custom:
                     setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_X, TargetPassType.X, window.Manager.CustomTargetPass_X, mesh, result);
@@ -347,7 +348,33 @@ namespace ModEditor
                 case WriteTargetType.Tangent:
                     mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.tangents, result);
                     break;
-                case WriteTargetType.Texture:
+                case WriteTargetType.Custom:
+                    setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_X, TargetPassType.X, window.Manager.CustomTargetPass_X, mesh, result);
+                    setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_Y, TargetPassType.Y, window.Manager.CustomTargetPass_Y, mesh, result);
+                    setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_Z, TargetPassType.Z, window.Manager.CustomTargetPass_Z, mesh, result);
+                    setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_W, TargetPassType.W, window.Manager.CustomTargetPass_W, mesh, result);
+                    break;
+            }
+        }
+
+        void write_Data(Mesh mesh, Color[] result)
+        {
+            switch (window.Manager.WriteTargetType)
+            {
+                case WriteTargetType.VertexColor:
+                    Color[] colors = mesh.colors;
+                    if (colors.Length != mesh.vertexCount)
+                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
+                    mesh.colors = CalcUtil.Self.GetResultColor(window.Manager.WriteType, colors, result);
+                    break;
+                case WriteTargetType.Vertex:
+                    mesh.vertices = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.vertices, result);
+                    break;
+                case WriteTargetType.Normal:
+                    mesh.normals = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.normals, result);
+                    break;
+                case WriteTargetType.Tangent:
+                    mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.tangents, result);
                     break;
                 case WriteTargetType.Custom:
                     setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_X, TargetPassType.X, window.Manager.CustomTargetPass_X, mesh, result);
@@ -370,30 +397,47 @@ namespace ModEditor
                 if (data != null && data.IsAvailable)
                 {
                     data.Cala(window.Manager.BrushColorFrom, window.Manager.BrushColorTo, window.Manager.BrushColorFromStep, window.Manager.BrushColorToStep, window.Manager.BrushStrength);
+                    WriteType writeType = window.Manager.WriteType;
+                    if (writeType == WriteType.OtherUtil)
+                    {
+                        VertexBrushUtilBase util = brushUtilInstances[window.Manager.BrushUtilIndex];
+                        util.TargetType = window.Manager.WriteTargetType;
+                        util.CustomTarget_X = window.Manager.CustomTargetType_X;
+                        util.CustomTarget_Y = window.Manager.CustomTargetType_Y;
+                        util.CustomTarget_Z = window.Manager.CustomTargetType_Z;
+                        util.CustomTarget_W = window.Manager.CustomTargetType_W;
+                        util.CustomPass_X = window.Manager.CustomTargetPass_X;
+                        util.CustomPass_Y = window.Manager.CustomTargetPass_Y;
+                        util.CustomPass_Z = window.Manager.CustomTargetPass_Z;
+                        util.CustomPass_W = window.Manager.CustomTargetPass_W;
+                        if (util.BrushWrite(mesh, data))
+                            writeType = WriteType.Replace;
+                        else
+                            continue;
+                    }
                     switch (window.Manager.WriteTargetType)
                     {
                         case WriteTargetType.VertexColor:
                             Color[] colors = mesh.colors;
                             if (colors.Length != mesh.vertexCount)
                                 colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
-                            mesh.colors = data.GetResultColor(window.Manager.WriteType, colors);
+                            mesh.colors = data.GetResultColor(writeType, colors);
                             break;
                         case WriteTargetType.Vertex:
-                            mesh.vertices = data.GetResult(window.Manager.WriteType, mesh.vertices);
+                            mesh.vertices = data.GetResult(writeType, mesh.vertices);
+                            data.UpdateVertex(mesh.vertices);
                             break;
                         case WriteTargetType.Normal:
-                            mesh.normals = data.GetResult(window.Manager.WriteType, mesh.normals);
+                            mesh.normals = data.GetResult(writeType, mesh.normals);
                             break;
                         case WriteTargetType.Tangent:
-                            mesh.tangents = data.GetResult(window.Manager.WriteType, mesh.tangents);
-                            break;
-                        case WriteTargetType.Texture:
+                            mesh.tangents = data.GetResult(writeType, mesh.tangents);
                             break;
                         case WriteTargetType.Custom:
-                            setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_X, TargetPassType.X, window.Manager.CustomTargetPass_X, mesh, data);
-                            setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_Y, TargetPassType.Y, window.Manager.CustomTargetPass_Y, mesh, data);
-                            setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_Z, TargetPassType.Z, window.Manager.CustomTargetPass_Z, mesh, data);
-                            setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_W, TargetPassType.W, window.Manager.CustomTargetPass_W, mesh, data);
+                            setCustomData(writeType, window.Manager.CustomTargetType_X, TargetPassType.X, window.Manager.CustomTargetPass_X, mesh, data);
+                            setCustomData(writeType, window.Manager.CustomTargetType_Y, TargetPassType.Y, window.Manager.CustomTargetPass_Y, mesh, data);
+                            setCustomData(writeType, window.Manager.CustomTargetType_Z, TargetPassType.Z, window.Manager.CustomTargetPass_Z, mesh, data);
+                            setCustomData(writeType, window.Manager.CustomTargetType_W, TargetPassType.W, window.Manager.CustomTargetPass_W, mesh, data);
                             break;
                     }
                 }
@@ -412,6 +456,7 @@ namespace ModEditor
                     break;
                 case CustomTargetType.Vertex:
                     mesh.vertices = data.GetResultCustom(writeType, inPass, outPass, mesh.vertices);
+                    data.UpdateVertex(mesh.vertices);
                     break;
                 case CustomTargetType.Normal:
                     mesh.normals = data.GetResultCustom(writeType, inPass, outPass, mesh.normals);
@@ -499,6 +544,28 @@ namespace ModEditor
         }
 
         void setCustomData(WriteType writeType, CustomTargetType customTarget, TargetPassType inPass, TargetPassType outPass, Mesh mesh, Vector4[] result)
+        {
+            switch (customTarget)
+            {
+                case CustomTargetType.VertexColor:
+                    Color[] colors = mesh.colors;
+                    if (colors.Length != mesh.vertexCount)
+                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
+                    mesh.colors = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, colors, result);
+                    break;
+                case CustomTargetType.Vertex:
+                    mesh.vertices = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.vertices, result);
+                    break;
+                case CustomTargetType.Normal:
+                    mesh.normals = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.normals, result);
+                    break;
+                case CustomTargetType.Tangent:
+                    mesh.tangents = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.tangents, result);
+                    break;
+            }
+        }
+
+        void setCustomData(WriteType writeType, CustomTargetType customTarget, TargetPassType inPass, TargetPassType outPass, Mesh mesh, Color[] result)
         {
             switch (customTarget)
             {

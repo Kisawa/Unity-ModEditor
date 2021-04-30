@@ -33,7 +33,7 @@
 				float depth;
 				COMPUTE_EYEDEPTH(depth);
 				float outlineWidth = clamp(_OutlineWidth * 0.01 * depth, 0.001, 0.03);
-				float3 pos = v.vertex + v.tangent.xyz * outlineWidth * v.color.x;
+				float3 pos = v.vertex + v.tangent.xyz * outlineWidth;
 				return UnityObjectToClipPos(pos);
 			}
 

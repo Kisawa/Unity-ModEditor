@@ -25,7 +25,6 @@ namespace ModEditor
         Vertex,
         Normal,
         Tangent,
-        Texture,
         Custom
     }
 
@@ -51,6 +50,7 @@ namespace ModEditor
         One,
         Two,
         Three,
-        Four
+        Four,
+        Color
     }
 }
