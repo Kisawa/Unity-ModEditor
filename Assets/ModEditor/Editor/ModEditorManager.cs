@@ -504,8 +504,6 @@ namespace ModEditor
             get => brushStrength;
             set
             {
-                if (value < 0)
-                    value = 0;
                 if (value == brushStrength)
                     return;
                 Undo.RecordObject(this, "ModEditor BrushStrength");

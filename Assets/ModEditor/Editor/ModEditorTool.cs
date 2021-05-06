@@ -453,10 +453,10 @@ namespace ModEditor
                         switch (VertexBrushType)
                         {
                             case VertexBrushType.Color:
-                                data.Cala(BrushColor, BrushStrength);
+                                data.Cala(BrushColor, 1);
                                 break;
                             case VertexBrushType.TwoColorGradient:
-                                data.Cala(BrushColorFrom, BrushColorTo, BrushColorFromStep, BrushColorToStep, BrushStrength);
+                                data.Cala(BrushColorFrom, BrushColorTo, BrushColorFromStep, BrushColorToStep, 1);
                                 break;
                         }
                     }

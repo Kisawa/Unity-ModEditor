@@ -205,7 +205,7 @@ namespace ModEditor
                 EditorGUI.indentLevel = 2;
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Strength:", labelStyle, GUILayout.Width(80));
-                window.Manager.BrushStrength = EditorGUILayout.Slider(window.Manager.BrushStrength, 0, 10, GUILayout.Width(window.position.width - 120));
+                window.Manager.BrushStrength = EditorGUILayout.Slider(window.Manager.BrushStrength, -10, 10, GUILayout.Width(window.position.width - 120));
                 EditorGUILayout.EndHorizontal();
 
                 EditorGUILayout.BeginHorizontal();
