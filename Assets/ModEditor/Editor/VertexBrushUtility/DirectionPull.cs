@@ -17,14 +17,14 @@ namespace ModEditor
             {
                 case WriteTargetType.Vertex:
                     {
-                        ComputeBuffer vertexBuffer4 = CalcUtil.Self.GetBuffer4_from3(data._Vertexs);
+                        ComputeBuffer vertexBuffer4 = CalcUtil.Self.GetBuffer4(mesh.vertices);
                         calcShader.SetBuffer(kernel_DirectionPull, "_Origin", vertexBuffer4);
 
                         ComputeBuffer _Direction = null;
                         switch (directionType)
                         {
                             case DirectionType.Vertex:
-                                _Direction = CalcUtil.Self.GetBuffer4_from3(data._Vertexs);
+                                _Direction = CalcUtil.Self.GetBuffer4(mesh.vertices);
                                 break;
                             case DirectionType.Normal:
                                 _Direction = CalcUtil.Self.GetBuffer4(mesh.normals);
