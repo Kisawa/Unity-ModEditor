@@ -12,6 +12,8 @@ namespace ModEditor
 
         public abstract PassCount PassCount { get; }
 
+        public virtual bool WithSelect { get; set; }
+
         public VertexCalcUtilBase() { }
 
         public virtual float[] ExecuteOne(Mesh mesh)

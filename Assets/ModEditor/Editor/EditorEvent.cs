@@ -602,6 +602,57 @@ namespace ModEditor
                                 @event.Use();
                         }
                     }
+                    if (@event.keyCode == KeyCode.Return)
+                    {
+                        if (!@event.control && !@event.alt && !@event.shift)
+                        {
+                            OnKey.Enter.InvokeDown();
+                            if (Use.OnKey.Enter.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.control && !@event.alt && !@event.shift)
+                        {
+                            Control.OnKey.Enter.InvokeDown();
+                            if (Use.Control.OnKey.Enter.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.alt && !@event.control && !@event.shift)
+                        {
+                            Alt.OnKey.Enter.InvokeDown();
+                            if (Use.Alt.OnKey.Enter.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt && !@event.shift)
+                        {
+                            ControlAndAlt.OnKey.Enter.InvokeDown();
+                            if (Use.ControlAndAlt.OnKey.Enter.InvokeDown())
+                                @event.Use();
+                        }
+                        if (!@event.control && !@event.alt && @event.shift)
+                        {
+                            Shift.OnKey.Enter.InvokeDown();
+                            if (Use.Shift.OnKey.Enter.InvokeDown())
+                                @event.Use();
+                        }
+                        if (!@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndAlt.OnKey.Enter.InvokeDown();
+                            if (Use.ShiftAndAlt.OnKey.Enter.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.control && !@event.alt && @event.shift)
+                        {
+                            ShiftAndControl.OnKey.Enter.InvokeDown();
+                            if (Use.ShiftAndControl.OnKey.Enter.InvokeDown())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndControlAndAlt.OnKey.Enter.InvokeDown();
+                            if (Use.ShiftAndControlAndAlt.OnKey.Enter.InvokeDown())
+                                @event.Use();
+                        }
+                    }
                 }
                 if (@event.type == EventType.KeyUp)
                 {
@@ -1163,6 +1214,57 @@ namespace ModEditor
                         {
                             ShiftAndControlAndAlt.OnKey.C.InvokeUp();
                             if (Use.ShiftAndControlAndAlt.OnKey.C.InvokeUp())
+                                @event.Use();
+                        }
+                    }
+                    if (@event.keyCode == KeyCode.Return)
+                    {
+                        if (!@event.control && !@event.alt && !@event.shift)
+                        {
+                            OnKey.Enter.InvokeUp();
+                            if (Use.OnKey.Enter.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && !@event.alt && !@event.shift)
+                        {
+                            Control.OnKey.Enter.InvokeUp();
+                            if (Use.Control.OnKey.Enter.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.alt && !@event.control && !@event.shift)
+                        {
+                            Alt.OnKey.Enter.InvokeUp();
+                            if (Use.Alt.OnKey.Enter.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt && !@event.shift)
+                        {
+                            ControlAndAlt.OnKey.Enter.InvokeUp();
+                            if (Use.ControlAndAlt.OnKey.Enter.InvokeUp())
+                                @event.Use();
+                        }
+                        if (!@event.control && !@event.alt && @event.shift)
+                        {
+                            Shift.OnKey.Enter.InvokeUp();
+                            if (Use.Shift.OnKey.Enter.InvokeUp())
+                                @event.Use();
+                        }
+                        if (!@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndAlt.OnKey.Enter.InvokeUp();
+                            if (Use.ShiftAndAlt.OnKey.Enter.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && !@event.alt && @event.shift)
+                        {
+                            ShiftAndControl.OnKey.Enter.InvokeUp();
+                            if (Use.ShiftAndControl.OnKey.Enter.InvokeUp())
+                                @event.Use();
+                        }
+                        if (@event.control && @event.alt && @event.shift)
+                        {
+                            ShiftAndControlAndAlt.OnKey.Enter.InvokeUp();
+                            if (Use.ShiftAndControlAndAlt.OnKey.Enter.InvokeUp())
                                 @event.Use();
                         }
                     }
@@ -1924,6 +2026,8 @@ namespace ModEditor
         public class Key_Z : Key_Base { }
 
         public class Key_C : Key_Base { }
+
+        public class Key_Enter : Key_Base { }
     }
 
     public class OnKey
@@ -1949,6 +2053,8 @@ namespace ModEditor
         public Key.Key_Z Z = new Key.Key_Z();
 
         public Key.Key_C C = new Key.Key_C();
+
+        public Key.Key_Enter Enter = new Key.Key_Enter();
     }
 
     public static class Mouse

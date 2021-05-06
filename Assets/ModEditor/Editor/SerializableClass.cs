@@ -241,6 +241,7 @@ namespace ModEditor
                             if (string.IsNullOrEmpty(AssetDatabase.GetAssetPath(mesh)))
                             {
                                 string path = $"{ModEditorWindow.ModEditorPath}/Meshs/{mesh.name}.mesh";
+                                path = path.Replace(':', '-');
                                 AssetDatabase.DeleteAsset(path);
                                 AssetDatabase.CreateAsset(mesh, path);
                             }

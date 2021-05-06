@@ -19,6 +19,7 @@ namespace ModEditor
                     {
                         ComputeBuffer vertexBuffer4 = CalcUtil.Self.GetBuffer4_from3(data._Vertexs);
                         calcShader.SetBuffer(kernel_DirectionPull, "_Origin", vertexBuffer4);
+
                         ComputeBuffer _Direction = null;
                         switch (directionType)
                         {
@@ -36,7 +37,7 @@ namespace ModEditor
                                 break;
                         }
                         calcShader.SetBuffer(kernel_DirectionPull, "_Direction", _Direction);
-                        calcShader.SetBuffer(kernel_DirectionPull, "_Result", data.RW_BrushResult);
+                        calcShader.SetBuffer(kernel_DirectionPull, "RW_Result", data.RW_BrushResult);
                         calcShader.Dispatch(kernel_DirectionPull, Mathf.CeilToInt((float)data.RW_BrushResult.count / 1024), 1, 1);
                         vertexBuffer4.Dispose();
                         _Direction.Dispose();

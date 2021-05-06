@@ -2,10 +2,10 @@
 
 StructuredBuffer<float4> _Direction;
 StructuredBuffer<float4> _Origin;
-RWStructuredBuffer<float4> _Result;
+RWStructuredBuffer<float4> RW_Result;
 [numthreads(1024,1,1)]
 void DirectionPull(uint3 id : SV_DispatchThreadID)
 {
-	float4 pull = _Result[id.x];
-	_Result[id.x] = _Origin[id.x] + normalize(_Direction[id.x]) * pull;
+	float4 pull = RW_Result[id.x];
+	RW_Result[id.x] = _Origin[id.x] + _Direction[id.x] * pull;
 }

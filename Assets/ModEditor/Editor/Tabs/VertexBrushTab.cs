@@ -99,6 +99,11 @@ namespace ModEditor
             EditorEvent.Use.ShiftAndControlAndAlt.OnKey.D.Down += D_Down;
             EditorEvent.Use.ShiftAndControlAndAlt.OnKey.Z.Down += Z_Down;
             EditorEvent.Use.ShiftAndControlAndAlt.OnKey.C.Down += C_Down;
+            EditorEvent.Use.OnKey.Enter.Down += Enter_Down;
+            EditorEvent.Use.Control.OnKey.Enter.Down += Enter_Down;
+            EditorEvent.Use.Alt.OnKey.Enter.Down += Enter_Down;
+            EditorEvent.Use.ShiftAndControl.OnKey.Enter.Down += Enter_Down;
+            EditorEvent.Use.ShiftAndControlAndAlt.OnKey.Enter.Down += Enter_Down;
             Mouse.Update += Mouse_Update;
             ScrollWheel.Update += ScrollWheel_Update;
             if (brushCursor == null)
@@ -157,6 +162,11 @@ namespace ModEditor
             EditorEvent.Use.ShiftAndControlAndAlt.OnKey.D.Down -= D_Down;
             EditorEvent.Use.ShiftAndControlAndAlt.OnKey.Z.Down -= Z_Down;
             EditorEvent.Use.ShiftAndControlAndAlt.OnKey.C.Down -= C_Down;
+            EditorEvent.Use.OnKey.Enter.Down -= Enter_Down;
+            EditorEvent.Use.Control.OnKey.Enter.Down -= Enter_Down;
+            EditorEvent.Use.Alt.OnKey.Enter.Down -= Enter_Down;
+            EditorEvent.Use.ShiftAndControl.OnKey.Enter.Down -= Enter_Down;
+            EditorEvent.Use.ShiftAndControlAndAlt.OnKey.Enter.Down -= Enter_Down;
             Mouse.Update -= Mouse_Update;
             ScrollWheel.Update -= ScrollWheel_Update;
             PlayerSettings.defaultCursor = defaultCursor;
@@ -277,8 +287,21 @@ namespace ModEditor
                 EditorGUILayout.LabelField(calcUtilContents[window.Manager.CalcUtilIndex], GUI.skin.GetStyle("LODRendererAddButton"), GUILayout.Width(window.position.width - 30));
                 calcUtilInstances[window.Manager.CalcUtilIndex].Draw(labelStyle, window.position.width - 30);
                 GUILayout.Space(5);
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("With Select:", labelStyle, GUILayout.Width(130));
+                bool withSelect = calcUtilInstances[window.Manager.CalcUtilIndex].WithSelect;
+                if (GUILayout.Button(withSelect ? window.toggleOnContent : window.toggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(20)))
+                {
+                    withSelect = !withSelect;
+                    calcUtilInstances[window.Manager.CalcUtilIndex].WithSelect = withSelect;
+                }
+                if (withSelect)
+                    EditorGUILayout.LabelField("/Enter", GUI.skin.GetStyle("LODSliderTextSelected"), GUILayout.Width(80));
+                EditorGUILayout.EndHorizontal();
+                EditorGUI.BeginDisabledGroup(withSelect);
                 if (GUILayout.Button($"Execute Write - {passCountStr(calcUtilInstances[window.Manager.CalcUtilIndex].PassCount)} Pass", "EditModeSingleButton", GUILayout.Width(window.position.width - 30)))
                     executeCalcUtil(calcUtilInstances[window.Manager.CalcUtilIndex]);
+                EditorGUI.EndDisabledGroup();
             }
             EditorGUILayout.EndVertical();
             EditorGUI.indentLevel = 0;

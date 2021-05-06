@@ -489,7 +489,7 @@ namespace ModEditor
 
         CalcShaderData.CalcVertexsData addCalcShaderRender(Renderer renderer, MeshFilter meshFilter)
         {
-            if (renderer == null || meshFilter == null || meshFilter.sharedMesh == null)
+            if (renderer == null || meshFilter == null || meshFilter.sharedMesh == null || meshFilter.sharedMesh.vertexCount == 0)
                 return null;
             Material material = new Material(Shader.Find("Hidden/ModEditorVertexView"));
             CalcShaderData.CalcVertexsData data = new CalcShaderData.CalcMeshVertexsData_ScreenScope(renderer, meshFilter);
@@ -500,7 +500,7 @@ namespace ModEditor
 
         CalcShaderData.CalcVertexsData addCalcShaderRender(SkinnedMeshRenderer skinnedMesh)
         {
-            if (skinnedMesh == null || skinnedMesh.sharedMesh == null)
+            if (skinnedMesh == null || skinnedMesh.sharedMesh == null || skinnedMesh.sharedMesh.vertexCount == 0)
                 return null;
             Material material = new Material(Shader.Find("Hidden/ModEditorVertexView"));
             CalcShaderData.CalcVertexsData data = new CalcShaderData.CalcSkinnedMeshVertexsData_ScreenScope(skinnedMesh);
