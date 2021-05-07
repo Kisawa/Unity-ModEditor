@@ -25,7 +25,7 @@ float _Depth;
 bool _ClearSpread;
 int _OnlyZone;
 int _ZoneInSelect;
-StructuredBuffer<float3> _Vertexs;
+StructuredBuffer<float3> _Vertices;
 RWStructuredBuffer<float> RW_Selects;
 RWStructuredBuffer<float> RW_Depths;
 RWStructuredBuffer<float> RW_Sizes;
@@ -34,7 +34,7 @@ RWStructuredBuffer<int> RW_Zone;
 [numthreads(1024,1,1)]
 void SelectWithScreenScope(uint3 id : SV_DispatchThreadID)
 {
-	float3 viewPos = mul(_MV, float4(_Vertexs[id.x], 1.0)).xyz;
+	float3 viewPos = mul(_MV, float4(_Vertices[id.x], 1.0)).xyz;
 	float depth = -viewPos.z;
 	RW_Depths[id.x] = depth;
 	float4 clipPos = mul(_P, float4(viewPos, 1.0));

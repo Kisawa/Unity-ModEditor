@@ -261,6 +261,11 @@ namespace ModEditor
                                     write_Data(mesh, result, _Select);
                             }
                             break;
+                        case PassCount.Other:
+                            {
+                                util.ExecuteOther(mesh);
+                            }
+                            break;
                     }
                 }
             }

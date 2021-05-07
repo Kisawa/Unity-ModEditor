@@ -52,6 +52,7 @@ namespace ModEditor
         Two,
         Three,
         Four,
-        Color
+        Color,
+        Other
     }
 }

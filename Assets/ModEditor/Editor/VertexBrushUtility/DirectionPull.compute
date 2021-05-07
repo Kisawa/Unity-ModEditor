@@ -1,11 +1,13 @@
-﻿#pragma kernel DirectionPull
+﻿#pragma kernel DirectionPull_Vertex
 
 StructuredBuffer<float4> _Direction;
-StructuredBuffer<float4> _Origin;
+StructuredBuffer<float3> _Vertex;
 RWStructuredBuffer<float4> RW_Result;
 [numthreads(1024,1,1)]
-void DirectionPull(uint3 id : SV_DispatchThreadID)
+void DirectionPull_Vertex(uint3 id : SV_DispatchThreadID)
 {
-	float4 pull = RW_Result[id.x];
-	RW_Result[id.x] = _Origin[id.x] + _Direction[id.x] * pull;
+	float3 pull = RW_Result[id.x].xyz;
+	float3 vertex = _Vertex[id.x];
+	float3 direction = _Direction[id.x].xyz;
+	RW_Result[id.x].xyz = vertex + direction * pull;
 }

@@ -10,6 +10,8 @@ namespace ModEditor
 
         public abstract string Tip { get; }
 
+        public virtual WriteTargetType UtilTarget { get; } = WriteTargetType.None;
+
         public VertexBrushUtilBase() { }
 
         public WriteTargetType TargetType;

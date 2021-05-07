@@ -12,6 +12,8 @@ namespace ModEditor
 
         public abstract PassCount PassCount { get; }
 
+        public virtual bool AllowSelect { get; } = true;
+
         public virtual bool WithSelect { get; set; }
 
         public VertexCalcUtilBase() { }
@@ -39,6 +41,11 @@ namespace ModEditor
         public virtual Color[] ExecuteColor(Mesh mesh)
         {
             return null;
+        }
+
+        public virtual void ExecuteOther(Mesh mesh)
+        {
+            
         }
 
         public virtual void Draw(GUIStyle labelStyle, float maxWidth)

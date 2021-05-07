@@ -214,7 +214,7 @@ namespace ModEditor
                 EditorGUILayout.EndHorizontal();
 
                 GUILayout.Space(5);
-                EditorGUILayout.BeginVertical("SelectionRect", GUILayout.Width(window.position.width - 100));
+                EditorGUILayout.BeginVertical("SelectionRect", GUILayout.Width(window.position.width - 30));
                 switch (window.Manager.VertexBrushType)
                 {
                     case VertexBrushType.Color:
@@ -284,23 +284,27 @@ namespace ModEditor
                     window.Manager.calcUtilIndex = calcUtilContents.Length - 1;
                 window.Manager.CalcUtilIndex = EditorGUILayout.Popup(window.Manager.CalcUtilIndex, calcUtilNames, GUILayout.Width(140));
                 EditorGUILayout.EndHorizontal();
-                EditorGUILayout.LabelField(calcUtilContents[window.Manager.CalcUtilIndex], GUI.skin.GetStyle("LODRendererAddButton"), GUILayout.Width(window.position.width - 30));
-                calcUtilInstances[window.Manager.CalcUtilIndex].Draw(labelStyle, window.position.width - 30);
-                GUILayout.Space(5);
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("With Select:", labelStyle, GUILayout.Width(130));
-                bool withSelect = calcUtilInstances[window.Manager.CalcUtilIndex].WithSelect;
-                if (GUILayout.Button(withSelect ? window.toggleOnContent : window.toggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(20)))
-                {
-                    withSelect = !withSelect;
-                    calcUtilInstances[window.Manager.CalcUtilIndex].WithSelect = withSelect;
-                }
-                if (withSelect)
-                    EditorGUILayout.LabelField("/Enter", GUI.skin.GetStyle("LODSliderTextSelected"), GUILayout.Width(80));
+                GUILayout.Space(10);
+                EditorGUILayout.LabelField("", GUI.skin.GetStyle("CN EntryInfoIconSmall"), GUILayout.Width(20));
+                EditorGUILayout.LabelField(calcUtilContents[window.Manager.CalcUtilIndex], GUI.skin.GetStyle("MiniLabel"), GUILayout.Width(window.position.width - 60));
                 EditorGUILayout.EndHorizontal();
-                EditorGUI.BeginDisabledGroup(withSelect);
-                if (GUILayout.Button($"Execute Write - {passCountStr(calcUtilInstances[window.Manager.CalcUtilIndex].PassCount)} Pass", "EditModeSingleButton", GUILayout.Width(window.position.width - 30)))
-                    executeCalcUtil(calcUtilInstances[window.Manager.CalcUtilIndex]);
+                VertexCalcUtilBase util = calcUtilInstances[window.Manager.CalcUtilIndex];
+                util.Draw(labelStyle, window.position.width - 30);
+                GUILayout.Space(5);
+                if (util.AllowSelect)
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.LabelField("With Select:", labelStyle, GUILayout.Width(130));
+                    if (GUILayout.Button(util.WithSelect ? window.toggleOnContent : window.toggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(20)))
+                        util.WithSelect = !util.WithSelect;
+                    if (util.WithSelect)
+                        EditorGUILayout.LabelField("/Enter", GUI.skin.GetStyle("LODSliderTextSelected"), GUILayout.Width(80));
+                    EditorGUILayout.EndHorizontal();
+                }
+                EditorGUI.BeginDisabledGroup(util.AllowSelect && util.WithSelect);
+                if (GUILayout.Button($"Execute Write - {passCountStr(util.PassCount)} Pass", "EditModeSingleButton", GUILayout.Width(window.position.width - 30)))
+                    executeCalcUtil(util);
                 EditorGUI.EndDisabledGroup();
             }
             EditorGUILayout.EndVertical();
@@ -325,25 +329,30 @@ namespace ModEditor
                 EditorGUILayout.LabelField("Type:", labelStyle, GUILayout.Width(100));
                 window.Manager.WriteType = (WriteType)EditorGUILayout.EnumPopup(window.Manager.WriteType, GUILayout.Width(140));
                 EditorGUILayout.EndHorizontal();
+                bool presetTargetType = false;
                 if (window.Manager.WriteType == WriteType.OtherUtil)
                 {
-                    EditorGUILayout.BeginHorizontal();
-                    GUILayout.Space(50);
-                    EditorGUILayout.BeginVertical("SelectionRect");
-                    EditorGUILayout.LabelField("Util Select:", GUI.skin.GetStyle("AnimationTimelineTick"), GUILayout.Width(window.position.width - 100));
+                    EditorGUILayout.BeginVertical("SelectionRect", GUILayout.Width(window.position.width - 30));
+                    EditorGUILayout.LabelField("Util Select:", GUI.skin.GetStyle("AnimationTimelineTick"));
                     if (window.Manager.BrushUtilIndex >= brushUtilContents.Length)
                         window.Manager.brushUtilIndex = brushUtilContents.Length - 1;
-                    window.Manager.BrushUtilIndex = EditorGUILayout.Popup(window.Manager.BrushUtilIndex, brushUtilContents, GUILayout.Width(window.position.width - 120));
-                    brushUtilInstances[window.Manager.BrushUtilIndex].Draw(labelStyle, window.position.width - 120);
+                    window.Manager.BrushUtilIndex = EditorGUILayout.Popup(window.Manager.BrushUtilIndex, brushUtilContents, GUILayout.Width(window.position.width - 65));
+                    brushUtilInstances[window.Manager.BrushUtilIndex].Draw(labelStyle, window.position.width - 70);
                     EditorGUILayout.EndVertical();
-                    EditorGUILayout.EndHorizontal();
+                    WriteTargetType utilTarget = brushUtilInstances[window.Manager.BrushUtilIndex].UtilTarget;
+                    if (utilTarget != WriteTargetType.None)
+                    {
+                        window.Manager.WriteTargetType = utilTarget;
+                        presetTargetType = true;
+                    }
                 }
                 GUILayout.Space(5);
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Target Type:", labelStyle, GUILayout.Width(100));
+                EditorGUI.BeginDisabledGroup(presetTargetType);
                 window.Manager.WriteTargetType = (WriteTargetType)EditorGUILayout.EnumPopup(window.Manager.WriteTargetType, GUILayout.Width(140));
+                EditorGUI.EndDisabledGroup();
                 EditorGUILayout.EndHorizontal();
-
                 if (window.Manager.WriteTargetType == WriteTargetType.Custom)
                 {
                     EditorGUI.indentLevel = 3;

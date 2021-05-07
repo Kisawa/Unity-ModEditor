@@ -11,14 +11,16 @@ namespace ModEditor
 
         public override string Tip => "Stretch in the direction of the vector";
 
+        public override WriteTargetType UtilTarget => WriteTargetType.Vertex;
+
         public override bool BrushWrite(Mesh mesh, CalcShaderData.CalcVertexsData data)
         {
             switch (TargetType)
             {
                 case WriteTargetType.Vertex:
                     {
-                        ComputeBuffer vertexBuffer4 = CalcUtil.Self.GetBuffer4(mesh.vertices);
-                        calcShader.SetBuffer(kernel_DirectionPull, "_Origin", vertexBuffer4);
+                        ComputeBuffer vertexBuffer3 = CalcUtil.Self.GetBuffer3(mesh.vertices);
+                        calcShader.SetBuffer(kernel_DirectionPull_Vertex, "_Vertex", vertexBuffer3);
 
                         ComputeBuffer _Direction = null;
                         switch (directionType)
@@ -36,10 +38,12 @@ namespace ModEditor
                                 _Direction = CalcUtil.Self.GetBuffer4(mesh.colors);
                                 break;
                         }
-                        calcShader.SetBuffer(kernel_DirectionPull, "_Direction", _Direction);
-                        calcShader.SetBuffer(kernel_DirectionPull, "RW_Result", data.RW_BrushResult);
-                        calcShader.Dispatch(kernel_DirectionPull, Mathf.CeilToInt((float)data.RW_BrushResult.count / 1024), 1, 1);
-                        vertexBuffer4.Dispose();
+                        calcShader.SetBuffer(kernel_DirectionPull_Vertex, "_Direction", _Direction);
+                        calcShader.SetBuffer(kernel_DirectionPull_Vertex, "RW_Result", data.RW_BrushResult);
+                        calcShader.Dispatch(kernel_DirectionPull_Vertex, Mathf.CeilToInt((float)data.RW_BrushResult.count / 1024), 1, 1);
+                        if (calcNormal)
+                            mesh.RecalculateNormals();
+                        vertexBuffer3.Dispose();
                         _Direction.Dispose();
                     }
                     return true;
@@ -49,21 +53,28 @@ namespace ModEditor
         }
 
         ComputeShader calcShader;
-        public int kernel_DirectionPull;
+        public int kernel_DirectionPull_Vertex;
 
         DirectionType directionType = DirectionType.Normal;
+        bool calcNormal;
 
         public DirectionPull()
         {
             calcShader = AssetDatabase.LoadAssetAtPath<ComputeShader>($"{ModEditorWindow.ModEditorPath}/Editor/VertexBrushUtility/DirectionPull.compute");
-            kernel_DirectionPull = calcShader.FindKernel("DirectionPull");
+            kernel_DirectionPull_Vertex = calcShader.FindKernel("DirectionPull_Vertex");
         }
 
         public override void Draw(GUIStyle labelStyle, float maxWidth)
         {
             base.Draw(labelStyle, maxWidth);
-            EditorGUILayout.LabelField("Direction:", labelStyle, GUILayout.Width(maxWidth));
-            directionType = (DirectionType)EditorGUILayout.EnumPopup(directionType, GUILayout.Width(maxWidth));
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Direction:", labelStyle, GUILayout.Width(100));
+            directionType = (DirectionType)EditorGUILayout.EnumPopup(directionType, GUILayout.Width(maxWidth - 100));
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Calc Normal:", labelStyle, GUILayout.Width(100));
+            calcNormal = EditorGUILayout.Toggle(calcNormal, GUILayout.Width(maxWidth - 100));
+            EditorGUILayout.EndHorizontal();
         }
 
         public enum DirectionType

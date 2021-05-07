@@ -18,7 +18,7 @@ namespace ModEditor
             /// <summary>
             /// Buffer type is "float3"
             /// </summary>
-            public ComputeBuffer _Vertexs { get; private set; }
+            public ComputeBuffer _Vertices { get; private set; }
             /// <summary>
             /// Buffer type is "int"
             /// </summary>
@@ -40,7 +40,7 @@ namespace ModEditor
             {
                 get 
                 {
-                    if (trans == null || renderer == null || material == null || !_Vertexs.IsValid() || !_Triangles.IsValid() || !RW_Depths.IsValid() || !RW_Sizes.IsValid() || !Cache.RW_Selects.IsValid() || !Cache.RW_Zone.IsValid())
+                    if (trans == null || renderer == null || material == null || !_Vertices.IsValid() || !_Triangles.IsValid() || !RW_Depths.IsValid() || !RW_Sizes.IsValid() || !Cache.RW_Selects.IsValid() || !Cache.RW_Zone.IsValid())
                         return false;
                     return true;
                 }
@@ -67,8 +67,8 @@ namespace ModEditor
                 this.renderer = renderer;
                 trans = renderer.transform;
                 _vertexs = vertexs;
-                _Vertexs = new ComputeBuffer(vertexs.Length, sizeof(float) * 3);
-                _Vertexs.SetData(vertexs);
+                _Vertices = new ComputeBuffer(vertexs.Length, sizeof(float) * 3);
+                _Vertices.SetData(vertexs);
                 _Triangles = new ComputeBuffer(triangles.Length, sizeof(int));
                 _Triangles.SetData(triangles);
                 RW_Depths = new ComputeBuffer(vertexs.Length, sizeof(float));
@@ -87,7 +87,7 @@ namespace ModEditor
                     return;
                 }
                 _vertexs = vertex;
-                _Vertexs.SetData(vertex);
+                _Vertices.SetData(vertex);
             }
 
             public virtual float GetMinDepth(Camera camera, Vector3 mouseTexcoord, float brushSize)
@@ -284,7 +284,7 @@ namespace ModEditor
 
             public virtual void Clear()
             {
-                _Vertexs.Dispose();
+                _Vertices.Dispose();
                 _Triangles.Dispose();
                 RW_Depths.Dispose();
                 RW_Sizes.Dispose();
@@ -302,7 +302,7 @@ namespace ModEditor
             {
                 get 
                 {
-                    if (trans == null || renderer == null || meshFilter == null || meshFilter.sharedMesh == null || material == null || !_Vertexs.IsValid() || !_Triangles.IsValid() || !RW_Depths.IsValid() || !RW_Sizes.IsValid() || !Cache.RW_Selects.IsValid() || !Cache.RW_Zone.IsValid())
+                    if (trans == null || renderer == null || meshFilter == null || meshFilter.sharedMesh == null || material == null || !_Vertices.IsValid() || !_Triangles.IsValid() || !RW_Depths.IsValid() || !RW_Sizes.IsValid() || !Cache.RW_Selects.IsValid() || !Cache.RW_Zone.IsValid())
                         return false;
                     return true;
                 }
@@ -322,7 +322,7 @@ namespace ModEditor
             {
                 get
                 {
-                    if (trans == null || renderer == null || skinnedMesh == null || skinnedMesh.sharedMesh == null || material == null || !_Vertexs.IsValid() || !_Triangles.IsValid() || !RW_Depths.IsValid())
+                    if (trans == null || renderer == null || skinnedMesh == null || skinnedMesh.sharedMesh == null || material == null || !_Vertices.IsValid() || !_Triangles.IsValid() || !RW_Depths.IsValid())
                         return false;
                     return true;
                 }
@@ -358,12 +358,12 @@ namespace ModEditor
                 CalcUtil.Self.CalcShader.SetInt("_ClearSpread", clearSpread ? 1 : 0);
                 CalcUtil.Self.CalcShader.SetInt("_OnlyZone", Key.Shift ? 1 : 0);
                 CalcUtil.Self.CalcShader.SetInt("_ZoneInSelect", ModEditor.BrushLock && Key.ShiftAndControl ? 1 : 0);
-                CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "_Vertexs", _Vertexs);
+                CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "_Vertices", _Vertices);
                 CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "RW_Selects", Cache.RW_Selects);
                 CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "RW_Depths", RW_Depths);
                 CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "RW_Sizes", RW_Sizes);
                 CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "RW_Zone", Cache.RW_Zone);
-                CalcUtil.Self.CalcShader.Dispatch(CalcUtil.Self.kernel_SelectWithScreenScope, Mathf.CeilToInt((float)_Vertexs.count / 1024), 1, 1);
+                CalcUtil.Self.CalcShader.Dispatch(CalcUtil.Self.kernel_SelectWithScreenScope, Mathf.CeilToInt((float)_Vertices.count / 1024), 1, 1);
             }
         }
 
@@ -381,7 +381,7 @@ namespace ModEditor
                 if (camera == null)
                     return;
                 skinnedMesh.BakeMesh(bakedMesh);
-                _Vertexs.SetData(bakedMesh.vertices);
+                _Vertices.SetData(bakedMesh.vertices);
                 CalcUtil.Self.CalcShader.SetVector("_MouseTexcoord", mouseTexcoord);
                 CalcUtil.Self.CalcShader.SetFloat("_Size", brushSize);
                 CalcUtil.Self.CalcShader.SetFloat("_Depth", brushDepth);
@@ -390,12 +390,12 @@ namespace ModEditor
                 CalcUtil.Self.CalcShader.SetInt("_ClearSpread", clearSpread ? 1 : 0);
                 CalcUtil.Self.CalcShader.SetInt("_OnlyZone", Key.Shift ? 1 : 0);
                 CalcUtil.Self.CalcShader.SetInt("_ZoneInSelect", ModEditor.BrushLock && Key.ShiftAndControl ? 1 : 0);
-                CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "_Vertexs", _Vertexs);
+                CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "_Vertices", _Vertices);
                 CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "RW_Selects", Cache.RW_Selects);
                 CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "RW_Depths", RW_Depths);
                 CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "RW_Sizes", RW_Sizes);
                 CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "RW_Zone", Cache.RW_Zone);
-                CalcUtil.Self.CalcShader.Dispatch(CalcUtil.Self.kernel_SelectWithScreenScope, Mathf.CeilToInt((float)_Vertexs.count / 1024), 1, 1);
+                CalcUtil.Self.CalcShader.Dispatch(CalcUtil.Self.kernel_SelectWithScreenScope, Mathf.CeilToInt((float)_Vertices.count / 1024), 1, 1);
             }
         }
     }
