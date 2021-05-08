@@ -38,7 +38,7 @@ namespace ModEditor
                 return PassCount.Other;
             }
         }
-        CalcType calcType = CalcType.Normals;
+        CalcType calcType { get => window.RecalcMeshCalcType; set => window.RecalcMeshCalcType = value; }
 
         public override Vector3[] ExecuteThree(Mesh mesh)
         {
@@ -84,7 +84,7 @@ namespace ModEditor
             EditorGUILayout.EndHorizontal();
         }
 
-        enum CalcType
+        public enum CalcType
         {
             Normals,
             Tangents,

@@ -6,6 +6,8 @@ namespace ModEditor
 {
     public abstract class VertexCalcUtilBase
     {
+        public ModEditorWindow window { get; set; }
+
         public abstract string Name { get; }
 
         public abstract string Tip { get; }
@@ -17,6 +19,16 @@ namespace ModEditor
         public virtual bool WithSelect { get; set; }
 
         public VertexCalcUtilBase() { }
+
+        public virtual void OnFocus()
+        {
+
+        }
+
+        public virtual void OnLostFocus()
+        {
+
+        }
 
         public virtual float[] ExecuteOne(Mesh mesh)
         {

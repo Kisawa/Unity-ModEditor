@@ -13,7 +13,6 @@ namespace ModEditor
         public SceneCollectionTab(EditorWindow window) : base(window)
         {
             this.window = window as ModEditorWindow;
-            
         }
 
         Vector2 scroll;

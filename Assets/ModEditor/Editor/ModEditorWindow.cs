@@ -36,6 +36,7 @@ namespace ModEditor
         public ModEditorManager Manager { get; private set; }
 
         public event Action onRefreshTargetDic;
+        public event Action<GameObject> onTargetChanged;
         
         [MenuItem("Tools/Mod Editor %#E")]
         static void Open()
@@ -78,6 +79,7 @@ namespace ModEditor
                 _tabIndex = value;
             }
         }
+
         List<WindowTabBase> tabs;
 
         public SceneCollectionTab Tab_SceneCollection
@@ -181,7 +183,7 @@ namespace ModEditor
             Undo.undoRedoPerformed += undoRedoPerformed;
             EditorApplication.playModeStateChanged += playModeStateChanged;
             AssetModificationManagement.onWillSaveAssets += onWillSaveAssets;
-            SceneView.beforeSceneGui += beforeSceneGui;
+            SceneView.duringSceneGui += duringSceneGui;
             registerEvent();
         }
 
@@ -198,7 +200,7 @@ namespace ModEditor
             Undo.undoRedoPerformed -= undoRedoPerformed;
             EditorApplication.playModeStateChanged -= playModeStateChanged;
             AssetModificationManagement.onWillSaveAssets -= onWillSaveAssets;
-            SceneView.beforeSceneGui -= beforeSceneGui;
+            SceneView.duringSceneGui -= duringSceneGui;
             logoutEvent();
         }
 
@@ -216,8 +218,11 @@ namespace ModEditor
                 Manager.LockTarget = !Manager.LockTarget;
                 if (!Manager.LockTarget)
                 {
+                    GameObject pre = Manager.Target;
                     Manager.Target = Selection.activeGameObject;
                     refreshObjDic();
+                    if (pre != Manager.Target)
+                        onTargetChanged?.Invoke(Manager.Target);
                 }
             }
             EditorGUI.BeginDisabledGroup(true);
@@ -257,8 +262,11 @@ namespace ModEditor
         {
             if (!Manager.LockTarget)
             {
+                GameObject pre = Manager.Target;
                 Manager.Target = Selection.activeGameObject;
                 refreshObjDic();
+                if (pre != Manager.Target)
+                    onTargetChanged?.Invoke(Manager.Target);
             }
             Repaint();
         }

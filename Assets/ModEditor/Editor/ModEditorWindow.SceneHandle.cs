@@ -100,7 +100,7 @@ namespace ModEditor
                 Manager.VertexWithZTest = !Manager.VertexWithZTest;
         }
 
-        private void beforeSceneGui(SceneView obj)
+        private void duringSceneGui(SceneView obj)
         {
             camera = obj.camera;
             VertexView = Tools.current == Tool.Custom;

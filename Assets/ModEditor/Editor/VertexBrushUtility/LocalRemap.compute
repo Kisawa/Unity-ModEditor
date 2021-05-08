@@ -1,0 +1,16 @@
+﻿#pragma kernel LocalRemap
+
+float4x4 _LocalToWorld;
+float3 _RelativeWorldPos;
+StructuredBuffer<float3> _Vertex;
+RWStructuredBuffer<float4> RW_Result;
+[numthreads(1024,1,1)]
+void LocalRemap(uint3 id : SV_DispatchThreadID)
+{
+	float4 strength = RW_Result[id.x];
+	float4 vertex = float4(_Vertex[id.x], 1);
+	float3 worldPos = mul(_LocalToWorld, vertex).xyz;
+	float4 localPos = 0;
+	localPos.xyz = lerp(vertex.xyz, worldPos - _RelativeWorldPos, strength.xyz);
+	RW_Result[id.x] = localPos;
+}

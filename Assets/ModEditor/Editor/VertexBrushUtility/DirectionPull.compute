@@ -9,5 +9,6 @@ void DirectionPull_Vertex(uint3 id : SV_DispatchThreadID)
 	float3 pull = RW_Result[id.x].xyz;
 	float3 vertex = _Vertex[id.x];
 	float3 direction = _Direction[id.x].xyz;
-	RW_Result[id.x].xyz = vertex + direction * pull;
+	float4 res = float4(vertex + direction * pull, 0);
+	RW_Result[id.x] = res;
 }

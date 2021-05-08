@@ -32,7 +32,7 @@ namespace ModEditor
             }
         }
 
-        DataType currentData = DataType.VertexColor;
+        DataType currentData { get => window.CopyCurrentData; set => window.CopyCurrentData = value; }
 
         public override Vector3[] ExecuteThree(Mesh mesh)
         {

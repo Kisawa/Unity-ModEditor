@@ -16,34 +16,41 @@ namespace ModEditor
             Type[] calcTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes().Where(y => typeof(VertexCalcUtilBase).IsAssignableFrom(y) && y.IsClass && !y.IsAbstract)).ToArray();
             calcUtilNames = new string[calcTypes.Length];
-            calcUtilContents = new GUIContent[calcTypes.Length];
+            calcUtilTipContents = new GUIContent[calcTypes.Length];
             calcUtilInstances = new VertexCalcUtilBase[calcTypes.Length];
             for (int i = 0; i < calcTypes.Length; i++)
             {
                 VertexCalcUtilBase util = (VertexCalcUtilBase)Activator.CreateInstance(calcTypes[i]);
                 calcUtilNames[i] = util.Name;
-                calcUtilContents[i] = new GUIContent(util.Tip, util.Tip);
+                calcUtilTipContents[i] = new GUIContent(util.Tip, util.Tip);
                 calcUtilInstances[i] = util;
+                util.window = this.window;
             }
 
             Type[] brushTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes().Where(y => typeof(VertexBrushUtilBase).IsAssignableFrom(y) && y.IsClass && !y.IsAbstract)).ToArray();
-            brushUtilContents = new GUIContent[brushTypes.Length];
+            brushUtilNames = new string[brushTypes.Length];
+            brushUtilTipContents = new GUIContent[brushTypes.Length];
             brushUtilInstances = new VertexBrushUtilBase[brushTypes.Length];
             for (int i = 0; i < brushTypes.Length; i++)
             {
                 VertexBrushUtilBase util = (VertexBrushUtilBase)Activator.CreateInstance(brushTypes[i]);
-                brushUtilContents[i] = new GUIContent(util.Name, util.Tip);
+                brushUtilNames[i] = util.Name;
+                brushUtilTipContents[i] = new GUIContent(util.Tip, util.Tip);
                 brushUtilInstances[i] = util;
+                util.window = this.window;
             }
         }
 
         string[] calcUtilNames;
-        GUIContent[] calcUtilContents;
+        GUIContent[] calcUtilTipContents;
         VertexCalcUtilBase[] calcUtilInstances;
-        GUIContent[] brushUtilContents;
+        string[] brushUtilNames;
+        GUIContent[] brushUtilTipContents;
+        [SerializeField]
         VertexBrushUtilBase[] brushUtilInstances;
 
+        Vector2 scroll;
         Texture2D defaultCursor;
         Texture2D brushCursor;
 
@@ -108,6 +115,15 @@ namespace ModEditor
             ScrollWheel.Update += ScrollWheel_Update;
             if (brushCursor == null)
                 brushCursor = AssetDatabase.LoadAssetAtPath<Texture2D>($"{ModEditorWindow.ModEditorPath}/Textures/brushCursor.png");
+            if (window.Manager.CalcUtilIndex >= calcUtilTipContents.Length)
+                window.Manager.calcUtilIndex = calcUtilTipContents.Length - 1;
+            calcUtilInstances[window.Manager.CalcUtilIndex].OnFocus();
+            if (window.Manager.WriteType == WriteType.OtherUtil)
+            {
+                if (window.Manager.BrushUtilIndex >= brushUtilTipContents.Length)
+                    window.Manager.brushUtilIndex = brushUtilTipContents.Length - 1;
+                brushUtilInstances[window.Manager.BrushUtilIndex].OnFocus();
+            }
         }
 
         public override void OnLostFocus()
@@ -171,10 +187,14 @@ namespace ModEditor
             ScrollWheel.Update -= ScrollWheel_Update;
             PlayerSettings.defaultCursor = defaultCursor;
             Cursor.SetCursor(defaultCursor, Vector2.zero, CursorMode.Auto);
+            calcUtilInstances[window.Manager.CalcUtilIndex].OnLostFocus();
+            if(window.Manager.WriteType == WriteType.OtherUtil)
+                brushUtilInstances[window.Manager.BrushUtilIndex].OnLostFocus();
         }
 
         public override void Draw()
         {
+            scroll = EditorGUILayout.BeginScrollView(scroll);
             GUIStyle labelStyle = GUI.skin.GetStyle("LODRenderersText");
             EditorGUILayout.BeginHorizontal("Badge");
             GUILayout.Space(15);
@@ -187,6 +207,7 @@ namespace ModEditor
             drawCalcUtil(labelStyle);
             EditorGUILayout.Space(10);
             drawWrite(labelStyle);
+            EditorGUILayout.EndScrollView();
         }
 
         void drawBrush(GUIStyle labelStyle)
@@ -205,16 +226,16 @@ namespace ModEditor
                 EditorGUI.indentLevel = 2;
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Strength:", labelStyle, GUILayout.Width(80));
-                window.Manager.BrushStrength = EditorGUILayout.Slider(window.Manager.BrushStrength, -10, 10, GUILayout.Width(window.position.width - 120));
+                window.Manager.BrushStrength = EditorGUILayout.Slider(window.Manager.BrushStrength, -10, 10, GUILayout.Width(window.position.width - 125));
                 EditorGUILayout.EndHorizontal();
 
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Brush Type:", labelStyle, GUILayout.Width(100));
-                window.Manager.VertexBrushType = (VertexBrushType)EditorGUILayout.EnumPopup(window.Manager.VertexBrushType, GUILayout.Width(window.position.width - 140));
+                window.Manager.VertexBrushType = (VertexBrushType)EditorGUILayout.EnumPopup(window.Manager.VertexBrushType, GUILayout.Width(window.position.width - 145));
                 EditorGUILayout.EndHorizontal();
 
                 GUILayout.Space(5);
-                EditorGUILayout.BeginVertical("SelectionRect", GUILayout.Width(window.position.width - 30));
+                EditorGUILayout.BeginVertical("SelectionRect", GUILayout.Width(window.position.width - 40));
                 switch (window.Manager.VertexBrushType)
                 {
                     case VertexBrushType.Color:
@@ -240,13 +261,13 @@ namespace ModEditor
                         EditorGUILayout.BeginHorizontal();
                         GUILayout.Space(10);
                         EditorGUILayout.LabelField("From Step:", labelStyle, GUILayout.Width(100));
-                        window.Manager.BrushColorFromStep = EditorGUILayout.Slider(window.Manager.BrushColorFromStep, 0, 1, GUILayout.Width(window.position.width - 150));
+                        window.Manager.BrushColorFromStep = EditorGUILayout.Slider(window.Manager.BrushColorFromStep, 0, 1, GUILayout.Width(window.position.width - 160));
                         EditorGUILayout.EndHorizontal();
 
                         EditorGUILayout.BeginHorizontal();
                         GUILayout.Space(10);
                         EditorGUILayout.LabelField("To Step:", labelStyle, GUILayout.Width(100));
-                        window.Manager.BrushColorToStep = EditorGUILayout.Slider(window.Manager.BrushColorToStep, 0, 1, GUILayout.Width(window.position.width - 150));
+                        window.Manager.BrushColorToStep = EditorGUILayout.Slider(window.Manager.BrushColorToStep, 0, 1, GUILayout.Width(window.position.width - 160));
                         EditorGUILayout.EndHorizontal();
 
                         EditorGUILayout.BeginHorizontal();
@@ -280,17 +301,23 @@ namespace ModEditor
                 EditorGUI.indentLevel = 2;
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Util Select:", labelStyle, GUILayout.Width(100));
-                if (window.Manager.CalcUtilIndex >= calcUtilContents.Length)
-                    window.Manager.calcUtilIndex = calcUtilContents.Length - 1;
+                if (window.Manager.CalcUtilIndex >= calcUtilTipContents.Length)
+                    window.Manager.calcUtilIndex = calcUtilTipContents.Length - 1;
+                int preCalcUtilIndex = window.Manager.CalcUtilIndex;
                 window.Manager.CalcUtilIndex = EditorGUILayout.Popup(window.Manager.CalcUtilIndex, calcUtilNames, GUILayout.Width(140));
+                if (preCalcUtilIndex != window.Manager.CalcUtilIndex)
+                {
+                    calcUtilInstances[preCalcUtilIndex].OnLostFocus();
+                    calcUtilInstances[window.Manager.CalcUtilIndex].OnFocus();
+                }
                 EditorGUILayout.EndHorizontal();
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.Space(10);
                 EditorGUILayout.LabelField("", GUI.skin.GetStyle("CN EntryInfoIconSmall"), GUILayout.Width(20));
-                EditorGUILayout.LabelField(calcUtilContents[window.Manager.CalcUtilIndex], GUI.skin.GetStyle("MiniLabel"), GUILayout.Width(window.position.width - 60));
+                EditorGUILayout.LabelField(calcUtilTipContents[window.Manager.CalcUtilIndex], GUI.skin.GetStyle("MiniLabel"), GUILayout.Width(window.position.width - 70));
                 EditorGUILayout.EndHorizontal();
                 VertexCalcUtilBase util = calcUtilInstances[window.Manager.CalcUtilIndex];
-                util.Draw(labelStyle, window.position.width - 30);
+                util.Draw(labelStyle, window.position.width - 40);
                 GUILayout.Space(5);
                 if (util.AllowSelect)
                 {
@@ -303,7 +330,7 @@ namespace ModEditor
                     EditorGUILayout.EndHorizontal();
                 }
                 EditorGUI.BeginDisabledGroup(util.AllowSelect && util.WithSelect);
-                if (GUILayout.Button($"Execute Write - {passCountStr(util.PassCount)} Pass", "EditModeSingleButton", GUILayout.Width(window.position.width - 30)))
+                if (GUILayout.Button($"Execute Write - {passCountStr(util.PassCount)} Pass", "EditModeSingleButton", GUILayout.Width(window.position.width - 40)))
                     executeCalcUtil(util);
                 EditorGUI.EndDisabledGroup();
             }
@@ -327,17 +354,31 @@ namespace ModEditor
                 EditorGUI.indentLevel = 2;
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Type:", labelStyle, GUILayout.Width(100));
+                WriteType preWriteType = window.Manager.WriteType;
                 window.Manager.WriteType = (WriteType)EditorGUILayout.EnumPopup(window.Manager.WriteType, GUILayout.Width(140));
                 EditorGUILayout.EndHorizontal();
                 bool presetTargetType = false;
                 if (window.Manager.WriteType == WriteType.OtherUtil)
                 {
-                    EditorGUILayout.BeginVertical("SelectionRect", GUILayout.Width(window.position.width - 30));
+                    EditorGUILayout.BeginVertical("SelectionRect", GUILayout.Width(window.position.width - 40));
                     EditorGUILayout.LabelField("Util Select:", GUI.skin.GetStyle("AnimationTimelineTick"));
-                    if (window.Manager.BrushUtilIndex >= brushUtilContents.Length)
-                        window.Manager.brushUtilIndex = brushUtilContents.Length - 1;
-                    window.Manager.BrushUtilIndex = EditorGUILayout.Popup(window.Manager.BrushUtilIndex, brushUtilContents, GUILayout.Width(window.position.width - 65));
-                    brushUtilInstances[window.Manager.BrushUtilIndex].Draw(labelStyle, window.position.width - 70);
+                    if (window.Manager.BrushUtilIndex >= brushUtilTipContents.Length)
+                        window.Manager.brushUtilIndex = brushUtilTipContents.Length - 1;
+                    int preBrushUtilIndex = window.Manager.BrushUtilIndex;
+                    window.Manager.BrushUtilIndex = EditorGUILayout.Popup(window.Manager.BrushUtilIndex, brushUtilNames, GUILayout.Width(window.position.width - 65));
+                    if (preWriteType != WriteType.OtherUtil)
+                        brushUtilInstances[window.Manager.BrushUtilIndex].OnFocus();
+                    else if (preBrushUtilIndex != window.Manager.BrushUtilIndex)
+                    {
+                        brushUtilInstances[preBrushUtilIndex].OnLostFocus();
+                        brushUtilInstances[window.Manager.BrushUtilIndex].OnFocus();
+                    }
+                    EditorGUILayout.BeginHorizontal();
+                    GUILayout.Space(10);
+                    EditorGUILayout.LabelField("", GUI.skin.GetStyle("CN EntryInfoIconSmall"), GUILayout.Width(20));
+                    EditorGUILayout.LabelField(brushUtilTipContents[window.Manager.BrushUtilIndex], GUI.skin.GetStyle("MiniLabel"), GUILayout.Width(window.position.width - 80));
+                    EditorGUILayout.EndHorizontal();
+                    brushUtilInstances[window.Manager.BrushUtilIndex].Draw(labelStyle, window.position.width - 80);
                     EditorGUILayout.EndVertical();
                     WriteTargetType utilTarget = brushUtilInstances[window.Manager.BrushUtilIndex].UtilTarget;
                     if (utilTarget != WriteTargetType.None)
@@ -346,6 +387,8 @@ namespace ModEditor
                         presetTargetType = true;
                     }
                 }
+                else if(preWriteType == WriteType.OtherUtil)
+                    brushUtilInstances[window.Manager.BrushUtilIndex].OnLostFocus();
                 GUILayout.Space(5);
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Target Type:", labelStyle, GUILayout.Width(100));

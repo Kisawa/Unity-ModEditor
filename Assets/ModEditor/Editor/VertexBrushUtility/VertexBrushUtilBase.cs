@@ -1,11 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 namespace ModEditor
 {
     public abstract class VertexBrushUtilBase
     {
+        public ModEditorWindow window { get; set; }
+
         public abstract string Name { get; }
 
         public abstract string Tip { get; }
@@ -31,6 +34,16 @@ namespace ModEditor
         public TargetPassType CustomPass_Z;
 
         public TargetPassType CustomPass_W;
+
+        public virtual void OnFocus()
+        { 
+            
+        }
+
+        public virtual void OnLostFocus()
+        { 
+            
+        }
 
         public virtual bool BrushWrite(Mesh mesh, CalcShaderData.CalcVertexsData data)
         {

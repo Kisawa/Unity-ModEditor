@@ -9,7 +9,7 @@ namespace ModEditor
     {
         public override string Name => "DirectionPull";
 
-        public override string Tip => "Stretch in the direction of the vector";
+        public override string Tip => "Stretch in the direction of the vector.";
 
         public override WriteTargetType UtilTarget => WriteTargetType.Vertex;
 
@@ -40,7 +40,7 @@ namespace ModEditor
                         }
                         calcShader.SetBuffer(kernel_DirectionPull_Vertex, "_Direction", _Direction);
                         calcShader.SetBuffer(kernel_DirectionPull_Vertex, "RW_Result", data.RW_BrushResult);
-                        calcShader.Dispatch(kernel_DirectionPull_Vertex, Mathf.CeilToInt((float)data.RW_BrushResult.count / 1024), 1, 1);
+                        calcShader.Dispatch(kernel_DirectionPull_Vertex, Mathf.CeilToInt((float)mesh.vertexCount / 1024), 1, 1);
                         if (calcNormal)
                             mesh.RecalculateNormals();
                         vertexBuffer3.Dispose();
@@ -55,8 +55,8 @@ namespace ModEditor
         ComputeShader calcShader;
         public int kernel_DirectionPull_Vertex;
 
-        DirectionType directionType = DirectionType.Normal;
-        bool calcNormal;
+        DirectionType directionType { get => window.DirectionPullDirectionType; set => window.DirectionPullDirectionType = value; }
+        bool calcNormal { get => window.DirectionPullCalcNormal; set => window.DirectionPullCalcNormal = value; }
 
         public DirectionPull()
         {
