@@ -7,6 +7,15 @@ namespace ModEditor
 {
     public partial class ModEditorWindow
     {
+        void targetChanged_serializableRefresh()
+        {
+            if (Manager.Target != null)
+            {
+                localRemapCoord = Manager.Target.transform.position;
+                localRemapRotation = Manager.Target.transform.rotation;
+            }
+        }
+
         #region Copy
         [SerializeField]
         Copy.DataType copyCurrentData = Copy.DataType.VertexColor;
@@ -70,17 +79,29 @@ namespace ModEditor
         #endregion
 
         #region LocalRemap
-        [SerializeField]
-        Vector3 coord;
-        public Vector3 Coord
+        public Vector3 localRemapCoord;
+        public Vector3 LocalRemapCoord
         {
-            get => coord;
+            get => localRemapCoord;
             set
             {
-                if (value == coord)
+                if (value == localRemapCoord)
                     return;
                 Undo.RecordObject(this, "LoaclRemap Coord Changed");
-                coord = value;
+                localRemapCoord = value;
+            }
+        }
+
+        public Quaternion localRemapRotation = Quaternion.identity;
+        public Quaternion LocalRemapRotation
+        {
+            get => localRemapRotation;
+            set
+            {
+                if (value == localRemapRotation)
+                    return;
+                Undo.RecordObject(this, "LoaclRemap Rotation Changed");
+                localRemapRotation = value;
             }
         }
         #endregion

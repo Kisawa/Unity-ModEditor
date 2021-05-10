@@ -51,8 +51,6 @@ namespace ModEditor
         VertexBrushUtilBase[] brushUtilInstances;
 
         Vector2 scroll;
-        Texture2D defaultCursor;
-        Texture2D brushCursor;
 
         public override void OnFocus()
         {
@@ -85,6 +83,7 @@ namespace ModEditor
             EditorEvent.Use.Shift.OnKey.Space.Down += Space_Down;
             EditorEvent.Use.ShiftAndControl.OnKey.Space.Down += Space_Down;
             EditorEvent.Use.OnKey.CapsLock.Down += CapsLock_Down;
+            EditorEvent.Use.Alt.OnKey.CapsLock.Down += Alt_CapsLock_Down;
             EditorEvent.Use.Control.OnMouse.DragLeft += Control_OnMouse_DragLeft;
             EditorEvent.Use.Control.OnScrollWheel.Roll += Control_OnScrollWheel_Roll;
             EditorEvent.Use.OnKey.V.Down += V_Down;
@@ -113,8 +112,6 @@ namespace ModEditor
             EditorEvent.Use.ShiftAndControlAndAlt.OnKey.Enter.Down += Enter_Down;
             Mouse.Update += Mouse_Update;
             ScrollWheel.Update += ScrollWheel_Update;
-            if (brushCursor == null)
-                brushCursor = AssetDatabase.LoadAssetAtPath<Texture2D>($"{ModEditorWindow.ModEditorPath}/Textures/brushCursor.png");
             if (window.Manager.CalcUtilIndex >= calcUtilTipContents.Length)
                 window.Manager.calcUtilIndex = calcUtilTipContents.Length - 1;
             calcUtilInstances[window.Manager.CalcUtilIndex].OnFocus();
@@ -157,6 +154,7 @@ namespace ModEditor
             EditorEvent.Use.Shift.OnKey.Space.Down -= Space_Down;
             EditorEvent.Use.ShiftAndControl.OnKey.Space.Down -= Space_Down;
             EditorEvent.Use.OnKey.CapsLock.Down -= CapsLock_Down;
+            EditorEvent.Use.Alt.OnKey.CapsLock.Down -= Alt_CapsLock_Down;
             EditorEvent.Use.Control.OnMouse.DragLeft -= Control_OnMouse_DragLeft;
             EditorEvent.Use.Control.OnScrollWheel.Roll -= Control_OnScrollWheel_Roll;
             EditorEvent.Use.OnKey.V.Down -= V_Down;
@@ -185,8 +183,6 @@ namespace ModEditor
             EditorEvent.Use.ShiftAndControlAndAlt.OnKey.Enter.Down -= Enter_Down;
             Mouse.Update -= Mouse_Update;
             ScrollWheel.Update -= ScrollWheel_Update;
-            PlayerSettings.defaultCursor = defaultCursor;
-            Cursor.SetCursor(defaultCursor, Vector2.zero, CursorMode.Auto);
             calcUtilInstances[window.Manager.CalcUtilIndex].OnLostFocus();
             if(window.Manager.WriteType == WriteType.OtherUtil)
                 brushUtilInstances[window.Manager.BrushUtilIndex].OnLostFocus();
@@ -480,12 +476,6 @@ namespace ModEditor
         {
             if (!window.VertexView)
                 return;
-            if (PlayerSettings.defaultCursor != brushCursor)
-            {
-                defaultCursor = PlayerSettings.defaultCursor;
-                PlayerSettings.defaultCursor = brushCursor;
-                Cursor.SetCursor(brushCursor, new Vector2(brushCursor.width / 2f, brushCursor.height / 2f), CursorMode.Auto);
-            }
             if (window.SceneHandleType == SceneHandleType.None)
                 EditorGUIUtility.AddCursorRect(new Rect(0, 0, scene.position.width, scene.position.height), MouseCursor.CustomCursor);
         }

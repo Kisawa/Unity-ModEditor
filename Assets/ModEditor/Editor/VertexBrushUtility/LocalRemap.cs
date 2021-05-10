@@ -13,8 +13,8 @@ namespace ModEditor
 
         Transform targetTrans;
         bool available;
-        Quaternion rotate = Quaternion.identity;
-        Vector3 coord { get => window.Coord; set => window.Coord = value; }
+        Quaternion rotation { get => window.LocalRemapRotation; set => window.LocalRemapRotation = value; }
+        Vector3 coord { get => window.LocalRemapCoord; set => window.LocalRemapCoord = value; }
 
         ComputeShader calcShader;
         int kernel_LocalRemap;
@@ -32,10 +32,7 @@ namespace ModEditor
             window.onSceneValidate += Window_onSceneValidate;
             available = window.Manager.Target != null;
             if (available)
-            {
                 targetTrans = window.Manager.Target.transform;
-                coord = targetTrans.position;
-            }
             else
                 targetTrans = null;
         }
@@ -53,7 +50,8 @@ namespace ModEditor
             if (available)
             {
                 targetTrans = window.Manager.Target.transform;
-                coord = targetTrans.position;
+                window.localRemapRotation = targetTrans.rotation;
+                window.localRemapCoord = targetTrans.position;
             }
             else
                 targetTrans = null;
@@ -61,10 +59,10 @@ namespace ModEditor
 
         private void Window_onSceneValidate(SceneView obj)
         {
-            if (!available)
+            if (!available || !window.VertexView)
                 return;
-            rotate = Handles.RotationHandle(rotate, coord);
-            coord = Handles.PositionHandle(coord, rotate);
+            rotation = Handles.RotationHandle(rotation, coord);
+            coord = Handles.PositionHandle(coord, rotation);
             if (GUI.changed)
                 window.Repaint();
         }
@@ -77,7 +75,7 @@ namespace ModEditor
             calcShader.SetVector("_RelativeWorldPos", coord);
             ComputeBuffer _vertexBuffer3 = CalcUtil.Self.GetBuffer3(mesh.vertices);
             calcShader.SetBuffer(kernel_LocalRemap, "_Vertex", _vertexBuffer3);
-            calcShader.SetBuffer(kernel_LocalRemap, "RW_Result", data.RW_BrushResult);
+            calcShader.SetBuffer(kernel_LocalRemap, "RW_Result", data.Cache.RW_BrushResult);
             calcShader.Dispatch(kernel_LocalRemap, Mathf.CeilToInt((float)mesh.vertexCount / 1024), 1, 1);
             _vertexBuffer3.Dispose();
             return true;
@@ -94,6 +92,11 @@ namespace ModEditor
             EditorGUI.EndDisabledGroup();
             EditorGUILayout.LabelField("Coord Local Pos:", labelStyle, GUILayout.Width(maxWidth));
             coord = targetTrans.TransformPoint(EditorGUILayout.Vector3Field("", targetTrans.InverseTransformPoint(coord), GUILayout.Width(maxWidth)));
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Space(30);
+            if (GUILayout.Button("Reset rotation relative to the object.", GUILayout.Width(maxWidth - 30)))
+                rotation = targetTrans.rotation;
+            EditorGUILayout.EndHorizontal();
         }
     }
 }

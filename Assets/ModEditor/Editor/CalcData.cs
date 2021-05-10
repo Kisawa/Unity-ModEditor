@@ -20,11 +20,24 @@ namespace ModEditor
             /// <summary>
             /// Buffer type is "int"
             /// </summary>
-            public ComputeBuffer RW_Zone;
+            public ComputeBuffer RW_Zone { get; set; }
             /// <summary>
             /// Buffer type is "float"
             /// </summary>
-            public ComputeBuffer RW_Selects;
+            public ComputeBuffer RW_Selects { get; set; }
+            /// <summary>
+            /// Buffer type is "float"
+            /// </summary>
+            public ComputeBuffer RW_Depths { get; set; }
+            /// <summary>
+            /// Buffer type is "float"
+            /// </summary>
+            public ComputeBuffer RW_Sizes { get; set; }
+            /// <summary>
+            /// Buffer type is "float4"
+            /// </summary>
+            public ComputeBuffer RW_BrushResult { get; set; }
+            public virtual bool IsAvailable { get => !RW_Depths.IsValid() || !RW_Sizes.IsValid() || !RW_Selects.IsValid() || !RW_Zone.IsValid() || !RW_BrushResult.IsValid(); }
         }
 
         public abstract class CalcDataWithVertexsBase

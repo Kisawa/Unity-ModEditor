@@ -39,7 +39,7 @@ namespace ModEditor
                                 break;
                         }
                         calcShader.SetBuffer(kernel_DirectionPull_Vertex, "_Direction", _Direction);
-                        calcShader.SetBuffer(kernel_DirectionPull_Vertex, "RW_Result", data.RW_BrushResult);
+                        calcShader.SetBuffer(kernel_DirectionPull_Vertex, "RW_Result", data.Cache.RW_BrushResult);
                         calcShader.Dispatch(kernel_DirectionPull_Vertex, Mathf.CeilToInt((float)mesh.vertexCount / 1024), 1, 1);
                         if (calcNormal)
                             mesh.RecalculateNormals();

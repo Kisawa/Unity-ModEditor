@@ -175,6 +175,7 @@ namespace ModEditor
             if (toggleOnContent == null)
                 toggleOnContent = EditorGUIUtility.IconContent("ShurikenToggleFocusedOn");
             refreshWindow();
+            targetChanged_serializableRefresh();
 
             for (int i = 0; i < tabs.Count; i++)
                 tabs[i].OnEnable();
@@ -222,7 +223,10 @@ namespace ModEditor
                     Manager.Target = Selection.activeGameObject;
                     refreshObjDic();
                     if (pre != Manager.Target)
+                    {
+                        targetChanged_serializableRefresh();
                         onTargetChanged?.Invoke(Manager.Target);
+                    }
                 }
             }
             EditorGUI.BeginDisabledGroup(true);
@@ -266,7 +270,10 @@ namespace ModEditor
                 Manager.Target = Selection.activeGameObject;
                 refreshObjDic();
                 if (pre != Manager.Target)
+                {
+                    targetChanged_serializableRefresh();
                     onTargetChanged?.Invoke(Manager.Target);
+                }
             }
             Repaint();
         }

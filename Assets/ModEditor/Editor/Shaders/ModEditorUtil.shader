@@ -83,16 +83,6 @@
 			return o;
 		}
 
-		v2f vert_BrushCover(appdata v)
-		{
-			v2f o;
-			o.pos = UnityObjectToClipPos(v.vertex);
-			o.uv = v.texcoord;
-			o.screenPos = ComputeScreenPos(o.pos);
-			COMPUTE_EYEDEPTH(o.screenPos.z);
-			return o;
-		}
-
 		[maxvertexcount(6)]
 		void geom_normalView(triangle v2g input[3], inout LineStream<g2f> tristream)
 		{
@@ -194,32 +184,20 @@
             return fixed4(i.normal.xyz, 1);
         }
 
+		float _FromStep;
+		float _ToStep;
 		float3 _MouseTexcoord;
 		float _BrushSize;
-		fixed4 _BrushViewColor;
+		fixed4 _BrushScopeViewColor;
 		fixed4 frag_ScreenMesh(v2f i) : SV_Target
 		{
 			i.uv.x *= _MouseTexcoord.z;
 			float2 mouseTexcoord = _MouseTexcoord.xy;
 			mouseTexcoord.x *= _MouseTexcoord.z;
 			float dis = distance(i.uv, mouseTexcoord);
-			fixed4 col = _BrushViewColor;
-			col.a = .5;
-			col = lerp(0, col, min(1 - step(_BrushSize, dis), step(_BrushSize - 0.002, dis)));
-			return col;
-		}
-
-		float _BrushDepth;
-		fixed4 frag_BrushCover(v2f i) : SV_Target
-		{
-			float2 screenTexcoord = i.screenPos.xy / i.screenPos.w;
-			screenTexcoord.x *= _MouseTexcoord.z;
-			float2 mouseTexcoord = _MouseTexcoord.xy;
-			mouseTexcoord.x *= _MouseTexcoord.z;
-			float dis = distance(screenTexcoord, mouseTexcoord);
-			float res = (1 - step(_BrushSize, dis)) * (1 - step(_BrushDepth, i.screenPos.z));
-			fixed4 col = _BrushViewColor;
-			col.a *= res;
+			fixed4 col = lerp(0, _BrushScopeViewColor, min(1 - step(_BrushSize, dis), step(_BrushSize - 0.002, dis)));
+			col = max(col, lerp(0, _BrushScopeViewColor, 1 - step(_BrushSize * _FromStep, dis)));
+			col = max(col, lerp(0, _BrushScopeViewColor, step(_BrushSize * _ToStep, dis) - step(_BrushSize, dis)));
 			return col;
 		}
 		ENDCG
@@ -301,16 +279,6 @@
             CGPROGRAM
 			#pragma vertex vert_ScreenMesh
 			#pragma fragment frag_ScreenMesh
-			ENDCG
-        }
-
-		Pass
-        {
-			ZWrite Off
-			Blend SrcAlpha OneMinusSrcAlpha
-            CGPROGRAM
-			#pragma vertex vert_BrushCover
-			#pragma fragment frag_BrushCover
 			ENDCG
         }
     }

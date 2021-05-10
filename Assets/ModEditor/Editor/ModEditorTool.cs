@@ -19,8 +19,21 @@ namespace ModEditor
         GUIContent toggleOnContent;
         GUIContent lockContent;
         GUIContent unlockContent;
+        GUIContent lockBrushContent;
+        GUIContent unlockBrushContent;
 
         public override GUIContent toolbarIcon => icon;
+
+        bool zoneLock;
+        bool ZoneLock
+        {
+            get
+            {
+                if (ModEditor != null && ModEditor.Manager != null)
+                    zoneLock = ModEditor.ZoneLock;
+                return zoneLock;
+            }
+        }
 
         bool brushLock;
         bool BrushLock
@@ -324,9 +337,13 @@ namespace ModEditor
             if (toggleOnContent == null)
                 toggleOnContent = EditorGUIUtility.IconContent("ShurikenToggleFocusedOn");
             if (lockContent == null)
-                lockContent = EditorGUIUtility.IconContent("IN LockButton on act");
+                lockContent = EditorGUIUtility.TrIconContent("IN LockButton on act", "Lock or unlock available vertices.   /CapsLock");
             if (unlockContent == null)
-                unlockContent = EditorGUIUtility.IconContent("IN LockButton");
+                unlockContent = EditorGUIUtility.TrIconContent("IN LockButton", "Lock or unlock available vertices.   /CapsLock");
+            if (lockBrushContent == null)
+                lockBrushContent = EditorGUIUtility.TrIconContent("d_scenepicking_notpickable-mixed", "Lock or unlock the brush position.   /Alt-CapsLock");
+            if (unlockBrushContent == null)
+                unlockBrushContent = EditorGUIUtility.TrIconContent("d_scenepicking_pickable-mixed_hover", "Lock or unlock the brush position.   /Alt-CapsLock");
         }
 
         public override void OnToolGUI(EditorWindow window)
@@ -373,7 +390,10 @@ namespace ModEditor
                     break;
             }
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Label(BrushLock ? lockContent : unlockContent, "ToolbarButtonFlat");
+            EditorGUI.BeginDisabledGroup(BrushLock);
+            GUILayout.Label(ZoneLock ? lockContent : unlockContent, "ToolbarButtonFlat");
+            EditorGUI.EndDisabledGroup();
+            GUILayout.Label(BrushLock ? lockBrushContent : unlockBrushContent, "ToolbarButtonFlat");
             GUILayout.Label($"Current brush dpeth:  {BrushDepth}", "ToolbarButtonFlat");
             EditorGUILayout.EndHorizontal();
 
@@ -440,15 +460,26 @@ namespace ModEditor
                 return;
             ModEditor.Mat_Util.SetVector("_MouseTexcoord", Mouse.ScreenTexcoord);
             ModEditor.Mat_Util.SetFloat("_BrushSize", BrushSize);
-            ModEditor.Mat_Util.SetFloat("_BrushDepth", BrushDepth);
-            ModEditor.Mat_Util.SetColor("_BrushViewColor", ModEditor.Manager.BrushScopeViewColor);
+            ModEditor.Mat_Util.SetColor("_BrushScopeViewColor", ModEditor.Manager.BrushScopeViewColor * (BrushLock ? 0 : 1));
+            switch (VertexBrushType)
+            {
+                case VertexBrushType.Color:
+                    ModEditor.Mat_Util.SetFloat("_FromStep", 0);
+                    ModEditor.Mat_Util.SetFloat("_ToStep", 1);
+                    break;
+                case VertexBrushType.TwoColorGradient:
+                    ModEditor.Mat_Util.SetFloat("_FromStep", BrushColorFromStep);
+                    ModEditor.Mat_Util.SetFloat("_ToStep", BrushColorToStep);
+                    break;
+            }
             bool brushOn = ModEditor.TabType == ModEditorTabType.VertexBrush;
             for (int i = 0; i < ModEditor.CalcShaderDatas.Count; i++)
             {
                 CalcShaderData.CalcVertexsData data = ModEditor.CalcShaderDatas[i];
                 if (brushOn)
                 {
-                    data.Update(ModEditor.camera, Mouse.ScreenTexcoord, BrushSize, BrushDepth);
+                    if (!BrushLock)
+                        data.Update(ModEditor.camera, Mouse.ScreenTexcoord, BrushSize, BrushDepth);
                     if (BrushColorView)
                     {
                         switch (VertexBrushType)
@@ -470,8 +501,11 @@ namespace ModEditor
                     data.material.SetColor("_SelectedVertexColor", SelectedVertexColor);
                     data.material.SetFloat("_VertexScale", VertexScale);
                     data.material.SetInt("_VertexWithZTest", VertexWithZTest ? (int)CompareFunction.LessEqual : (int)CompareFunction.Always);
-                    data.material.SetInt("_OnlyZone", BrushLock && Key.Shift ? 1 : 0);
-                    data.material.SetInt("_Hide", BrushLock && Key.Shift && !Key.Control ? 1 : 0);
+                    data.material.SetInt("_OnlyZone", ZoneLock && Key.Shift ? 1 : 0);
+                    bool hide = !BrushColorView;
+                    if (ZoneLock && Key.Shift && !Key.Control)
+                        hide = true;
+                    data.material.SetInt("_Hide", hide ? 1 : 0);
                 }
             }
             SceneView.RepaintAll();

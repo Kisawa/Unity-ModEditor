@@ -19,7 +19,7 @@ namespace ModEditor
             for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
             {
                 GameObject target = window.Manager.TargetChildren[i];
-                if (target == null || !target.activeSelf)
+                if (target == null)
                     continue;
                 if (!window.Manager.ActionableDic[target])
                     continue;
@@ -67,7 +67,7 @@ namespace ModEditor
 
         private void Shift_OnMouse_Left()
         {
-            if (window.OnSceneGUI || !window.BrushLock)
+            if (window.OnSceneGUI || !window.ZoneLock || window.BrushLock)
                 return;
             for (int i = 0; i < window.CalcShaderDatas.Count; i++)
                 window.CalcShaderDatas[i].AddZoneFromSelect();
@@ -75,7 +75,7 @@ namespace ModEditor
 
         private void Shift_OnMouse_Right()
         {
-            if (window.OnSceneGUI || !window.BrushLock)
+            if (window.OnSceneGUI || !window.ZoneLock || window.BrushLock)
                 return;
             for (int i = 0; i < window.CalcShaderDatas.Count; i++)
                 window.CalcShaderDatas[i].SubZoneFromSelect();
@@ -83,7 +83,7 @@ namespace ModEditor
 
         private void Space_Down()
         {
-            if (!window.VertexView)
+            if (!window.VertexView || window.BrushLock)
                 return;
             float depth = float.MaxValue;
             for (int i = 0; i < window.CalcShaderDatas.Count; i++)
@@ -98,14 +98,21 @@ namespace ModEditor
 
         private void CapsLock_Down()
         {
-            window.BrushLock = !window.BrushLock;
+            if (window.BrushLock)
+                return;
+            window.ZoneLock = !window.ZoneLock;
             for (int i = 0; i < window.CalcShaderDatas.Count; i++)
-                window.CalcShaderDatas[i].LockZoneFromSelect(window.BrushLock);
+                window.CalcShaderDatas[i].LockZoneFromSelect(window.ZoneLock);
+        }
+
+        private void Alt_CapsLock_Down()
+        {
+            window.BrushLock = !window.BrushLock;
         }
 
         private void Control_OnMouse_DragLeft()
         {
-            if (!window.VertexView)
+            if (!window.VertexView || window.BrushLock)
                 return;
             window.Manager.BrushSize += Event.current.delta.x * 0.01f;
             window.SceneHandleType = SceneHandleType.BrushSize;
@@ -113,7 +120,7 @@ namespace ModEditor
 
         private void Control_OnScrollWheel_Roll(float obj)
         {
-            if (!window.VertexView)
+            if (!window.VertexView || window.BrushLock)
                 return;
             window.Manager.BrushDepth -= Event.current.delta.y * 0.01f;
             window.SceneHandleType = SceneHandleType.BrushDepth;
@@ -121,7 +128,7 @@ namespace ModEditor
 
         private void Mouse_Update()
         {
-            if (Mouse.IsButton)
+            if (Mouse.IsButton || window.BrushLock)
                 return;
             for (int i = 0; i < window.CalcShaderDatas.Count; i++)
                 window.CalcShaderDatas[i].ClearSpread();
@@ -129,7 +136,7 @@ namespace ModEditor
 
         private void ScrollWheel_Update()
         {
-            if (Key.Alt)
+            if (Key.Alt || window.BrushLock)
                 return;
             for (int i = 0; i < window.CalcShaderDatas.Count; i++)
                 window.CalcShaderDatas[i].ClearSpread();
@@ -205,7 +212,7 @@ namespace ModEditor
             for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
             {
                 GameObject target = window.Manager.TargetChildren[i];
-                if (target == null || !target.activeSelf)
+                if (target == null)
                     continue;
                 if (!window.Manager.ActionableDic[target])
                     continue;

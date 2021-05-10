@@ -9,7 +9,6 @@ namespace ModEditor
         public event Action<Camera> onCameraChange;
         public event Action<SceneView> onSceneValidate;
         public event Action onVertexViewChange;
-        public event Action onBrushColorViewChange;
 
         Camera _camera;
         public Camera camera
@@ -48,7 +47,6 @@ namespace ModEditor
                 if (brushColorView == value)
                     return;
                 brushColorView = value;
-                onBrushColorViewChange?.Invoke();
             }
         }
 
@@ -63,6 +61,8 @@ namespace ModEditor
             }
             set => sceneHandleType = value;
         }
+
+        public bool ZoneLock { get; set; }
 
         public bool BrushLock { get; set; }
 

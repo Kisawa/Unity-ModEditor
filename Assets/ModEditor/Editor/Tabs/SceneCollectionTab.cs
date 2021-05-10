@@ -52,7 +52,6 @@ namespace ModEditor
             window.onCameraChange += onCameraChange;
             window.onRefreshTargetDic += refreshBuffer;
             window.onVertexViewChange += refreshBuffer;
-            window.onBrushColorViewChange += refreshBuffer;
             onCameraChange(null);
         }
 
@@ -62,7 +61,6 @@ namespace ModEditor
             window.onCameraChange -= onCameraChange;
             window.onRefreshTargetDic -= refreshBuffer;
             window.onVertexViewChange -= refreshBuffer;
-            window.onBrushColorViewChange -= refreshBuffer;
             if (window.camera != null && buffer != null)
                 window.camera.RemoveCommandBuffer(cameraEvent, buffer);
         }
@@ -160,7 +158,7 @@ namespace ModEditor
                     for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
                     {
                         GameObject obj = window.Manager.TargetChildren[i];
-                        if (obj == window.Manager.Target || obj.gameObject == null)
+                        if (obj == window.Manager.Target || obj == null)
                             continue;
                         EditorGUI.indentLevel = 1;
                         Transform parent = obj.transform.parent;
@@ -413,7 +411,7 @@ namespace ModEditor
             for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
             {
                 GameObject target = window.Manager.TargetChildren[i];
-                if (target == null || !target.activeSelf)
+                if (target == null)
                     continue;
                 if (!window.Manager.ActionableDic[target])
                     continue;
@@ -445,8 +443,6 @@ namespace ModEditor
                         buffer.DrawRenderer(renderer, window.Mat_Util, j, 6);
                     if (window.Manager.NormalMapView)
                         buffer.DrawRenderer(renderer, window.Mat_Util, j, 7);
-                    if (window.VertexView && window.TabType == ModEditorTabType.VertexBrush)
-                        buffer.DrawRenderer(renderer, window.Mat_Util, j, 9);
                 }
                 if (window.VertexView)
                 {
@@ -456,11 +452,7 @@ namespace ModEditor
                     if (data != null)
                     {
                         for (int j = 0; j < subCount; j++)
-                        {
-                            if (window.BrushColorView)
-                                buffer.DrawRenderer(data.renderer, data.material, j, 0);
-                            buffer.DrawRenderer(data.renderer, data.material, j, 1);
-                        }
+                            buffer.DrawRenderer(data.renderer, data.material, j);
                     }
                 }
             }

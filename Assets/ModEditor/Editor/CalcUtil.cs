@@ -85,6 +85,24 @@ namespace ModEditor
                 cache.RW_Selects = new ComputeBuffer(count, sizeof(float));
                 cache.RW_Selects.SetData(Enumerable.Repeat(0, count).ToArray());
             }
+            if (cache.RW_Depths == null || cache.RW_Depths.count != count)
+            {
+                if (cache.RW_Depths != null)
+                    cache.RW_Depths.Dispose();
+                cache.RW_Depths = new ComputeBuffer(count, sizeof(float));
+            }
+            if (cache.RW_Sizes == null || cache.RW_Sizes.count != count)
+            {
+                if (cache.RW_Sizes != null)
+                    cache.RW_Sizes.Dispose();
+                cache.RW_Sizes = new ComputeBuffer(count, sizeof(float));
+            }
+            if (cache.RW_BrushResult == null || cache.RW_BrushResult.count != count)
+            {
+                if (cache.RW_BrushResult != null)
+                    cache.RW_BrushResult.Dispose();
+                cache.RW_BrushResult = new ComputeBuffer(count, sizeof(float) * 4);
+            }
             return cache;
         }
 
@@ -96,6 +114,12 @@ namespace ModEditor
                     item.RW_Zone.Dispose();
                 if (item.RW_Selects != null)
                     item.RW_Selects.Dispose();
+                if (item.RW_Depths != null)
+                    item.RW_Depths.Dispose();
+                if (item.RW_Sizes != null)
+                    item.RW_Sizes.Dispose();
+                if (item.RW_BrushResult != null)
+                    item.RW_BrushResult.Dispose();
             }
             Cache.Clear();
         }
