@@ -126,6 +126,7 @@ namespace ModEditor
             EditorEvent.Use.ShiftAndControl.OnKey.Space.Down += Space_Down;
             EditorEvent.Use.OnKey.CapsLock.Down += CapsLock_Down;
             EditorEvent.Use.Alt.OnKey.CapsLock.Down += Alt_CapsLock_Down;
+            EditorEvent.Use.ShiftAndControlAndAlt.OnKey.CapsLock.Down += Alt_CapsLock_Down;
             EditorEvent.Use.Control.OnMouse.DragLeft += Control_OnMouse_DragLeft;
             EditorEvent.Use.Control.OnScrollWheel.Roll += Control_OnScrollWheel_Roll;
             EditorEvent.Use.OnKey.V.Down += V_Down;
@@ -197,6 +198,7 @@ namespace ModEditor
             EditorEvent.Use.ShiftAndControl.OnKey.Space.Down -= Space_Down;
             EditorEvent.Use.OnKey.CapsLock.Down -= CapsLock_Down;
             EditorEvent.Use.Alt.OnKey.CapsLock.Down -= Alt_CapsLock_Down;
+            EditorEvent.Use.ShiftAndControlAndAlt.OnKey.CapsLock.Down -= Alt_CapsLock_Down;
             EditorEvent.Use.Control.OnMouse.DragLeft -= Control_OnMouse_DragLeft;
             EditorEvent.Use.Control.OnScrollWheel.Roll -= Control_OnScrollWheel_Roll;
             EditorEvent.Use.OnKey.V.Down -= V_Down;

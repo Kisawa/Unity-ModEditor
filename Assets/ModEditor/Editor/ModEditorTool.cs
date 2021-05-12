@@ -501,7 +501,7 @@ namespace ModEditor
                     data.Material.SetColor("_SelectedVertexColor", SelectedVertexColor);
                     data.Material.SetFloat("_VertexScale", VertexScale);
                     data.Material.SetInt("_VertexWithZTest", VertexWithZTest ? (int)CompareFunction.LessEqual : (int)CompareFunction.Always);
-                    data.Material.SetInt("_OnlyZone", ZoneLock && Key.Shift ? 1 : 0);
+                    data.Material.SetInt("_OnlyZone", ZoneLock && Key.Shift || BrushLock ? 1 : 0);
                     bool hide = !BrushColorView;
                     if (ZoneLock && Key.Shift && !Key.Control)
                         hide = true;
