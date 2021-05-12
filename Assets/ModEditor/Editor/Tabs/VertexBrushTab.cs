@@ -25,6 +25,7 @@ namespace ModEditor
                 calcUtilTipContents[i] = new GUIContent(util.Tip, util.Tip);
                 calcUtilInstances[i] = util;
                 util.window = this.window;
+                util.Tab = this;
             }
 
             Type[] brushTypes = AppDomain.CurrentDomain.GetAssemblies()
@@ -39,6 +40,7 @@ namespace ModEditor
                 brushUtilTipContents[i] = new GUIContent(util.Tip, util.Tip);
                 brushUtilInstances[i] = util;
                 util.window = this.window;
+                util.Tab = this;
             }
         }
 
@@ -49,8 +51,48 @@ namespace ModEditor
         GUIContent[] brushUtilTipContents;
         [SerializeField]
         VertexBrushUtilBase[] brushUtilInstances;
+        bool writeCommand;
+        public bool WriteCommand
+        {
+            get => writeCommand;
+            set
+            {
+                if (value == writeCommand)
+                    return;
+                if (value)
+                {
+                    Undo.undoRedoPerformed += BrushWrite;
+                    RecordObjInOperation();
+                }
+                else
+                {
+                    Undo.undoRedoPerformed -= BrushWrite;
+                    ClearObjInOperation();
+                }
+                writeCommand = value;
+            }
+        }
+        public GUIStyle CommandSyle
+        {
+            get
+            {
+                if (WriteCommand)
+                    return GUI.skin.GetStyle("LODSliderTextSelected");
+                else
+                    return GUI.skin.GetStyle("LODRenderersText");
+            }
+        }
 
         Vector2 scroll;
+
+        public override void OnDiable()
+        {
+            base.OnDiable();
+            for (int i = 0; i < calcUtilInstances.Length; i++)
+                calcUtilInstances[i].OnDisable();
+            for (int i = 0; i < brushUtilInstances.Length; i++)
+                brushUtilInstances[i].OnDisable();
+        }
 
         public override void OnFocus()
         {
@@ -186,23 +228,37 @@ namespace ModEditor
             calcUtilInstances[window.Manager.CalcUtilIndex].OnLostFocus();
             if(window.Manager.WriteType == WriteType.OtherUtil)
                 brushUtilInstances[window.Manager.BrushUtilIndex].OnLostFocus();
+            WriteCommand = false;
         }
 
         public override void Draw()
         {
             scroll = EditorGUILayout.BeginScrollView(scroll);
             GUIStyle labelStyle = GUI.skin.GetStyle("LODRenderersText");
-            EditorGUILayout.BeginHorizontal("Badge");
+            EditorGUILayout.BeginVertical("Badge", GUILayout.Width(window.position.width - 25));
+            EditorGUILayout.BeginHorizontal();
             GUILayout.Space(15);
-            EditorGUILayout.LabelField("Brush Scope View Color:", labelStyle, GUILayout.Width(150));
+            EditorGUILayout.LabelField("Brush Scope View Color:", labelStyle, GUILayout.Width(window.position.width - 160));
             window.Manager.BrushScopeViewColor = EditorGUILayout.ColorField(window.Manager.BrushScopeViewColor, GUILayout.Width(80));
             EditorGUILayout.EndHorizontal();
+            if (window.VertexView && window.BrushLock && !BrushDisable())
+            {
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(15);
+                GUIContent content = new GUIContent("Brush Command Switch:", "When enabled, you can adjust the some parameters in the panel and execute the brush write.");
+                WriteCommand = GUILayout.Toggle(WriteCommand, content, "IN EditColliderButton", GUILayout.Width(window.position.width - 75));
+                EditorGUILayout.EndHorizontal();
+            }
+            else
+                WriteCommand = false;
+            EditorGUILayout.EndVertical();
             EditorGUILayout.Space(10);
             drawBrush(labelStyle);
             EditorGUILayout.Space(10);
             drawCalcUtil(labelStyle);
             EditorGUILayout.Space(10);
             drawWrite(labelStyle);
+            EditorGUILayout.Space(10);
             EditorGUILayout.EndScrollView();
         }
 
@@ -219,14 +275,15 @@ namespace ModEditor
 
             if (window.Manager.BrushUnfold)
             {
+                BeginCheckWriteCommand();
                 EditorGUI.indentLevel = 2;
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("Strength:", labelStyle, GUILayout.Width(80));
+                EditorGUILayout.LabelField("Strength:", CommandSyle, GUILayout.Width(80));
                 window.Manager.BrushStrength = EditorGUILayout.Slider(window.Manager.BrushStrength, -10, 10, GUILayout.Width(window.position.width - 125));
                 EditorGUILayout.EndHorizontal();
 
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("Brush Type:", labelStyle, GUILayout.Width(100));
+                EditorGUILayout.LabelField("Brush Type:", CommandSyle, GUILayout.Width(100));
                 window.Manager.VertexBrushType = (VertexBrushType)EditorGUILayout.EnumPopup(window.Manager.VertexBrushType, GUILayout.Width(window.position.width - 145));
                 EditorGUILayout.EndHorizontal();
 
@@ -236,7 +293,7 @@ namespace ModEditor
                 {
                     case VertexBrushType.Color:
                         EditorGUILayout.BeginHorizontal();
-                        EditorGUILayout.LabelField("Brush Color:", labelStyle, GUILayout.Width(100));
+                        EditorGUILayout.LabelField("Brush Color:", CommandSyle, GUILayout.Width(100));
                         window.Manager.BrushColor = EditorGUILayout.ColorField(window.Manager.BrushColor, GUILayout.Width(100));
                         EditorGUILayout.EndHorizontal();
                         EditorGUILayout.BeginHorizontal();
@@ -246,7 +303,7 @@ namespace ModEditor
                         break;
                     case VertexBrushType.TwoColorGradient:
                         EditorGUILayout.BeginHorizontal();
-                        EditorGUILayout.LabelField("From:", labelStyle, GUILayout.Width(80));
+                        EditorGUILayout.LabelField("From:", CommandSyle, GUILayout.Width(80));
                         window.Manager.BrushColorFrom = EditorGUILayout.ColorField(window.Manager.BrushColorFrom, GUILayout.Width(100));
                         EditorGUILayout.EndHorizontal();
                         EditorGUILayout.BeginHorizontal();
@@ -256,18 +313,18 @@ namespace ModEditor
 
                         EditorGUILayout.BeginHorizontal();
                         GUILayout.Space(10);
-                        EditorGUILayout.LabelField("From Step:", labelStyle, GUILayout.Width(100));
+                        EditorGUILayout.LabelField("From Step:", CommandSyle, GUILayout.Width(100));
                         window.Manager.BrushColorFromStep = EditorGUILayout.Slider(window.Manager.BrushColorFromStep, 0, 1, GUILayout.Width(window.position.width - 160));
                         EditorGUILayout.EndHorizontal();
 
                         EditorGUILayout.BeginHorizontal();
                         GUILayout.Space(10);
-                        EditorGUILayout.LabelField("To Step:", labelStyle, GUILayout.Width(100));
+                        EditorGUILayout.LabelField("To Step:", CommandSyle, GUILayout.Width(100));
                         window.Manager.BrushColorToStep = EditorGUILayout.Slider(window.Manager.BrushColorToStep, 0, 1, GUILayout.Width(window.position.width - 160));
                         EditorGUILayout.EndHorizontal();
 
                         EditorGUILayout.BeginHorizontal();
-                        EditorGUILayout.LabelField("To:", labelStyle, GUILayout.Width(80));
+                        EditorGUILayout.LabelField("To:", CommandSyle, GUILayout.Width(80));
                         window.Manager.BrushColorTo = EditorGUILayout.ColorField(window.Manager.BrushColorTo, GUILayout.Width(100));
                         EditorGUILayout.EndHorizontal();
                         EditorGUILayout.BeginHorizontal();
@@ -277,6 +334,7 @@ namespace ModEditor
                         break;
                 }
                 EditorGUILayout.EndVertical();
+                EndCheckWriteCommand();
             }
             
             EditorGUILayout.EndVertical();
@@ -470,6 +528,17 @@ namespace ModEditor
                 }
                 EditorGUILayout.EndHorizontal();
             }
+        }
+
+        public void BeginCheckWriteCommand()
+        {
+            EditorGUI.BeginChangeCheck();
+        }
+
+        public void EndCheckWriteCommand()
+        {
+            if (EditorGUI.EndChangeCheck() && WriteCommand)
+                BrushWrite();
         }
 
         private void onSceneValidate(SceneView scene)

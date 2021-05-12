@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
 public class GUIStyleViewer : EditorWindow
 {
@@ -15,7 +16,7 @@ public class GUIStyleViewer : EditorWindow
     void OnGUI()
     {
         scroll = GUILayout.BeginScrollView(scroll);
-        int count = (int)(position.width / innerWidth); ;
+        int count = (int)(position.width / innerWidth);
         for (int i = 0; i < GUI.skin.customStyles.Length; i++)
         {
             GUIStyle style = GUI.skin.customStyles[i];
@@ -31,8 +32,8 @@ public class GUIStyleViewer : EditorWindow
             //    GUIUtility.systemCopyBuffer = style.name;
             //EditorGUILayout.EndVertical();
 
-            EditorGUILayout.BeginVertical();
-            GUILayout.Button($"Current brush dpeth:  5.000", style, GUILayout.Width(200));
+            EditorGUILayout.BeginVertical(style);
+            GUILayout.Label("Command", GUILayout.Width(200));
             if (GUILayout.Button("Game Camera Follow"))
             {
                 GUIUtility.systemCopyBuffer = style.name;

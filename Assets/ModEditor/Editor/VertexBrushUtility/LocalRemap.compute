@@ -1,16 +1,27 @@
-﻿#pragma kernel LocalRemap
+﻿#pragma kernel LocalMix
+#pragma kernel LocalRemap
 
-float4x4 _LocalToWorld;
+float4x4 _WorldToLocal;
 float3 _RelativeWorldPos;
 StructuredBuffer<float3> _Vertex;
+RWStructuredBuffer<float3> RW_Mix;
+[numthreads(1024,1,1)]
+void LocalMix(uint3 id : SV_DispatchThreadID)
+{
+	float3 mix = RW_Mix[id.x];
+	float3 vertex = _Vertex[id.x];
+	float3 relativeVertex = mul(_WorldToLocal, float4(_RelativeWorldPos, 1)).xyz;
+	mix = normalize(mix + vertex - relativeVertex);
+	RW_Mix[id.x] = mix;
+}
+
+StructuredBuffer<float4> _Origin;
 RWStructuredBuffer<float4> RW_Result;
 [numthreads(1024,1,1)]
 void LocalRemap(uint3 id : SV_DispatchThreadID)
 {
 	float4 strength = RW_Result[id.x];
-	float4 vertex = float4(_Vertex[id.x], 1);
-	float3 worldPos = mul(_LocalToWorld, vertex).xyz;
-	float4 localPos = 0;
-	localPos.xyz = lerp(vertex.xyz, worldPos - _RelativeWorldPos, strength.xyz);
+	float4 localPos = _Origin[id.x];
+	localPos.xyz = lerp(localPos.xyz, RW_Mix[id.x], strength.xyz);
 	RW_Result[id.x] = localPos;
 }

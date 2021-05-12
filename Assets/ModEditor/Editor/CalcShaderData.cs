@@ -13,8 +13,9 @@ namespace ModEditor
         public abstract class CalcVertexsData
         {
             public Transform trans { get; protected set; }
-            public Renderer renderer { get; protected set; }
-            public Material material { get; private set; }
+            public Renderer Renderer { get; protected set; }
+            public Mesh OriginMesh { get; private set; }
+            public Material Material { get; private set; }
             /// <summary>
             /// Buffer type is "float3"
             /// </summary>
@@ -28,13 +29,11 @@ namespace ModEditor
             {
                 get 
                 {
-                    if (trans == null || renderer == null || material == null || !_Vertices.IsValid() || !_Triangles.IsValid() || Cache.IsAvailable)
+                    if (trans == null || Renderer == null || Material == null || !_Vertices.IsValid() || !_Triangles.IsValid() || Cache.IsAvailable)
                         return false;
                     return true;
                 }
             }
-
-            Vector3[] _vertexs;
 
             bool _clearSpread;
             protected bool clearSpread
@@ -50,16 +49,16 @@ namespace ModEditor
                 }
             }
 
-            public CalcVertexsData(Renderer renderer, Vector3[] vertexs, int[] triangles)
+            public CalcVertexsData(Renderer renderer, Mesh originMesh)
             {
-                this.renderer = renderer;
                 trans = renderer.transform;
-                _vertexs = vertexs;
-                _Vertices = new ComputeBuffer(vertexs.Length, sizeof(float) * 3);
-                _Vertices.SetData(vertexs);
-                _Triangles = new ComputeBuffer(triangles.Length, sizeof(int));
-                _Triangles.SetData(triangles);
-                Cache = CalcUtil.Self.GetCache(trans, vertexs.Length);
+                Renderer = renderer;
+                OriginMesh = originMesh;
+                _Vertices = new ComputeBuffer(originMesh.vertexCount, sizeof(float) * 3);
+                _Vertices.SetData(originMesh.vertices);
+                _Triangles = new ComputeBuffer(originMesh.triangles.Length, sizeof(int));
+                _Triangles.SetData(originMesh.triangles);
+                Cache = CalcUtil.Self.GetCache(trans, originMesh.vertexCount);
             }
 
             public abstract void Update(Camera camera, Vector3 mouseTexcoord, float brushSize, float brushDepth);
@@ -71,7 +70,6 @@ namespace ModEditor
                     Clear();
                     return;
                 }
-                _vertexs = vertex;
                 _Vertices.SetData(vertex);
             }
 
@@ -115,9 +113,11 @@ namespace ModEditor
                     Cache.SpreadLevel++;
                     float[] _selects = new float[Cache.RW_Selects.count];
                     Cache.RW_Selects.GetData(_selects);
+                    Vector3[] vertices = new Vector3[_Vertices.count];
+                    _Vertices.GetData(vertices);
                     UnifyOverlapVertexJob job = new UnifyOverlapVertexJob()
                     {
-                        vertexs = new NativeArray<Vector3>(_vertexs, Allocator.TempJob),
+                        vertexs = new NativeArray<Vector3>(vertices, Allocator.TempJob),
                         selects = new NativeArray<float>(_selects, Allocator.TempJob)
                     };
                     JobHandle jobHandle = job.Schedule();
@@ -254,7 +254,7 @@ namespace ModEditor
 
             public virtual void BindMaterial(Material material)
             {
-                this.material = material;
+                this.Material = material;
                 material.SetBuffer("_Selects", Cache.RW_Selects);
                 material.SetBuffer("_Zone", Cache.RW_Zone);
                 material.SetBuffer("_Colors", Cache.RW_BrushResult);
@@ -270,8 +270,8 @@ namespace ModEditor
             {
                 _Vertices.Dispose();
                 _Triangles.Dispose();
-                if (material != null)
-                    Object.DestroyImmediate(material);
+                if (Material != null)
+                    Object.DestroyImmediate(Material);
             }
         }
 
@@ -283,13 +283,13 @@ namespace ModEditor
             {
                 get 
                 {
-                    if (trans == null || renderer == null || meshFilter == null || meshFilter.sharedMesh == null || material == null || !_Vertices.IsValid() || !_Triangles.IsValid() || Cache.IsAvailable)
+                    if (trans == null || Renderer == null || meshFilter == null || meshFilter.sharedMesh == null || Material == null || !_Vertices.IsValid() || !_Triangles.IsValid() || Cache.IsAvailable)
                         return false;
                     return true;
                 }
             }
 
-            public CalcMeshVertexsData(Renderer renderer, MeshFilter meshFilter): base(renderer, meshFilter.sharedMesh.vertices, meshFilter.sharedMesh.triangles)
+            public CalcMeshVertexsData(Renderer renderer, MeshFilter meshFilter): base(renderer, meshFilter.sharedMesh)
             {
                 this.meshFilter = meshFilter;
             }
@@ -303,7 +303,7 @@ namespace ModEditor
             {
                 get
                 {
-                    if (trans == null || renderer == null || skinnedMesh == null || skinnedMesh.sharedMesh == null || material == null || !_Vertices.IsValid() || !_Triangles.IsValid() || Cache.IsAvailable)
+                    if (trans == null || Renderer == null || skinnedMesh == null || skinnedMesh.sharedMesh == null || Material == null || !_Vertices.IsValid() || !_Triangles.IsValid() || Cache.IsAvailable)
                         return false;
                     return true;
                 }
@@ -311,7 +311,7 @@ namespace ModEditor
 
             protected Mesh bakedMesh;
 
-            public CalcSkinnedMeshMeshVertexsData(SkinnedMeshRenderer skinnedMesh) : base(skinnedMesh, skinnedMesh.sharedMesh.vertices, skinnedMesh.sharedMesh.triangles)
+            public CalcSkinnedMeshMeshVertexsData(SkinnedMeshRenderer skinnedMesh) : base(skinnedMesh, skinnedMesh.sharedMesh)
             {
                 this.skinnedMesh = skinnedMesh;
                 bakedMesh = new Mesh();

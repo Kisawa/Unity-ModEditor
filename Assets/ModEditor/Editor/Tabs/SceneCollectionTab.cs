@@ -452,7 +452,7 @@ namespace ModEditor
                     if (data != null)
                     {
                         for (int j = 0; j < subCount; j++)
-                            buffer.DrawRenderer(data.renderer, data.material, j);
+                            buffer.DrawRenderer(data.Renderer, data.Material, j);
                     }
                 }
             }

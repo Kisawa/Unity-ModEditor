@@ -8,6 +8,8 @@ namespace ModEditor
     {
         public ModEditorWindow window { get; set; }
 
+        public VertexBrushTab Tab { get; set; }
+
         public abstract string Name { get; }
 
         public abstract string Tip { get; }
@@ -28,6 +30,11 @@ namespace ModEditor
         public virtual void OnLostFocus()
         {
 
+        }
+
+        public virtual void OnDisable()
+        { 
+            
         }
 
         public virtual float[] ExecuteOne(Mesh mesh)

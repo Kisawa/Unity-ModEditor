@@ -464,6 +464,16 @@ namespace ModEditor
             return _result;
         }
 
+        public void GetBuffer4(Vector3[] values, ComputeBuffer _buffer4)
+        {
+            ComputeBuffer _values = new ComputeBuffer(values.Length, sizeof(float) * 3);
+            _values.SetData(values);
+            CalcShader.SetBuffer(kernel_Origin3To4, "_Origin3", _values);
+            CalcShader.SetBuffer(kernel_Origin3To4, "RW_Result4", _buffer4);
+            CalcShader.Dispatch(kernel_Origin3To4, Mathf.CeilToInt((float)values.Length / 1024), 1, 1);
+            _values.Dispose();
+        }
+
         public ComputeBuffer GetBuffer4_from3(ComputeBuffer _buffer3)
         {
             ComputeBuffer _result = new ComputeBuffer(_buffer3.count, sizeof(float) * 4);
@@ -471,6 +481,13 @@ namespace ModEditor
             CalcShader.SetBuffer(kernel_Origin3To4, "RW_Result4", _result);
             CalcShader.Dispatch(kernel_Origin3To4, Mathf.CeilToInt((float)_buffer3.count / 1024), 1, 1);
             return _result;
+        }
+
+        public void GetBuffer4_from3(ComputeBuffer _buffer3, ComputeBuffer _buffer4)
+        {
+            CalcShader.SetBuffer(kernel_Origin3To4, "_Origin3", _buffer3);
+            CalcShader.SetBuffer(kernel_Origin3To4, "RW_Result4", _buffer4);
+            CalcShader.Dispatch(kernel_Origin3To4, Mathf.CeilToInt((float)_buffer3.count / 1024), 1, 1);
         }
 
         public ComputeBuffer GetBuffer4(Vector3[] values, Color[] origin)
@@ -499,6 +516,13 @@ namespace ModEditor
             return _result;
         }
 
+        public void GetBuffer4(Vector3[] values, TargetPassType inPass, TargetPassType outPass, ComputeBuffer _buffer4)
+        {
+            ComputeBuffer _buffer1 = GetBuffer1(values, inPass);
+            GetBuffer4_from1(_buffer1, _buffer4, outPass);
+            _buffer1.Dispose();
+        }
+
         public ComputeBuffer GetBuffer4(Color[] values)
         {
             ComputeBuffer _result = new ComputeBuffer(values.Length, sizeof(float) * 4);
@@ -506,11 +530,35 @@ namespace ModEditor
             return _result;
         }
 
+        public void GetBuffer4(Color[] values, ComputeBuffer _buffer4)
+        {
+            _buffer4.SetData(values);
+        }
+
+        public void GetBuffer4(Color[] values, TargetPassType inPass, TargetPassType outPass, ComputeBuffer _buffer4)
+        {
+            ComputeBuffer _buffer1 = GetBuffer1(values, inPass);
+            GetBuffer4_from1(_buffer1, _buffer4, outPass);
+            _buffer1.Dispose();
+        }
+
         public ComputeBuffer GetBuffer4(Vector4[] values)
         {
             ComputeBuffer _result = new ComputeBuffer(values.Length, sizeof(float) * 4);
             _result.SetData(values);
             return _result;
+        }
+
+        public void GetBuffer4(Vector4[] values, ComputeBuffer _buffer4)
+        {
+            _buffer4.SetData(values);
+        }
+
+        public void GetBuffer4(Vector4[] values, TargetPassType inPass, TargetPassType outPass, ComputeBuffer _buffer4)
+        {
+            ComputeBuffer _buffer1 = GetBuffer1(values, inPass);
+            GetBuffer4_from1(_buffer1, _buffer4, outPass);
+            _buffer1.Dispose();
         }
 
         public Color[] GetResultColor(WriteType type, Color[] origin, float[] values, ComputeBuffer _Select = null)

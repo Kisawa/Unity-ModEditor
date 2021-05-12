@@ -449,7 +449,7 @@ namespace ModEditor
 
         public override bool IsAvailable()
         {
-            if (ModEditor != null && ModEditor.Manager.Target != null && (ModEditor.Manager.LockTarget || ModEditor.Manager.Target == Selection.activeGameObject))
+            if (ModEditor != null && ModEditor.Manager.Target != null && ModEditor.TabType == ModEditorTabType.VertexBrush && (ModEditor.Manager.LockTarget || ModEditor.Manager.Target == Selection.activeGameObject))
                 return true;
             return false;
         }
@@ -495,17 +495,17 @@ namespace ModEditor
                 }
                 if (data.IsAvailable)
                 {
-                    data.material.SetInt("_BrushOn", brushOn ? 1 : 0);
-                    data.material.SetInt("_HideNoSelectVertex", HideUnselectedVertex ? 1 : 0);
-                    data.material.SetColor("_UnselectedVertexColor", UnselectedVertexColor);
-                    data.material.SetColor("_SelectedVertexColor", SelectedVertexColor);
-                    data.material.SetFloat("_VertexScale", VertexScale);
-                    data.material.SetInt("_VertexWithZTest", VertexWithZTest ? (int)CompareFunction.LessEqual : (int)CompareFunction.Always);
-                    data.material.SetInt("_OnlyZone", ZoneLock && Key.Shift ? 1 : 0);
+                    data.Material.SetInt("_BrushOn", brushOn ? 1 : 0);
+                    data.Material.SetInt("_HideNoSelectVertex", HideUnselectedVertex ? 1 : 0);
+                    data.Material.SetColor("_UnselectedVertexColor", UnselectedVertexColor);
+                    data.Material.SetColor("_SelectedVertexColor", SelectedVertexColor);
+                    data.Material.SetFloat("_VertexScale", VertexScale);
+                    data.Material.SetInt("_VertexWithZTest", VertexWithZTest ? (int)CompareFunction.LessEqual : (int)CompareFunction.Always);
+                    data.Material.SetInt("_OnlyZone", ZoneLock && Key.Shift ? 1 : 0);
                     bool hide = !BrushColorView;
                     if (ZoneLock && Key.Shift && !Key.Control)
                         hide = true;
-                    data.material.SetInt("_Hide", hide ? 1 : 0);
+                    data.Material.SetInt("_Hide", hide ? 1 : 0);
                 }
             }
             SceneView.RepaintAll();

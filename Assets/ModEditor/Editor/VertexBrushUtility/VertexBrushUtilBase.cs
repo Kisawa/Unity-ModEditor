@@ -9,6 +9,8 @@ namespace ModEditor
     {
         public ModEditorWindow window { get; set; }
 
+        public VertexBrushTab Tab { get; set; }
+
         public abstract string Name { get; }
 
         public abstract string Tip { get; }
@@ -45,9 +47,24 @@ namespace ModEditor
             
         }
 
+        public virtual void OnDisable()
+        { 
+            
+        }
+
+        public virtual void WriteStart(Mesh mesh)
+        { 
+            
+        }
+
         public virtual bool BrushWrite(Mesh mesh, CalcShaderData.CalcVertexsData data)
         {
             return false;
+        }
+
+        public virtual void WriteEnd(Mesh mesh)
+        {
+
         }
 
         public virtual void Draw(GUIStyle labelStyle, float maxWidth)

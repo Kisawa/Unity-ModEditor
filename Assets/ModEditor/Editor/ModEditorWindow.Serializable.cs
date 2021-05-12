@@ -9,10 +9,12 @@ namespace ModEditor
     {
         void targetChanged_serializableRefresh()
         {
+            LocalRemapCoordClear();
+            LocalRemapRotationClear();
             if (Manager.Target != null)
             {
-                localRemapCoord = Manager.Target.transform.position;
-                localRemapRotation = Manager.Target.transform.rotation;
+                LocalRemapCoord[0] = Manager.Target.transform.position;
+                LocalRemapRotation[0] = Manager.Target.transform.rotation;
             }
         }
 
@@ -79,30 +81,80 @@ namespace ModEditor
         #endregion
 
         #region LocalRemap
-        public Vector3 localRemapCoord;
-        public Vector3 LocalRemapCoord
+        public List<Vector3> LocalRemapCoord = new List<Vector3>();
+
+        public void LocalRemapCoordSet(int index, Vector3 coord)
         {
-            get => localRemapCoord;
-            set
+            if (index < LocalRemapCoord.Count)
             {
-                if (value == localRemapCoord)
-                    return;
-                Undo.RecordObject(this, "LoaclRemap Coord Changed");
-                localRemapCoord = value;
+                if (LocalRemapCoord[index] != coord)
+                {
+                    Undo.RecordObject(this, "LocalRemap Coord Changed");
+                    LocalRemapCoord[index] = coord;
+                }
+            }
+            else if (index == LocalRemapCoord.Count)
+            {
+                Undo.RecordObject(this, "LocalRemap Coord Changed");
+                LocalRemapCoord.Add(coord);
+            }
+            else
+            {
+                throw new System.IndexOutOfRangeException("ModEditor: LocalRemap Coord Index out of range.");
             }
         }
 
-        public Quaternion localRemapRotation = Quaternion.identity;
-        public Quaternion LocalRemapRotation
+        public void LocalRemapCoordRemove(int index)
         {
-            get => localRemapRotation;
-            set
+            Undo.RecordObject(this, "LocalRemap Coord Changed");
+            LocalRemapCoord.RemoveAt(index);
+            if(LocalRemapCoord.Count == 0)
+                LocalRemapCoord.Add(Vector3.zero);
+        }
+
+        public void LocalRemapCoordClear()
+        {
+            Undo.RecordObject(this, "LocalRemap Coord Changed");
+            LocalRemapCoord.Clear();
+            LocalRemapCoord.Add(Vector3.zero);
+        }
+
+        public List<Quaternion> LocalRemapRotation = new List<Quaternion>();
+
+        public void LocalRemapRotationSet(int index, Quaternion rotation)
+        {
+            if (index < LocalRemapRotation.Count)
             {
-                if (value == localRemapRotation)
-                    return;
-                Undo.RecordObject(this, "LoaclRemap Rotation Changed");
-                localRemapRotation = value;
+                if (LocalRemapRotation[index] != rotation)
+                {
+                    Undo.RecordObject(this, "LocalRemap Rotation Changed");
+                    LocalRemapRotation[index] = rotation;
+                }
             }
+            else if (LocalRemapRotation.Count == index)
+            {
+                Undo.RecordObject(this, "LocalRemap Rotation Changed");
+                LocalRemapRotation.Add(rotation);
+            }
+            else
+            {
+                throw new System.IndexOutOfRangeException("ModEditor: LocalRemap Rotation Index out of range.");
+            }
+        }
+
+        public void LocalRemapRotationRemove(int index)
+        {
+            Undo.RecordObject(this, "LocalRemap Rotation Changed");
+            LocalRemapRotation.RemoveAt(index);
+            if (LocalRemapRotation.Count == 0)
+                LocalRemapRotation.Add(Quaternion.identity);
+        }
+
+        public void LocalRemapRotationClear()
+        {
+            Undo.RecordObject(this, "LocalRemap Rotation Changed");
+            LocalRemapRotation.Clear();
+            LocalRemapRotation.Add(Quaternion.identity);
         }
         #endregion
     }

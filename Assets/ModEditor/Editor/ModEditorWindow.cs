@@ -35,6 +35,8 @@ namespace ModEditor
 
         public ModEditorManager Manager { get; private set; }
 
+        public event Action onWindowFocus;
+        public event Action onWindowLostFocus;
         public event Action onRefreshTargetDic;
         public event Action<GameObject> onTargetChanged;
         
@@ -209,6 +211,16 @@ namespace ModEditor
         {
             Manager.CheckAndClearExposed();
             ExposedManagement.CheckAndClearExposed();
+        }
+
+        private void OnFocus()
+        {
+            onWindowFocus?.Invoke();
+        }
+
+        private void OnLostFocus()
+        {
+            onWindowLostFocus?.Invoke();
         }
 
         private void OnGUI()

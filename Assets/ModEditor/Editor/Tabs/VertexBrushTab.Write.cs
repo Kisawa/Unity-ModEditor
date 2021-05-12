@@ -11,10 +11,10 @@ namespace ModEditor
     {
         List<(Transform, Mesh)> objInOperation;
 
-        List<(Transform, Mesh)> recordObjInOperation()
+        public void RecordObjInOperation()
         {
-            if (window.camera == null)
-                return null;
+            if (window.camera == null || (objInOperation != null && objInOperation.Count != 0))
+                return;
             List<(Transform, Mesh)> _objInOperation = new List<(Transform, Mesh)>();
             for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
             {
@@ -30,7 +30,13 @@ namespace ModEditor
                 if (skinnedMeshRenderer != null)
                     _objInOperation.Add((target.transform, window.SetEditingMesh(target, skinnedMeshRenderer)));
             }
-            return _objInOperation;
+            objInOperation = _objInOperation;
+        }
+
+        public void ClearObjInOperation()
+        {
+            if(objInOperation != null)
+                objInOperation.Clear();
         }
 
         private void OnMouse_DownLeft()
@@ -39,14 +45,16 @@ namespace ModEditor
                 return;
             if (window.VertexView && !BrushDisable())
             {
-                objInOperation = recordObjInOperation();
-                write_ScreenScope();
+                RecordObjInOperation();
+                BrushWrite();
             }
         }
 
         private void OnMouse_UpLeft()
         {
-            objInOperation = null;
+            if (WriteCommand)
+                return;
+            ClearObjInOperation();
         }
 
         private void OnMouse_DragLeft()
@@ -54,7 +62,7 @@ namespace ModEditor
             if (window.OnSceneGUI)
                 return;
             if (window.VertexView && !BrushDisable())
-                write_ScreenScope();
+                BrushWrite();
         }
 
         private void Alt_OnScrollWheel_Roll(float obj)
@@ -108,6 +116,7 @@ namespace ModEditor
         private void Alt_CapsLock_Down()
         {
             window.BrushLock = !window.BrushLock;
+            Repaint();
         }
 
         private void Control_OnMouse_DragLeft()
@@ -205,10 +214,103 @@ namespace ModEditor
             return false;
         }
 
+        public void BrushWrite()
+        {
+            if (objInOperation == null || objInOperation.Count == 0)
+                return;
+            for (int i = 0; i < objInOperation.Count; i++)
+            {
+                Transform trans = objInOperation[i].Item1;
+                Mesh mesh = objInOperation[i].Item2;
+                if (trans == null || mesh == null)
+                    continue;
+                CalcShaderData.CalcVertexsData data = window.CalcShaderDatas.FirstOrDefault(x => x.trans == trans);
+                if (data != null && data.IsAvailable)
+                {
+                    switch (window.Manager.VertexBrushType)
+                    {
+                        case VertexBrushType.Color:
+                            data.Cala(window.Manager.BrushColor, window.Manager.BrushStrength);
+                            break;
+                        case VertexBrushType.TwoColorGradient:
+                            data.Cala(window.Manager.BrushColorFrom, window.Manager.BrushColorTo, window.Manager.BrushColorFromStep, window.Manager.BrushColorToStep, window.Manager.BrushStrength);
+                            break;
+                    }
+                    WriteType writeType = window.Manager.WriteType;
+                    if (writeType == WriteType.OtherUtil)
+                    {
+                        VertexBrushUtilBase util = brushUtilInstances[window.Manager.BrushUtilIndex];
+                        util.TargetType = window.Manager.WriteTargetType;
+                        util.CustomTarget_X = window.Manager.CustomTargetType_X;
+                        util.CustomTarget_Y = window.Manager.CustomTargetType_Y;
+                        util.CustomTarget_Z = window.Manager.CustomTargetType_Z;
+                        util.CustomTarget_W = window.Manager.CustomTargetType_W;
+                        util.CustomPass_X = window.Manager.CustomTargetPass_X;
+                        util.CustomPass_Y = window.Manager.CustomTargetPass_Y;
+                        util.CustomPass_Z = window.Manager.CustomTargetPass_Z;
+                        util.CustomPass_W = window.Manager.CustomTargetPass_W;
+                        if (util.BrushWrite(mesh, data))
+                            writeType = WriteType.Replace;
+                        else
+                            continue;
+                    }
+                    switch (window.Manager.WriteTargetType)
+                    {
+                        case WriteTargetType.VertexColor:
+                            Color[] colors = mesh.colors;
+                            if (colors.Length != mesh.vertexCount)
+                                colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
+                            mesh.colors = data.GetResultColor(writeType, colors);
+                            break;
+                        case WriteTargetType.Vertex:
+                            mesh.vertices = data.GetResult(writeType, mesh.vertices);
+                            data.UpdateVertex(mesh.vertices);
+                            break;
+                        case WriteTargetType.Normal:
+                            mesh.normals = data.GetResult(writeType, mesh.normals);
+                            break;
+                        case WriteTargetType.Tangent:
+                            mesh.tangents = data.GetResult(writeType, mesh.tangents);
+                            break;
+                        case WriteTargetType.Custom:
+                            setCustomData(writeType, window.Manager.CustomTargetType_X, TargetPassType.X, window.Manager.CustomTargetPass_X, mesh, data);
+                            setCustomData(writeType, window.Manager.CustomTargetType_Y, TargetPassType.Y, window.Manager.CustomTargetPass_Y, mesh, data);
+                            setCustomData(writeType, window.Manager.CustomTargetType_Z, TargetPassType.Z, window.Manager.CustomTargetPass_Z, mesh, data);
+                            setCustomData(writeType, window.Manager.CustomTargetType_W, TargetPassType.W, window.Manager.CustomTargetPass_W, mesh, data);
+                            break;
+                    }
+                }
+            }
+        }
+
+        void setCustomData(WriteType writeType, CustomTargetType customTarget, TargetPassType inPass, TargetPassType outPass, Mesh mesh, CalcShaderData.CalcVertexsData data)
+        {
+            switch (customTarget)
+            {
+                case CustomTargetType.VertexColor:
+                    Color[] colors = mesh.colors;
+                    if (colors.Length != mesh.vertexCount)
+                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
+                    mesh.colors = data.GetResultCustom(writeType, inPass, outPass, colors);
+                    break;
+                case CustomTargetType.Vertex:
+                    mesh.vertices = data.GetResultCustom(writeType, inPass, outPass, mesh.vertices);
+                    data.UpdateVertex(mesh.vertices);
+                    break;
+                case CustomTargetType.Normal:
+                    mesh.normals = data.GetResultCustom(writeType, inPass, outPass, mesh.normals);
+                    break;
+                case CustomTargetType.Tangent:
+                    mesh.tangents = data.GetResultCustom(writeType, inPass, outPass, mesh.tangents);
+                    break;
+            }
+        }
+
         void executeCalcUtil(VertexCalcUtilBase util)
         {
             if (BrushDisable())
                 return;
+            WriteCommand = false;
             for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
             {
                 GameObject target = window.Manager.TargetChildren[i];
@@ -408,98 +510,6 @@ namespace ModEditor
                     setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_Y, TargetPassType.Y, window.Manager.CustomTargetPass_Y, mesh, result);
                     setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_Z, TargetPassType.Z, window.Manager.CustomTargetPass_Z, mesh, result);
                     setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_W, TargetPassType.W, window.Manager.CustomTargetPass_W, mesh, result);
-                    break;
-            }
-        }
-
-        void write_ScreenScope()
-        {
-            if (objInOperation == null || objInOperation.Count == 0)
-                return;
-            for (int i = 0; i < objInOperation.Count; i++)
-            {
-                Transform trans = objInOperation[i].Item1;
-                Mesh mesh = objInOperation[i].Item2;
-                if (trans == null || mesh == null)
-                    continue;
-                CalcShaderData.CalcVertexsData data = window.CalcShaderDatas.FirstOrDefault(x => x.trans == trans);
-                if (data != null && data.IsAvailable)
-                {
-                    switch (window.Manager.VertexBrushType)
-                    {
-                        case VertexBrushType.Color:
-                            data.Cala(window.Manager.BrushColor, window.Manager.BrushStrength);
-                            break;
-                        case VertexBrushType.TwoColorGradient:
-                            data.Cala(window.Manager.BrushColorFrom, window.Manager.BrushColorTo, window.Manager.BrushColorFromStep, window.Manager.BrushColorToStep, window.Manager.BrushStrength);
-                            break;
-                    }
-                    WriteType writeType = window.Manager.WriteType;
-                    if (writeType == WriteType.OtherUtil)
-                    {
-                        VertexBrushUtilBase util = brushUtilInstances[window.Manager.BrushUtilIndex];
-                        util.TargetType = window.Manager.WriteTargetType;
-                        util.CustomTarget_X = window.Manager.CustomTargetType_X;
-                        util.CustomTarget_Y = window.Manager.CustomTargetType_Y;
-                        util.CustomTarget_Z = window.Manager.CustomTargetType_Z;
-                        util.CustomTarget_W = window.Manager.CustomTargetType_W;
-                        util.CustomPass_X = window.Manager.CustomTargetPass_X;
-                        util.CustomPass_Y = window.Manager.CustomTargetPass_Y;
-                        util.CustomPass_Z = window.Manager.CustomTargetPass_Z;
-                        util.CustomPass_W = window.Manager.CustomTargetPass_W;
-                        if (util.BrushWrite(mesh, data))
-                            writeType = WriteType.Replace;
-                        else
-                            continue;
-                    }
-                    switch (window.Manager.WriteTargetType)
-                    {
-                        case WriteTargetType.VertexColor:
-                            Color[] colors = mesh.colors;
-                            if (colors.Length != mesh.vertexCount)
-                                colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
-                            mesh.colors = data.GetResultColor(writeType, colors);
-                            break;
-                        case WriteTargetType.Vertex:
-                            mesh.vertices = data.GetResult(writeType, mesh.vertices);
-                            data.UpdateVertex(mesh.vertices);
-                            break;
-                        case WriteTargetType.Normal:
-                            mesh.normals = data.GetResult(writeType, mesh.normals);
-                            break;
-                        case WriteTargetType.Tangent:
-                            mesh.tangents = data.GetResult(writeType, mesh.tangents);
-                            break;
-                        case WriteTargetType.Custom:
-                            setCustomData(writeType, window.Manager.CustomTargetType_X, TargetPassType.X, window.Manager.CustomTargetPass_X, mesh, data);
-                            setCustomData(writeType, window.Manager.CustomTargetType_Y, TargetPassType.Y, window.Manager.CustomTargetPass_Y, mesh, data);
-                            setCustomData(writeType, window.Manager.CustomTargetType_Z, TargetPassType.Z, window.Manager.CustomTargetPass_Z, mesh, data);
-                            setCustomData(writeType, window.Manager.CustomTargetType_W, TargetPassType.W, window.Manager.CustomTargetPass_W, mesh, data);
-                            break;
-                    }
-                }
-            }
-        }
-
-        void setCustomData(WriteType writeType, CustomTargetType customTarget, TargetPassType inPass, TargetPassType outPass, Mesh mesh, CalcShaderData.CalcVertexsData data)
-        {
-            switch (customTarget)
-            {
-                case CustomTargetType.VertexColor:
-                    Color[] colors = mesh.colors;
-                    if (colors.Length != mesh.vertexCount)
-                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
-                    mesh.colors = data.GetResultCustom(writeType, inPass, outPass, colors);
-                    break;
-                case CustomTargetType.Vertex:
-                    mesh.vertices = data.GetResultCustom(writeType, inPass, outPass, mesh.vertices);
-                    data.UpdateVertex(mesh.vertices);
-                    break;
-                case CustomTargetType.Normal:
-                    mesh.normals = data.GetResultCustom(writeType, inPass, outPass, mesh.normals);
-                    break;
-                case CustomTargetType.Tangent:
-                    mesh.tangents = data.GetResultCustom(writeType, inPass, outPass, mesh.tangents);
                     break;
             }
         }

@@ -35,6 +35,7 @@ namespace ModEditor
                     return;
                 vertexView = value;
                 onVertexViewChange?.Invoke();
+                Repaint();
             }
         }
 
