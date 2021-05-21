@@ -9,8 +9,8 @@ using UnityEngine.Rendering;
 
 namespace ModEditor
 {
-    [EditorTool("ModEditor Tool")]
-    public class ModEditorTool : EditorTool
+    [EditorTool("ModEditor VertexBrush Tool")]
+    public class VertexBrushTool : EditorTool
     {
         static ModEditorWindow ModEditor => ModEditorWindow.Self;
 

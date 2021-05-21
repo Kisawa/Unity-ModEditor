@@ -98,6 +98,8 @@ namespace ModEditor
         {
             base.OnFocus();
             window.onSceneValidate += onSceneValidate;
+            EditorEvent.Use.OnKey.BackQuote.Down += BackQuote_Down;
+            EditorEvent.Use.OnKey.Tab.Down += Tab_Down;
             EditorEvent.OnMouse.DownLeft += OnMouse_DownLeft;
             EditorEvent.ShiftAndControl.OnMouse.DownLeft += OnMouse_DownLeft;
             EditorEvent.OnMouse.UpLeft += OnMouse_UpLeft;
@@ -170,6 +172,8 @@ namespace ModEditor
         {
             base.OnLostFocus();
             window.onSceneValidate -= onSceneValidate;
+            EditorEvent.Use.OnKey.BackQuote.Down -= BackQuote_Down;
+            EditorEvent.Use.OnKey.Tab.Down -= Tab_Down;
             EditorEvent.OnMouse.DownLeft -= OnMouse_DownLeft;
             EditorEvent.ShiftAndControl.OnMouse.DownLeft -= OnMouse_DownLeft;
             EditorEvent.OnMouse.UpLeft -= OnMouse_UpLeft;
@@ -243,7 +247,7 @@ namespace ModEditor
             EditorGUILayout.LabelField("Brush Scope View Color:", labelStyle, GUILayout.Width(window.position.width - 160));
             window.Manager.BrushScopeViewColor = EditorGUILayout.ColorField(window.Manager.BrushScopeViewColor, GUILayout.Width(80));
             EditorGUILayout.EndHorizontal();
-            if (window.VertexView && window.BrushLock && !BrushDisable())
+            if (window.ToolView && window.BrushLock && !BrushDisable())
             {
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.Space(15);
@@ -545,7 +549,7 @@ namespace ModEditor
 
         private void onSceneValidate(SceneView scene)
         {
-            if (!window.VertexView)
+            if (!window.ToolView)
                 return;
             if (window.SceneHandleType == SceneHandleType.None)
                 EditorGUIUtility.AddCursorRect(new Rect(0, 0, scene.position.width, scene.position.height), MouseCursor.CustomCursor);

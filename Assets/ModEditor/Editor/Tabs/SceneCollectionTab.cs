@@ -405,9 +405,13 @@ namespace ModEditor
             if(buffer != null)
                 buffer.Clear();
             window.ClearCalcShaderData();
-            if (window.camera == null || window.Manager.Target == null || window.Manager.TargetChildren.Count == 0)
+            if (window.camera == null)
                 return;
             updateMaterial();
+            if (window.TabType == ModEditorTabType.VertexBrush && window.ToolView)
+                buffer.DrawMesh(screenMesh, Matrix4x4.identity, window.Mat_Util, 0, 8);
+            if (window.Manager.Target == null || window.Manager.TargetChildren.Count == 0)
+                return;
             for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
             {
                 GameObject target = window.Manager.TargetChildren[i];
@@ -427,7 +431,7 @@ namespace ModEditor
                     subCount = skinnedMesh.sharedMesh.subMeshCount;
                 for (int j = 0; j < subCount; j++)
                 {
-                    if (window.Manager.GridView || window.Manager.UVView || window.Manager.VertexColorView || window.VertexView)
+                    if (window.Manager.GridView || window.Manager.UVView || window.Manager.VertexColorView || window.ToolView)
                         buffer.DrawRenderer(renderer, window.Mat_Util, j, 0);
                     if (window.Manager.NormalView)
                         buffer.DrawRenderer(renderer, window.Mat_Util, j, 1);
@@ -444,7 +448,7 @@ namespace ModEditor
                     if (window.Manager.NormalMapView)
                         buffer.DrawRenderer(renderer, window.Mat_Util, j, 7);
                 }
-                if (window.VertexView)
+                if (window.ToolView)
                 {
                     CalcShaderData.CalcVertexsData data = addCalcShaderRender(renderer, meshFilter);
                     if (data == null)
@@ -456,8 +460,6 @@ namespace ModEditor
                     }
                 }
             }
-            if (window.TabType == ModEditorTabType.VertexBrush && window.VertexView)
-                buffer.DrawMesh(screenMesh, Matrix4x4.identity, window.Mat_Util, 0, 8);
         }
 
         void updateMaterial()

@@ -145,7 +145,7 @@ namespace ModEditor
             CalcShader.SetInt("_OriginPass", (int)originPass);
             CalcShader.SetBuffer(kernel_Origin4To1, "_Origin4", _values);
             CalcShader.SetBuffer(kernel_Origin4To1, "RW_Result1", _result);
-            CalcShader.Dispatch(kernel_Origin4To1, Mathf.CeilToInt((float)values.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin4To1, Mathf.CeilToInt(values.Length / 1024f), 1, 1);
             _values.Dispose();
             return _result;
         }
@@ -158,7 +158,7 @@ namespace ModEditor
             CalcShader.SetInt("_OriginPass", (int)originPass);
             CalcShader.SetBuffer(kernel_Origin3To1, "_Origin3", _values);
             CalcShader.SetBuffer(kernel_Origin3To1, "RW_Result1", _result);
-            CalcShader.Dispatch(kernel_Origin3To1, Mathf.CeilToInt((float)values.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin3To1, Mathf.CeilToInt(values.Length / 1024f), 1, 1);
             _values.Dispose();
             return _result;
         }
@@ -171,7 +171,7 @@ namespace ModEditor
             CalcShader.SetInt("_OriginPass", (int)originPass);
             CalcShader.SetBuffer(kernel_Origin4To1, "_Origin4", _values);
             CalcShader.SetBuffer(kernel_Origin4To1, "RW_Result1", _result);
-            CalcShader.Dispatch(kernel_Origin4To1, Mathf.CeilToInt((float)values.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin4To1, Mathf.CeilToInt(values.Length / 1024f), 1, 1);
             _values.Dispose();
             return _result;
         }
@@ -182,7 +182,7 @@ namespace ModEditor
             CalcShader.SetInt("_OriginPass", (int)originPass);
             CalcShader.SetBuffer(kernel_Origin3To1, "_Origin3", _buffer3);
             CalcShader.SetBuffer(kernel_Origin3To1, "RW_Result1", _result);
-            CalcShader.Dispatch(kernel_Origin3To1, Mathf.CeilToInt((float)_buffer3.count / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin3To1, Mathf.CeilToInt(_buffer3.count / 1024f), 1, 1);
             return _result;
         }
 
@@ -192,7 +192,7 @@ namespace ModEditor
             CalcShader.SetInt("_OriginPass", (int)originPass);
             CalcShader.SetBuffer(kernel_Origin4To1, "_Origin4", _buffer4);
             CalcShader.SetBuffer(kernel_Origin4To1, "RW_Result1", _result);
-            CalcShader.Dispatch(kernel_Origin4To1, Mathf.CeilToInt((float)_buffer4.count / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin4To1, Mathf.CeilToInt(_buffer4.count / 1024f), 1, 1);
             return _result;
         }
 
@@ -204,7 +204,7 @@ namespace ModEditor
             CalcShader.SetInt("_ResultPass", -1);
             CalcShader.SetBuffer(kernel_Origin1To3, "_Origin1", _values);
             CalcShader.SetBuffer(kernel_Origin1To3, "RW_Result3", _result);
-            CalcShader.Dispatch(kernel_Origin1To3, Mathf.CeilToInt((float)values.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin1To3, Mathf.CeilToInt(values.Length / 1024f), 1, 1);
             _values.Dispose();
             return _result;
         }
@@ -215,7 +215,7 @@ namespace ModEditor
             CalcShader.SetInt("_ResultPass", -1);
             CalcShader.SetBuffer(kernel_Origin1To3, "_Origin1", _buffer1);
             CalcShader.SetBuffer(kernel_Origin1To3, "RW_Result3", _result);
-            CalcShader.Dispatch(kernel_Origin1To3, Mathf.CeilToInt((float)_buffer1.count / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin1To3, Mathf.CeilToInt(_buffer1.count / 1024f), 1, 1);
             return _result;
         }
 
@@ -228,7 +228,7 @@ namespace ModEditor
             CalcShader.SetInt("_ResultPass", -1);
             CalcShader.SetBuffer(kernel_Origin1To3, "_Origin1", _values);
             CalcShader.SetBuffer(kernel_Origin1To3, "RW_Result3", _result);
-            CalcShader.Dispatch(kernel_Origin1To3, Mathf.CeilToInt((float)values.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin1To3, Mathf.CeilToInt(values.Length / 1024f), 1, 1);
             _values.Dispose();
             return _result;
         }
@@ -238,7 +238,7 @@ namespace ModEditor
             CalcShader.SetInt("_ResultPass", -1);
             CalcShader.SetBuffer(kernel_Origin1To3, "_Origin1", _buffer1);
             CalcShader.SetBuffer(kernel_Origin1To3, "RW_Result3", _buffer3);
-            CalcShader.Dispatch(kernel_Origin1To3, Mathf.CeilToInt((float)_buffer1.count / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin1To3, Mathf.CeilToInt(_buffer1.count / 1024f), 1, 1);
         }
 
         public ComputeBuffer GetBuffer3(float[] values, TargetPassType resultPass)
@@ -249,7 +249,7 @@ namespace ModEditor
             CalcShader.SetInt("_ResultPass", (int)resultPass);
             CalcShader.SetBuffer(kernel_Origin1To3, "_Origin1", _values);
             CalcShader.SetBuffer(kernel_Origin1To3, "RW_Result3", _result);
-            CalcShader.Dispatch(kernel_Origin1To3, Mathf.CeilToInt((float)values.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin1To3, Mathf.CeilToInt(values.Length / 1024f), 1, 1);
             _values.Dispose();
             return _result;
         }
@@ -260,7 +260,7 @@ namespace ModEditor
             CalcShader.SetInt("_ResultPass", (int)resultPass);
             CalcShader.SetBuffer(kernel_Origin1To3, "_Origin1", _buffer1);
             CalcShader.SetBuffer(kernel_Origin1To3, "RW_Result3", _result);
-            CalcShader.Dispatch(kernel_Origin1To3, Mathf.CeilToInt((float)_buffer1.count / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin1To3, Mathf.CeilToInt(_buffer1.count / 1024f), 1, 1);
             return _result;
         }
 
@@ -273,7 +273,7 @@ namespace ModEditor
             CalcShader.SetInt("_ResultPass", (int)resultPass);
             CalcShader.SetBuffer(kernel_Origin1To3, "_Origin1", _values);
             CalcShader.SetBuffer(kernel_Origin1To3, "RW_Result3", _result);
-            CalcShader.Dispatch(kernel_Origin1To3, Mathf.CeilToInt((float)values.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin1To3, Mathf.CeilToInt(values.Length / 1024f), 1, 1);
             _values.Dispose();
             return _result;
         }
@@ -283,7 +283,7 @@ namespace ModEditor
             CalcShader.SetInt("_ResultPass", (int)resultPass);
             CalcShader.SetBuffer(kernel_Origin1To3, "_Origin1", _buffer1);
             CalcShader.SetBuffer(kernel_Origin1To3, "RW_Result3", _buffer3);
-            CalcShader.Dispatch(kernel_Origin1To3, Mathf.CeilToInt((float)_buffer1.count / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin1To3, Mathf.CeilToInt(_buffer1.count / 1024f), 1, 1);
         }
 
         public ComputeBuffer GetBuffer3(Vector3[] values)
@@ -301,7 +301,7 @@ namespace ModEditor
             CalcShader.SetInt("_ResultPass", -1);
             CalcShader.SetBuffer(kernel_Origin1To4, "_Origin1", _values);
             CalcShader.SetBuffer(kernel_Origin1To4, "RW_Result4", _result);
-            CalcShader.Dispatch(kernel_Origin1To4, Mathf.CeilToInt((float)values.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin1To4, Mathf.CeilToInt(values.Length / 1024f), 1, 1);
             _values.Dispose();
             return _result;
         }
@@ -312,7 +312,7 @@ namespace ModEditor
             CalcShader.SetInt("_ResultPass", -1);
             CalcShader.SetBuffer(kernel_Origin1To4, "_Origin1", _buffer1);
             CalcShader.SetBuffer(kernel_Origin1To4, "RW_Result4", _result);
-            CalcShader.Dispatch(kernel_Origin1To4, Mathf.CeilToInt((float)_buffer1.count / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin1To4, Mathf.CeilToInt(_buffer1.count / 1024f), 1, 1);
             return _result;
         }
 
@@ -325,7 +325,7 @@ namespace ModEditor
             CalcShader.SetInt("_ResultPass", -1);
             CalcShader.SetBuffer(kernel_Origin1To4, "_Origin1", _values);
             CalcShader.SetBuffer(kernel_Origin1To4, "RW_Result4", _result);
-            CalcShader.Dispatch(kernel_Origin1To4, Mathf.CeilToInt((float)values.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin1To4, Mathf.CeilToInt(values.Length / 1024f), 1, 1);
             _values.Dispose();
             return _result;
         }
@@ -339,7 +339,7 @@ namespace ModEditor
             CalcShader.SetInt("_ResultPass", -1);
             CalcShader.SetBuffer(kernel_Origin1To4, "_Origin1", _values);
             CalcShader.SetBuffer(kernel_Origin1To4, "RW_Result4", _result);
-            CalcShader.Dispatch(kernel_Origin1To4, Mathf.CeilToInt((float)values.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin1To4, Mathf.CeilToInt(values.Length / 1024f), 1, 1);
             _values.Dispose();
             return _result;
         }
@@ -349,7 +349,7 @@ namespace ModEditor
             CalcShader.SetInt("_ResultPass", -1);
             CalcShader.SetBuffer(kernel_Origin1To4, "_Origin1", _buffer1);
             CalcShader.SetBuffer(kernel_Origin1To4, "RW_Result4", _buffer4);
-            CalcShader.Dispatch(kernel_Origin1To4, Mathf.CeilToInt((float)_buffer4.count / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin1To4, Mathf.CeilToInt(_buffer4.count / 1024f), 1, 1);
         }
 
         public ComputeBuffer GetBuffer4(float[] values, TargetPassType resultPass)
@@ -360,7 +360,7 @@ namespace ModEditor
             CalcShader.SetInt("_ResultPass", (int)resultPass);
             CalcShader.SetBuffer(kernel_Origin1To4, "_Origin1", _values);
             CalcShader.SetBuffer(kernel_Origin1To4, "RW_Result4", _result);
-            CalcShader.Dispatch(kernel_Origin1To4, Mathf.CeilToInt((float)values.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin1To4, Mathf.CeilToInt(values.Length / 1024f), 1, 1);
             _values.Dispose();
             return _result;
         }
@@ -371,7 +371,7 @@ namespace ModEditor
             CalcShader.SetInt("_ResultPass", (int)resultPass);
             CalcShader.SetBuffer(kernel_Origin1To4, "_Origin1", _buffer1);
             CalcShader.SetBuffer(kernel_Origin1To4, "RW_Result4", _result);
-            CalcShader.Dispatch(kernel_Origin1To4, Mathf.CeilToInt((float)_buffer1.count / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin1To4, Mathf.CeilToInt(_buffer1.count / 1024f), 1, 1);
             return _result;
         }
 
@@ -384,7 +384,7 @@ namespace ModEditor
             CalcShader.SetInt("_ResultPass", (int)resultPass);
             CalcShader.SetBuffer(kernel_Origin1To4, "_Origin1", _values);
             CalcShader.SetBuffer(kernel_Origin1To4, "RW_Result4", _result);
-            CalcShader.Dispatch(kernel_Origin1To4, Mathf.CeilToInt((float)values.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin1To4, Mathf.CeilToInt(values.Length / 1024f), 1, 1);
             _values.Dispose();
             return _result;
         }
@@ -398,7 +398,7 @@ namespace ModEditor
             CalcShader.SetInt("_ResultPass", (int)resultPass);
             CalcShader.SetBuffer(kernel_Origin1To4, "_Origin1", _values);
             CalcShader.SetBuffer(kernel_Origin1To4, "RW_Result4", _result);
-            CalcShader.Dispatch(kernel_Origin1To4, Mathf.CeilToInt((float)values.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin1To4, Mathf.CeilToInt(values.Length / 1024f), 1, 1);
             _values.Dispose();
             return _result;
         }
@@ -408,7 +408,7 @@ namespace ModEditor
             CalcShader.SetInt("_ResultPass", (int)resultPass);
             CalcShader.SetBuffer(kernel_Origin1To4, "_Origin1", _buffer1);
             CalcShader.SetBuffer(kernel_Origin1To4, "RW_Result4", _buffer4);
-            CalcShader.Dispatch(kernel_Origin1To4, Mathf.CeilToInt((float)_buffer1.count / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin1To4, Mathf.CeilToInt(_buffer1.count / 1024f), 1, 1);
         }
 
         public ComputeBuffer GetBuffer4(Vector2[] values)
@@ -419,7 +419,7 @@ namespace ModEditor
             CalcShader.SetInt("_ResultPass", 0);
             CalcShader.SetBuffer(kernel_Origin2To4, "_Origin2", _values);
             CalcShader.SetBuffer(kernel_Origin2To4, "RW_Result4", _result);
-            CalcShader.Dispatch(kernel_Origin2To4, Mathf.CeilToInt((float)values.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin2To4, Mathf.CeilToInt(values.Length / 1024f), 1, 1);
             _values.Dispose();
             return _result;
         }
@@ -433,7 +433,7 @@ namespace ModEditor
             CalcShader.SetInt("_ResultPass", 0);
             CalcShader.SetBuffer(kernel_Origin2To4, "_Origin2", _values);
             CalcShader.SetBuffer(kernel_Origin2To4, "RW_Result4", _result);
-            CalcShader.Dispatch(kernel_Origin2To4, Mathf.CeilToInt((float)values.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin2To4, Mathf.CeilToInt(values.Length / 1024f), 1, 1);
             _values.Dispose();
             return _result;
         }
@@ -447,7 +447,7 @@ namespace ModEditor
             CalcShader.SetInt("_ResultPass", 0);
             CalcShader.SetBuffer(kernel_Origin2To4, "_Origin2", _values);
             CalcShader.SetBuffer(kernel_Origin2To4, "RW_Result4", _result);
-            CalcShader.Dispatch(kernel_Origin2To4, Mathf.CeilToInt((float)values.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin2To4, Mathf.CeilToInt(values.Length / 1024f), 1, 1);
             _values.Dispose();
             return _result;
         }
@@ -459,7 +459,7 @@ namespace ModEditor
             _values.SetData(values);
             CalcShader.SetBuffer(kernel_Origin3To4, "_Origin3", _values);
             CalcShader.SetBuffer(kernel_Origin3To4, "RW_Result4", _result);
-            CalcShader.Dispatch(kernel_Origin3To4, Mathf.CeilToInt((float)values.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin3To4, Mathf.CeilToInt(values.Length / 1024f), 1, 1);
             _values.Dispose();
             return _result;
         }
@@ -470,7 +470,7 @@ namespace ModEditor
             _values.SetData(values);
             CalcShader.SetBuffer(kernel_Origin3To4, "_Origin3", _values);
             CalcShader.SetBuffer(kernel_Origin3To4, "RW_Result4", _buffer4);
-            CalcShader.Dispatch(kernel_Origin3To4, Mathf.CeilToInt((float)values.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin3To4, Mathf.CeilToInt(values.Length / 1024f), 1, 1);
             _values.Dispose();
         }
 
@@ -479,7 +479,7 @@ namespace ModEditor
             ComputeBuffer _result = new ComputeBuffer(_buffer3.count, sizeof(float) * 4);
             CalcShader.SetBuffer(kernel_Origin3To4, "_Origin3", _buffer3);
             CalcShader.SetBuffer(kernel_Origin3To4, "RW_Result4", _result);
-            CalcShader.Dispatch(kernel_Origin3To4, Mathf.CeilToInt((float)_buffer3.count / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin3To4, Mathf.CeilToInt(_buffer3.count / 1024f), 1, 1);
             return _result;
         }
 
@@ -487,7 +487,7 @@ namespace ModEditor
         {
             CalcShader.SetBuffer(kernel_Origin3To4, "_Origin3", _buffer3);
             CalcShader.SetBuffer(kernel_Origin3To4, "RW_Result4", _buffer4);
-            CalcShader.Dispatch(kernel_Origin3To4, Mathf.CeilToInt((float)_buffer3.count / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin3To4, Mathf.CeilToInt(_buffer3.count / 1024f), 1, 1);
         }
 
         public ComputeBuffer GetBuffer4(Vector3[] values, Color[] origin)
@@ -498,7 +498,7 @@ namespace ModEditor
             _result.SetData(origin);
             CalcShader.SetBuffer(kernel_Origin3To4, "_Origin3", _values);
             CalcShader.SetBuffer(kernel_Origin3To4, "RW_Result4", _result);
-            CalcShader.Dispatch(kernel_Origin3To4, Mathf.CeilToInt((float)values.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin3To4, Mathf.CeilToInt(values.Length / 1024f), 1, 1);
             _values.Dispose();
             return _result;
         }
@@ -511,7 +511,7 @@ namespace ModEditor
             _result.SetData(origin);
             CalcShader.SetBuffer(kernel_Origin3To4, "_Origin3", _values);
             CalcShader.SetBuffer(kernel_Origin3To4, "RW_Result4", _result);
-            CalcShader.Dispatch(kernel_Origin3To4, Mathf.CeilToInt((float)values.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Origin3To4, Mathf.CeilToInt(values.Length / 1024f), 1, 1);
             _values.Dispose();
             return _result;
         }
@@ -611,7 +611,7 @@ namespace ModEditor
             ComputeBuffer RW_Result = new ComputeBuffer(origin.Length, sizeof(float) * 4);
             RW_Result.SetData(origin);
             CalcShader.SetBuffer(kernel_Result4, "RW_Result4", RW_Result);
-            CalcShader.Dispatch(kernel_Result4, Mathf.CeilToInt((float)RW_Result.count / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Result4, Mathf.CeilToInt(RW_Result.count / 1024f), 1, 1);
             RW_Result.GetData(origin);
             RW_Result.Dispose();
             if (clearSelect)
@@ -669,7 +669,7 @@ namespace ModEditor
             ComputeBuffer RW_Result = new ComputeBuffer(origin.Length, sizeof(float) * 3);
             RW_Result.SetData(origin);
             CalcShader.SetBuffer(kernel_Result3, "RW_Result3", RW_Result);
-            CalcShader.Dispatch(kernel_Result3, Mathf.CeilToInt((float)RW_Result.count / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Result3, Mathf.CeilToInt(RW_Result.count / 1024f), 1, 1);
             RW_Result.GetData(origin);
             RW_Result.Dispose();
             if (clearSelect)
@@ -727,7 +727,7 @@ namespace ModEditor
             ComputeBuffer RW_Result = new ComputeBuffer(origin.Length, sizeof(float) * 4);
             RW_Result.SetData(origin);
             CalcShader.SetBuffer(kernel_Result4, "RW_Result4", RW_Result);
-            CalcShader.Dispatch(kernel_Result4, Mathf.CeilToInt((float)RW_Result.count / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Result4, Mathf.CeilToInt(RW_Result.count / 1024f), 1, 1);
             RW_Result.GetData(origin);
             RW_Result.Dispose();
             if (clearSelect)
@@ -786,7 +786,7 @@ namespace ModEditor
             CalcShader.SetBuffer(kernel_Result1, "RW_Selects", _Select);
             CalcShader.SetBuffer(kernel_Result1, "_Origin4", values);
             CalcShader.SetBuffer(kernel_Result1, "RW_Result1", _buffer1);
-            CalcShader.Dispatch(kernel_Result1, Mathf.CeilToInt((float)origin.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Result1, Mathf.CeilToInt(origin.Length / 1024f), 1, 1);
             GetBuffer4_from1(_buffer1, _buffer4, outType);
             _buffer4.GetData(origin);
             _buffer4.Dispose();
@@ -847,7 +847,7 @@ namespace ModEditor
             CalcShader.SetBuffer(kernel_Result1, "RW_Selects", _Select);
             CalcShader.SetBuffer(kernel_Result1, "_Origin4", values);
             CalcShader.SetBuffer(kernel_Result1, "RW_Result1", _buffer1);
-            CalcShader.Dispatch(kernel_Result1, Mathf.CeilToInt((float)origin.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Result1, Mathf.CeilToInt(origin.Length / 1024f), 1, 1);
             GetBuffer3_from1(_buffer1, _buffer3, outType);
             _buffer3.GetData(origin);
             _buffer3.Dispose();
@@ -908,7 +908,7 @@ namespace ModEditor
             CalcShader.SetBuffer(kernel_Result1, "RW_Selects", _Select);
             CalcShader.SetBuffer(kernel_Result1, "_Origin4", values);
             CalcShader.SetBuffer(kernel_Result1, "RW_Result1", _buffer1);
-            CalcShader.Dispatch(kernel_Result1, Mathf.CeilToInt((float)origin.Length / 1024), 1, 1);
+            CalcShader.Dispatch(kernel_Result1, Mathf.CeilToInt(origin.Length / 1024f), 1, 1);
             GetBuffer4_from1(_buffer1, _buffer4, outType);
             _buffer4.GetData(origin);
             _buffer4.Dispose();

@@ -73,7 +73,7 @@ namespace ModEditor
 
         private void Window_onSceneValidate(SceneView obj)
         {
-            if (!available || !window.VertexView)
+            if (!available || !window.ToolView)
                 return;
             for (int i = 0; i < coord.Count; i++)
             {
@@ -167,7 +167,7 @@ namespace ModEditor
             if (targetTrans == null)
                 return;
             EditorGUILayout.BeginHorizontal();
-            if (window.VertexView)
+            if (window.ToolView)
             {
                 if (checkOriginMesh())
                 {

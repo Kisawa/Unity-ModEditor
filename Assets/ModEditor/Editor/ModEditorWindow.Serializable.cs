@@ -7,7 +7,7 @@ namespace ModEditor
 {
     public partial class ModEditorWindow
     {
-        void targetChanged_serializableRefresh()
+        void targetChanged_serializableData()
         {
             LocalRemapCoordClear();
             LocalRemapRotationClear();
@@ -17,6 +17,48 @@ namespace ModEditor
                 LocalRemapRotation[0] = Manager.Target.transform.rotation;
             }
         }
+
+        #region TextureBrushTab
+        [SerializeField]
+        bool textureBrushTabTextureView = false;
+        public bool TextureBrushTabTextureView
+        {
+            get => textureBrushTabTextureView;
+            set
+            {
+                if (value == textureBrushTabTextureView)
+                    return;
+                Undo.RecordObject(this, "TextureBrushTab TextureView Changed");
+                textureBrushTabTextureView = value;
+            }
+        }
+
+        public List<GameObject> TextureBrushTabBoardObj = new List<GameObject>();
+        public List<bool> TextureBrushTabBoardSwitchs = new List<bool>();
+        public bool TextureBrushTabBoardSwitchsCheck(GameObject obj)
+        {
+            int index = TextureBrushTabBoardObj.IndexOf(obj);
+            if (index == -1)
+            {
+                TextureBrushTabBoardObj.Add(obj);
+                TextureBrushTabBoardSwitchs.Add(true);
+                return true;
+            }
+            else
+                return TextureBrushTabBoardSwitchs[index];
+        }
+        public void TextureBrushTabBoardSwitchsSet(GameObject obj, bool res)
+        {
+            int index = TextureBrushTabBoardObj.IndexOf(obj);
+            if (index > -1)
+            {
+                if (TextureBrushTabBoardSwitchs[index] == res)
+                    return;
+                Undo.RecordObject(this, "TextureBrushTab BoardSwitchs Changed");
+                TextureBrushTabBoardSwitchs[index] = res;
+            }
+        }
+        #endregion
 
         #region Copy
         [SerializeField]

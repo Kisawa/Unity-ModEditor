@@ -177,7 +177,7 @@ namespace ModEditor
             if (toggleOnContent == null)
                 toggleOnContent = EditorGUIUtility.IconContent("ShurikenToggleFocusedOn");
             refreshWindow();
-            targetChanged_serializableRefresh();
+            targetChanged_serializableData();
 
             for (int i = 0; i < tabs.Count; i++)
                 tabs[i].OnEnable();
@@ -236,7 +236,7 @@ namespace ModEditor
                     refreshObjDic();
                     if (pre != Manager.Target)
                     {
-                        targetChanged_serializableRefresh();
+                        targetChanged_serializableData();
                         onTargetChanged?.Invoke(Manager.Target);
                     }
                 }
@@ -283,7 +283,7 @@ namespace ModEditor
                 refreshObjDic();
                 if (pre != Manager.Target)
                 {
-                    targetChanged_serializableRefresh();
+                    targetChanged_serializableData();
                     onTargetChanged?.Invoke(Manager.Target);
                 }
             }

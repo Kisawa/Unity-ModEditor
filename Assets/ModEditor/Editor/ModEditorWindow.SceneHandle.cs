@@ -25,15 +25,15 @@ namespace ModEditor
             }
         }
 
-        bool vertexView;
-        public bool VertexView
+        bool toolView;
+        public bool ToolView
         {
-            get => vertexView;
+            get => toolView;
             set
             {
-                if (vertexView == value)
+                if (toolView == value)
                     return;
-                vertexView = value;
+                toolView = value;
                 onVertexViewChange?.Invoke();
                 Repaint();
             }
@@ -74,15 +74,11 @@ namespace ModEditor
         void registerEvent()
         {
             Key.ControlOrAltStateChange += Key_ControlOrAltStateChange;
-            EditorEvent.Use.OnKey.Tab.Down += Tab_Down;
-            EditorEvent.Use.OnKey.BackQuote.Down += BackQuote_Down;
         }
 
         void logoutEvent()
         {
             Key.ControlOrAltStateChange -= Key_ControlOrAltStateChange;
-            EditorEvent.Use.OnKey.Tab.Down -= Tab_Down;
-            EditorEvent.Use.OnKey.BackQuote.Down -= BackQuote_Down;
         }
 
         private void Key_ControlOrAltStateChange(bool obj)
@@ -90,21 +86,10 @@ namespace ModEditor
             SceneHandleType = obj ? SceneHandleType.Ready : SceneHandleType.None;
         }
 
-        private void BackQuote_Down()
-        {
-            Tools.current = Tool.Custom;
-        }
-
-        private void Tab_Down()
-        {
-            if(VertexView)
-                Manager.VertexWithZTest = !Manager.VertexWithZTest;
-        }
-
         private void duringSceneGui(SceneView obj)
         {
             camera = obj.camera;
-            VertexView = Tools.current == Tool.Custom;
+            ToolView = Tools.current == Tool.Custom;
             EditorEvent.Update(Event.current, camera);
             viewHandle(obj);
             onSceneValidate?.Invoke(obj);

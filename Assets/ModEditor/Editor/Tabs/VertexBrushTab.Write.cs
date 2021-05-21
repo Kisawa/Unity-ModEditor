@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Collections;
 using Unity.Jobs;
+using UnityEditor;
 using UnityEngine;
 
 namespace ModEditor
@@ -39,11 +40,22 @@ namespace ModEditor
                 objInOperation.Clear();
         }
 
+        private void BackQuote_Down()
+        {
+            Tools.current = Tool.Custom;
+        }
+
+        private void Tab_Down()
+        {
+            if (window.ToolView)
+                window.Manager.VertexWithZTest = !window.Manager.VertexWithZTest;
+        }
+
         private void OnMouse_DownLeft()
         {
             if (window.OnSceneGUI)
                 return;
-            if (window.VertexView && !BrushDisable())
+            if (window.ToolView && !BrushDisable())
             {
                 RecordObjInOperation();
                 BrushWrite();
@@ -61,13 +73,13 @@ namespace ModEditor
         {
             if (window.OnSceneGUI)
                 return;
-            if (window.VertexView && !BrushDisable())
+            if (window.ToolView && !BrushDisable())
                 BrushWrite();
         }
 
         private void Alt_OnScrollWheel_Roll(float obj)
         {
-            if (window.OnSceneGUI || !window.VertexView)
+            if (window.OnSceneGUI || !window.ToolView)
                 return;
             for (int i = 0; i < window.CalcShaderDatas.Count; i++)
                 window.CalcShaderDatas[i].SpreadSelects(obj < 0);
@@ -91,7 +103,7 @@ namespace ModEditor
 
         private void Space_Down()
         {
-            if (!window.VertexView || window.BrushLock)
+            if (!window.ToolView || window.BrushLock)
                 return;
             float depth = float.MaxValue;
             for (int i = 0; i < window.CalcShaderDatas.Count; i++)
@@ -121,7 +133,7 @@ namespace ModEditor
 
         private void Control_OnMouse_DragLeft()
         {
-            if (!window.VertexView || window.BrushLock)
+            if (!window.ToolView || window.BrushLock)
                 return;
             window.Manager.BrushSize += Event.current.delta.x * 0.01f;
             window.SceneHandleType = SceneHandleType.BrushSize;
@@ -129,7 +141,7 @@ namespace ModEditor
 
         private void Control_OnScrollWheel_Roll(float obj)
         {
-            if (!window.VertexView || window.BrushLock)
+            if (!window.ToolView || window.BrushLock)
                 return;
             window.Manager.BrushDepth -= Event.current.delta.y * 0.01f;
             window.SceneHandleType = SceneHandleType.BrushDepth;
