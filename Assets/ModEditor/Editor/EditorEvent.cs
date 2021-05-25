@@ -8,28 +8,31 @@ namespace ModEditor
 {
     public static class EditorEvent
     {
-        public static OnKey OnKey = new OnKey();
+        public static Camera Camera { get; private set; }
 
-        public static OnMouse OnMouse = new OnMouse();
+        public static OnKey OnKey { get; } = new OnKey();
 
-        public static OnScrollWheel OnScrollWheel = new OnScrollWheel();
+        public static OnMouse OnMouse { get; } = new OnMouse();
 
-        public static Control Control = new Control();
+        public static OnScrollWheel OnScrollWheel { get; } = new OnScrollWheel();
 
-        public static Alt Alt = new Alt();
+        public static Control Control { get; } = new Control();
 
-        public static ControlAndAlt ControlAndAlt = new ControlAndAlt();
+        public static Alt Alt { get; } = new Alt();
 
-        public static Shift Shift = new Shift();
+        public static ControlAndAlt ControlAndAlt { get; } = new ControlAndAlt();
 
-        public static ShiftAndAlt ShiftAndAlt = new ShiftAndAlt();
+        public static Shift Shift { get; } = new Shift();
 
-        public static ShiftAndControl ShiftAndControl = new ShiftAndControl();
+        public static ShiftAndAlt ShiftAndAlt { get; } = new ShiftAndAlt();
 
-        public static ShiftAndControlAndAlt ShiftAndControlAndAlt = new ShiftAndControlAndAlt();
+        public static ShiftAndControl ShiftAndControl { get; } = new ShiftAndControl();
+
+        public static ShiftAndControlAndAlt ShiftAndControlAndAlt { get; } = new ShiftAndControlAndAlt();
 
         public static void Update(Event @event, Camera camera)
         {
+            Camera = camera;
             Key.UpdateControlState(@event.control);
             Key.UpdateAltState(@event.alt);
             Key.UpdateControlAndAltState(@event.control && @event.alt);
@@ -1897,25 +1900,25 @@ namespace ModEditor
 
         public static class Use
         {
-            public static OnKey OnKey = new OnKey();
+            public static OnKey OnKey { get; } = new OnKey();
 
-            public static OnMouse OnMouse = new OnMouse();
+            public static OnMouse OnMouse { get; } = new OnMouse();
 
-            public static OnScrollWheel OnScrollWheel = new OnScrollWheel();
+            public static OnScrollWheel OnScrollWheel { get; } = new OnScrollWheel();
 
-            public static Control Control = new Control();
+            public static Control Control { get; } = new Control();
 
-            public static Alt Alt = new Alt();
+            public static Alt Alt { get; } = new Alt();
 
-            public static ControlAndAlt ControlAndAlt = new ControlAndAlt();
+            public static ControlAndAlt ControlAndAlt { get; } = new ControlAndAlt();
 
-            public static Shift Shift = new Shift();
+            public static Shift Shift { get; } = new Shift();
 
-            public static ShiftAndAlt ShiftAndAlt = new ShiftAndAlt();
+            public static ShiftAndAlt ShiftAndAlt { get; } = new ShiftAndAlt();
 
-            public static ShiftAndControl ShiftAndControl = new ShiftAndControl();
+            public static ShiftAndControl ShiftAndControl { get; } = new ShiftAndControl();
 
-            public static ShiftAndControlAndAlt ShiftAndControlAndAlt = new ShiftAndControlAndAlt();
+            public static ShiftAndControlAndAlt ShiftAndControlAndAlt { get; } = new ShiftAndControlAndAlt();
         }
     }
 
@@ -2032,29 +2035,29 @@ namespace ModEditor
 
     public class OnKey
     {
-        public Key.Key_Tab Tab = new Key.Key_Tab();
+        public Key.Key_Tab Tab { get; } = new Key.Key_Tab();
 
-        public Key.Key_BackQuote BackQuote = new Key.Key_BackQuote();
+        public Key.Key_BackQuote BackQuote { get; } = new Key.Key_BackQuote();
 
-        public Key.Key_Space Space = new Key.Key_Space();
+        public Key.Key_Space Space { get; } = new Key.Key_Space();
 
-        public Key.Key_CapsLock CapsLock = new Key.Key_CapsLock();
+        public Key.Key_CapsLock CapsLock { get; } = new Key.Key_CapsLock();
 
-        public Key.Key_V V = new Key.Key_V();
+        public Key.Key_V V { get; } = new Key.Key_V();
 
-        public Key.Key_Q Q = new Key.Key_Q();
+        public Key.Key_Q Q { get; } = new Key.Key_Q();
 
-        public Key.Key_E E = new Key.Key_E();
+        public Key.Key_E E { get; } = new Key.Key_E();
 
-        public Key.Key_A A = new Key.Key_A();
+        public Key.Key_A A { get; } = new Key.Key_A();
 
-        public Key.Key_D D = new Key.Key_D();
+        public Key.Key_D D { get; } = new Key.Key_D();
 
-        public Key.Key_Z Z = new Key.Key_Z();
+        public Key.Key_Z Z { get; } = new Key.Key_Z();
 
-        public Key.Key_C C = new Key.Key_C();
+        public Key.Key_C C { get; } = new Key.Key_C();
 
-        public Key.Key_Enter Enter = new Key.Key_Enter();
+        public Key.Key_Enter Enter { get; } = new Key.Key_Enter();
     }
 
     public static class Mouse
@@ -2165,7 +2168,7 @@ namespace ModEditor
 
     public static class ScrollWheel
     {
-        public static bool Is { get; set; }
+        public static bool Is { get; private set; }
         public static event Action Update;
         public static void UpdateScrollWheelState(bool res)
         {
@@ -2189,64 +2192,64 @@ namespace ModEditor
 
     public class Control
     {
-        public OnKey OnKey = new OnKey();
+        public OnKey OnKey { get; } = new OnKey();
 
-        public OnMouse OnMouse = new OnMouse();
+        public OnMouse OnMouse { get; } = new OnMouse();
 
-        public OnScrollWheel OnScrollWheel = new OnScrollWheel();
+        public OnScrollWheel OnScrollWheel { get; } = new OnScrollWheel();
     }
 
     public class Alt
     {
-        public OnKey OnKey = new OnKey();
+        public OnKey OnKey { get; } = new OnKey();
 
-        public OnMouse OnMouse = new OnMouse();
+        public OnMouse OnMouse { get; } = new OnMouse();
 
-        public OnScrollWheel OnScrollWheel = new OnScrollWheel();
+        public OnScrollWheel OnScrollWheel { get; } = new OnScrollWheel();
     }
 
     public class ControlAndAlt
     {
-        public OnKey OnKey = new OnKey();
+        public OnKey OnKey { get; } = new OnKey();
 
-        public OnMouse OnMouse = new OnMouse();
+        public OnMouse OnMouse { get; } = new OnMouse();
 
-        public OnScrollWheel OnScrollWheel = new OnScrollWheel();
+        public OnScrollWheel OnScrollWheel { get; } = new OnScrollWheel();
     }
 
     public class Shift
     {
-        public OnKey OnKey = new OnKey();
+        public OnKey OnKey { get; } = new OnKey();
 
-        public OnMouse OnMouse = new OnMouse();
+        public OnMouse OnMouse { get; } = new OnMouse();
 
-        public OnScrollWheel OnScrollWheel = new OnScrollWheel();
+        public OnScrollWheel OnScrollWheel { get; } = new OnScrollWheel();
     }
 
     public class ShiftAndAlt
     {
-        public OnKey OnKey = new OnKey();
+        public OnKey OnKey { get; } = new OnKey();
 
-        public OnMouse OnMouse = new OnMouse();
+        public OnMouse OnMouse { get; } = new OnMouse();
 
-        public OnScrollWheel OnScrollWheel = new OnScrollWheel();
+        public OnScrollWheel OnScrollWheel { get; } = new OnScrollWheel();
     }
 
     public class ShiftAndControl
     {
-        public OnKey OnKey = new OnKey();
+        public OnKey OnKey { get; } = new OnKey();
 
-        public OnMouse OnMouse = new OnMouse();
+        public OnMouse OnMouse { get; } = new OnMouse();
 
-        public OnScrollWheel OnScrollWheel = new OnScrollWheel();
+        public OnScrollWheel OnScrollWheel { get; } = new OnScrollWheel();
     }
 
     public class ShiftAndControlAndAlt
     {
-        public OnKey OnKey = new OnKey();
+        public OnKey OnKey { get; } = new OnKey();
 
-        public OnMouse OnMouse = new OnMouse();
+        public OnMouse OnMouse { get; } = new OnMouse();
 
-        public OnScrollWheel OnScrollWheel = new OnScrollWheel();
+        public OnScrollWheel OnScrollWheel { get; } = new OnScrollWheel();
     }
 }

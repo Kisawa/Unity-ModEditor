@@ -12,6 +12,9 @@ void LocalMix(uint3 id : SV_DispatchThreadID)
 	float3 vertex = _Vertex[id.x];
 	float3 relativeVertex = mul(_WorldToLocal, float4(_RelativeWorldPos, 1)).xyz;
 	mix = normalize(mix + vertex - relativeVertex);
+	bool nan = isnan(mix);
+	if(nan)
+		mix = 0;
 	RW_Mix[id.x] = mix;
 }
 

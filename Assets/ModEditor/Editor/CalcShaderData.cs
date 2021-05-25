@@ -78,9 +78,9 @@ namespace ModEditor
                 if (!IsAvailable)
                 {
                     Clear();
-                    return ModEditorConstants.BrushMaxDepth;
+                    return ModEditorConstants.VertexBrushMaxDepth;
                 }
-                Update(camera, mouseTexcoord, brushSize, ModEditorConstants.BrushMaxDepth);
+                Update(camera, mouseTexcoord, brushSize, ModEditorConstants.VertexBrushMaxDepth);
                 float[] _depths = new float[Cache.RW_Depths.count];
                 Cache.RW_Depths.GetData(_depths);
                 float[] _selects = new float[Cache.RW_Selects.count];
@@ -89,7 +89,7 @@ namespace ModEditor
                 {
                     nums = new NativeArray<float>(_depths, Allocator.TempJob),
                     selects = new NativeArray<float>(_selects, Allocator.TempJob),
-                    min = new NativeArray<float>(new float[] { ModEditorConstants.BrushMaxDepth }, Allocator.TempJob)
+                    min = new NativeArray<float>(new float[] { ModEditorConstants.VertexBrushMaxDepth }, Allocator.TempJob)
                 };
                 JobHandle jobHandle = job.Schedule();
                 jobHandle.Complete();
@@ -338,7 +338,7 @@ namespace ModEditor
                 CalcUtil.Self.CalcShader.SetMatrix("_P", GL.GetGPUProjectionMatrix(camera.projectionMatrix, false));
                 CalcUtil.Self.CalcShader.SetInt("_ClearSpread", clearSpread ? 1 : 0);
                 CalcUtil.Self.CalcShader.SetInt("_OnlyZone", Key.Shift ? 1 : 0);
-                CalcUtil.Self.CalcShader.SetInt("_ZoneInSelect", ModEditor.ZoneLock && Key.ShiftAndControl ? 1 : 0);
+                CalcUtil.Self.CalcShader.SetInt("_ZoneInSelect", ModEditor.VertexZoneLock && Key.ShiftAndControl ? 1 : 0);
                 CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "_Vertices", _Vertices);
                 CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "RW_Selects", Cache.RW_Selects);
                 CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "RW_Depths", Cache.RW_Depths);
@@ -370,7 +370,7 @@ namespace ModEditor
                 CalcUtil.Self.CalcShader.SetMatrix("_P", GL.GetGPUProjectionMatrix(camera.projectionMatrix, false));
                 CalcUtil.Self.CalcShader.SetInt("_ClearSpread", clearSpread ? 1 : 0);
                 CalcUtil.Self.CalcShader.SetInt("_OnlyZone", Key.Shift ? 1 : 0);
-                CalcUtil.Self.CalcShader.SetInt("_ZoneInSelect", ModEditor.ZoneLock && Key.ShiftAndControl ? 1 : 0);
+                CalcUtil.Self.CalcShader.SetInt("_ZoneInSelect", ModEditor.VertexZoneLock && Key.ShiftAndControl ? 1 : 0);
                 CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "_Vertices", _Vertices);
                 CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "RW_Selects", Cache.RW_Selects);
                 CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "RW_Depths", Cache.RW_Depths);

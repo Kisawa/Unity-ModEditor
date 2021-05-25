@@ -87,7 +87,7 @@ namespace ModEditor
 
         private void Shift_OnMouse_Left()
         {
-            if (window.OnSceneGUI || !window.ZoneLock || window.BrushLock)
+            if (window.OnSceneGUI || !window.VertexZoneLock || window.VertexBrushLock)
                 return;
             for (int i = 0; i < window.CalcShaderDatas.Count; i++)
                 window.CalcShaderDatas[i].AddZoneFromSelect();
@@ -95,7 +95,7 @@ namespace ModEditor
 
         private void Shift_OnMouse_Right()
         {
-            if (window.OnSceneGUI || !window.ZoneLock || window.BrushLock)
+            if (window.OnSceneGUI || !window.VertexZoneLock || window.VertexBrushLock)
                 return;
             for (int i = 0; i < window.CalcShaderDatas.Count; i++)
                 window.CalcShaderDatas[i].SubZoneFromSelect();
@@ -103,53 +103,53 @@ namespace ModEditor
 
         private void Space_Down()
         {
-            if (!window.ToolView || window.BrushLock)
+            if (!window.ToolView || window.VertexBrushLock)
                 return;
             float depth = float.MaxValue;
             for (int i = 0; i < window.CalcShaderDatas.Count; i++)
             {
-                float _depth = window.CalcShaderDatas[i].GetMinDepth(window.camera, Mouse.ScreenTexcoord, window.Manager.BrushSize);
+                float _depth = window.CalcShaderDatas[i].GetMinDepth(window.camera, Mouse.ScreenTexcoord, window.Manager.VertexBrushSize);
                 if (depth > _depth)
                     depth = _depth;
             }
-            window.Manager.BrushDepth = depth + 0.0001f;
+            window.Manager.VertexBrushDepth = depth + 0.0001f;
             Mouse_Update();
         }
 
         private void CapsLock_Down()
         {
-            if (window.BrushLock)
+            if (window.VertexBrushLock)
                 return;
-            window.ZoneLock = !window.ZoneLock;
+            window.VertexZoneLock = !window.VertexZoneLock;
             for (int i = 0; i < window.CalcShaderDatas.Count; i++)
-                window.CalcShaderDatas[i].LockZoneFromSelect(window.ZoneLock);
+                window.CalcShaderDatas[i].LockZoneFromSelect(window.VertexZoneLock);
         }
 
         private void Alt_CapsLock_Down()
         {
-            window.BrushLock = !window.BrushLock;
+            window.VertexBrushLock = !window.VertexBrushLock;
             Repaint();
         }
 
         private void Control_OnMouse_DragLeft()
         {
-            if (!window.ToolView || window.BrushLock)
+            if (!window.ToolView || window.VertexBrushLock)
                 return;
-            window.Manager.BrushSize += Event.current.delta.x * 0.01f;
+            window.Manager.VertexBrushSize += Event.current.delta.x * 0.01f;
             window.SceneHandleType = SceneHandleType.BrushSize;
         }
 
         private void Control_OnScrollWheel_Roll(float obj)
         {
-            if (!window.ToolView || window.BrushLock)
+            if (!window.ToolView || window.VertexBrushLock)
                 return;
-            window.Manager.BrushDepth -= Event.current.delta.y * 0.01f;
+            window.Manager.VertexBrushDepth -= Event.current.delta.y * 0.01f;
             window.SceneHandleType = SceneHandleType.BrushDepth;
         }
 
         private void Mouse_Update()
         {
-            if (Mouse.IsButton || window.BrushLock)
+            if (Mouse.IsButton || window.VertexBrushLock)
                 return;
             for (int i = 0; i < window.CalcShaderDatas.Count; i++)
                 window.CalcShaderDatas[i].ClearSpread();
@@ -157,7 +157,7 @@ namespace ModEditor
 
         private void ScrollWheel_Update()
         {
-            if (Key.Alt || window.BrushLock)
+            if (Key.Alt || window.VertexBrushLock)
                 return;
             for (int i = 0; i < window.CalcShaderDatas.Count; i++)
                 window.CalcShaderDatas[i].ClearSpread();
@@ -172,7 +172,7 @@ namespace ModEditor
         {
             if (window.Manager.VertexBrushType == VertexBrushType.TwoColorGradient)
             {
-                window.Manager.BrushColorToStep += 0.01f;
+                window.Manager.VertexBrushColorToStep += 0.01f;
                 Repaint();
             }
         }
@@ -181,7 +181,7 @@ namespace ModEditor
         {
             if (window.Manager.VertexBrushType == VertexBrushType.TwoColorGradient)
             {
-                window.Manager.BrushColorToStep -= 0.01f;
+                window.Manager.VertexBrushColorToStep -= 0.01f;
                 Repaint();
             }
         }
@@ -190,7 +190,7 @@ namespace ModEditor
         {
             if (window.Manager.VertexBrushType == VertexBrushType.TwoColorGradient)
             {
-                window.Manager.BrushColorFromStep += 0.01f;
+                window.Manager.VertexBrushColorFromStep += 0.01f;
                 Repaint();
             }
         }
@@ -199,7 +199,7 @@ namespace ModEditor
         {
             if (window.Manager.VertexBrushType == VertexBrushType.TwoColorGradient)
             {
-                window.Manager.BrushColorFromStep -= 0.01f;
+                window.Manager.VertexBrushColorFromStep -= 0.01f;
                 Repaint();
             }
         }
@@ -242,10 +242,10 @@ namespace ModEditor
                     switch (window.Manager.VertexBrushType)
                     {
                         case VertexBrushType.Color:
-                            data.Cala(window.Manager.BrushColor, window.Manager.BrushStrength);
+                            data.Cala(window.Manager.VertexBrushColor, window.Manager.VertexBrushStrength);
                             break;
                         case VertexBrushType.TwoColorGradient:
-                            data.Cala(window.Manager.BrushColorFrom, window.Manager.BrushColorTo, window.Manager.BrushColorFromStep, window.Manager.BrushColorToStep, window.Manager.BrushStrength);
+                            data.Cala(window.Manager.VertexBrushColorFrom, window.Manager.VertexBrushColorTo, window.Manager.VertexBrushColorFromStep, window.Manager.VertexBrushColorToStep, window.Manager.VertexBrushStrength);
                             break;
                     }
                     WriteType writeType = window.Manager.WriteType;

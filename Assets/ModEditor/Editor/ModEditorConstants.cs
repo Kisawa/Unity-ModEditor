@@ -6,6 +6,6 @@ namespace ModEditor
 {
     public static class ModEditorConstants
     {
-        public static readonly float BrushMaxDepth = 20;
+        public static readonly float VertexBrushMaxDepth = 20;
     }
 }

@@ -468,18 +468,18 @@ namespace ModEditor
         }
         #endregion
 
-        #region Brush
+        #region VertexBrush
         [SerializeField]
-        bool brushUnfold = true;
-        public bool BrushUnfold
+        bool vertexBrushUnfold = true;
+        public bool VertexBrushUnfold
         {
-            get => brushUnfold;
+            get => vertexBrushUnfold;
             set
             {
-                if (value == brushUnfold)
+                if (value == vertexBrushUnfold)
                     return;
-                Undo.RecordObject(this, "ModEditor BrushUnfold");
-                brushUnfold = value;
+                Undo.RecordObject(this, "ModEditor VertexBrushUnfold");
+                vertexBrushUnfold = value;
             }
         }
 
@@ -498,142 +498,142 @@ namespace ModEditor
         }
 
         [SerializeField]
-        float brushStrength = 1;
-        public float BrushStrength
+        float vertexBrushStrength = 1;
+        public float VertexBrushStrength
         {
-            get => brushStrength;
+            get => vertexBrushStrength;
             set
             {
-                if (value == brushStrength)
+                if (value == vertexBrushStrength)
                     return;
-                Undo.RecordObject(this, "ModEditor BrushStrength");
-                brushStrength = value;
+                Undo.RecordObject(this, "ModEditor VertexBrushStrength");
+                vertexBrushStrength = value;
             }
         }
 
         [SerializeField]
-        Color brushColor = Color.white;
-        public Color BrushColor
+        Color vertexBrushColor = Color.white;
+        public Color VertexBrushColor
         {
-            get => brushColor;
+            get => vertexBrushColor;
             set
             {
-                if (value == brushColor)
+                if (value == vertexBrushColor)
                     return;
-                Undo.RecordObject(this, "ModEditor BrushColor");
-                brushColor = value;
+                Undo.RecordObject(this, "ModEditor VertexBrushColor");
+                vertexBrushColor = value;
             }
         }
 
         [SerializeField]
-        Color brushColorFrom = Color.red;
-        public Color BrushColorFrom
+        Color vertexBrushColorFrom = Color.red;
+        public Color VertexBrushColorFrom
         {
-            get => brushColorFrom;
+            get => vertexBrushColorFrom;
             set
             {
-                if (value == brushColorFrom)
+                if (value == vertexBrushColorFrom)
                     return;
-                Undo.RecordObject(this, "ModEditor BrushColorFrom");
-                brushColorFrom = value;
+                Undo.RecordObject(this, "ModEditor VertexBrushColorFrom");
+                vertexBrushColorFrom = value;
             }
         }
 
         [SerializeField]
-        float brushColorFromStep = 0;
-        public float BrushColorFromStep
+        float vertexBrushColorFromStep = 0;
+        public float VertexBrushColorFromStep
         {
-            get => brushColorFromStep;
+            get => vertexBrushColorFromStep;
             set
             {
                 if (value < 0)
                     value = 0;
-                if (value > brushColorToStep - 0.001f)
-                    value = brushColorToStep - 0.001f;
-                if (value == brushColorFromStep)
+                if (value > vertexBrushColorToStep - 0.001f)
+                    value = vertexBrushColorToStep - 0.001f;
+                if (value == vertexBrushColorFromStep)
                     return;
-                Undo.RecordObject(this, "ModEditor BrushColorFromStep");
-                brushColorFromStep = value;
+                Undo.RecordObject(this, "ModEditor VertexBrushColorFromStep");
+                vertexBrushColorFromStep = value;
             }
         }
 
         [SerializeField]
-        Color brushColorTo = Color.red;
-        public Color BrushColorTo
+        Color vertexBrushColorTo = Color.red;
+        public Color VertexBrushColorTo
         {
-            get => brushColorTo;
+            get => vertexBrushColorTo;
             set
             {
-                if (value == brushColorTo)
+                if (value == vertexBrushColorTo)
                     return;
-                Undo.RecordObject(this, "ModEditor BrushColorTo");
-                brushColorTo = value;
+                Undo.RecordObject(this, "ModEditor VertexBrushColorTo");
+                vertexBrushColorTo = value;
             }
         }
 
         [SerializeField]
-        float brushColorToStep = 1;
-        public float BrushColorToStep
+        float vertexBrushColorToStep = 1;
+        public float VertexBrushColorToStep
         {
-            get => brushColorToStep;
+            get => vertexBrushColorToStep;
             set
             {
-                if (value < brushColorFromStep + 0.001f)
-                    value = brushColorFromStep + 0.001f;
+                if (value < vertexBrushColorFromStep + 0.001f)
+                    value = vertexBrushColorFromStep + 0.001f;
                 if (value > 1)
                     value = 1;
-                if (value == brushColorToStep)
+                if (value == vertexBrushColorToStep)
                     return;
-                Undo.RecordObject(this, "ModEditor BrushColorToStep");
-                brushColorToStep = value;
+                Undo.RecordObject(this, "ModEditor VertexBrushColorToStep");
+                vertexBrushColorToStep = value;
             }
         }
 
         [SerializeField]
-        Color brushViewColor = Color.black * 0.3f;
-        public Color BrushScopeViewColor
+        Color vertexBrushViewColor = Color.black * 0.3f;
+        public Color VertexBrushScopeViewColor
         {
-            get => brushViewColor;
+            get => vertexBrushViewColor;
             set
             {
-                if (value == brushViewColor)
+                if (value == vertexBrushViewColor)
                     return;
-                Undo.RecordObject(this, "ModEditor BrushSelectViewColor");
-                brushViewColor = value;
+                Undo.RecordObject(this, "ModEditor VertexBrushScopeViewColor");
+                vertexBrushViewColor = value;
             }
         }
 
         [SerializeField]
-        float brushSize = 0.05f;
-        public float BrushSize
+        float vertexBrushSize = 0.05f;
+        public float VertexBrushSize
         {
-            get => brushSize;
+            get => vertexBrushSize;
             set
             {
-                if (value == brushSize)
+                if (value == vertexBrushSize)
                     return;
                 if (value < 0.01 || value > 0.5)
                     return;
-                Undo.RecordObject(this, "ModEditor BrushSize");
-                brushSize = value;
+                Undo.RecordObject(this, "ModEditor VertexBrushSize");
+                vertexBrushSize = value;
             }
         }
 
         [SerializeField]
-        float brushDepth = 10;
-        public float BrushDepth
+        float vertexBrushDepth = 10;
+        public float VertexBrushDepth
         {
-            get => brushDepth;
+            get => vertexBrushDepth;
             set
             {
-                if (value == brushDepth)
+                if (value == vertexBrushDepth)
                     return;
                 if (value < 0)
                     value = 0;
-                if (value > ModEditorConstants.BrushMaxDepth)
-                    value = ModEditorConstants.BrushMaxDepth;
-                Undo.RecordObject(this, "ModEditor BrushDepth");
-                brushDepth = value;
+                if (value > ModEditorConstants.VertexBrushMaxDepth)
+                    value = ModEditorConstants.VertexBrushMaxDepth;
+                Undo.RecordObject(this, "ModEditor VertexBrushDepth");
+                vertexBrushDepth = value;
             }
         }
         #endregion
@@ -840,6 +840,36 @@ namespace ModEditor
                     return;
                 Undo.RecordObject(this, "ModEditor BrushUtilIndex");
                 brushUtilIndex = value;
+            }
+        }
+        #endregion
+
+        #region TextureBrush
+        [SerializeField]
+        Color textureBaseColor = Color.clear;
+        public Color TextureBaseColor
+        {
+            get => textureBaseColor;
+            set
+            {
+                if (value == textureBaseColor)
+                    return;
+                Undo.RecordObject(this, "ModEditor TextureBaseColor");
+                textureBaseColor = value;
+            }
+        }
+
+        [SerializeField]
+        Color textureBrushColor = Color.white;
+        public Color TextureBrushColor
+        {
+            get => textureBrushColor;
+            set
+            {
+                if (value == textureBrushColor)
+                    return;
+                Undo.RecordObject(this, "ModEditor TextureBrushColor");
+                textureBrushColor = value;
             }
         }
         #endregion

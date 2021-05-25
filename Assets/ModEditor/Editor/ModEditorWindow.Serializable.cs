@@ -33,23 +33,23 @@ namespace ModEditor
             }
         }
 
-        public List<GameObject> TextureBrushTabBoardObj = new List<GameObject>();
+        public List<Transform> TextureBrushTabBoardObj = new List<Transform>();
         public List<bool> TextureBrushTabBoardSwitchs = new List<bool>();
-        public bool TextureBrushTabBoardSwitchsCheck(GameObject obj)
+        public bool TextureBrushTabBoardSwitchsCheck(Transform trans)
         {
-            int index = TextureBrushTabBoardObj.IndexOf(obj);
+            int index = TextureBrushTabBoardObj.IndexOf(trans);
             if (index == -1)
             {
-                TextureBrushTabBoardObj.Add(obj);
+                TextureBrushTabBoardObj.Add(trans);
                 TextureBrushTabBoardSwitchs.Add(true);
                 return true;
             }
             else
                 return TextureBrushTabBoardSwitchs[index];
         }
-        public void TextureBrushTabBoardSwitchsSet(GameObject obj, bool res)
+        public void TextureBrushTabBoardSwitchsSet(Transform trans, bool res)
         {
-            int index = TextureBrushTabBoardObj.IndexOf(obj);
+            int index = TextureBrushTabBoardObj.IndexOf(trans);
             if (index > -1)
             {
                 if (TextureBrushTabBoardSwitchs[index] == res)

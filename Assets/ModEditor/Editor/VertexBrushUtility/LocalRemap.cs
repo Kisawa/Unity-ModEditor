@@ -126,7 +126,7 @@ namespace ModEditor
                 calcShader.SetVector("_RelativeWorldPos", coord[i]);
                 calcShader.SetBuffer(kernel_LocalMix, "_Vertex", _vertexBuffer3);
                 calcShader.SetBuffer(kernel_LocalMix, "RW_Mix", _mix3);
-                calcShader.Dispatch(kernel_LocalMix, Mathf.CeilToInt((float)mesh.vertexCount / 1024), 1, 1);
+                calcShader.Dispatch(kernel_LocalMix, Mathf.CeilToInt(mesh.vertexCount / 1024f), 1, 1);
             }
 
             calcShader.SetBuffer(kernel_LocalRemap, "RW_Mix", _mix3);

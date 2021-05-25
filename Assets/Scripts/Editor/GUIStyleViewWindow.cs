@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
+using ModEditor;
 
 public class GUIStyleViewer : EditorWindow
 {
@@ -8,14 +9,18 @@ public class GUIStyleViewer : EditorWindow
     static void Open()
     {
         GUIStyleViewer window = GetWindow<GUIStyleViewer>("GUIStyle View");
+        string path = $"{ModEditorWindow.ModEditorPath}/Textures/Sphere-Editing.png";
+        window.texture = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
     }
 
     float innerWidth = 300;
     Vector2 scroll;
+    Texture2D texture;
 
     void OnGUI()
     {
         scroll = GUILayout.BeginScrollView(scroll);
+        GUI.Box(new Rect(0, 0, position.width, position.height), texture);
         int count = (int)(position.width / innerWidth);
         for (int i = 0; i < GUI.skin.customStyles.Length; i++)
         {
@@ -32,8 +37,8 @@ public class GUIStyleViewer : EditorWindow
             //    GUIUtility.systemCopyBuffer = style.name;
             //EditorGUILayout.EndVertical();
 
-            EditorGUILayout.BeginVertical(style);
-            GUILayout.Label("Command", GUILayout.Width(200));
+            EditorGUILayout.BeginVertical();
+            GUILayout.Button("Command", style);
             if (GUILayout.Button("Game Camera Follow"))
             {
                 GUIUtility.systemCopyBuffer = style.name;

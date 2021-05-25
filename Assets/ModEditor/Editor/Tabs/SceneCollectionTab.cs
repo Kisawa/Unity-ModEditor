@@ -49,6 +49,7 @@ namespace ModEditor
         public override void OnEnable()
         {
             base.OnEnable();
+            window.onTabChanged += refreshBuffer;
             window.onCameraChange += onCameraChange;
             window.onRefreshTargetDic += refreshBuffer;
             window.onVertexViewChange += refreshBuffer;
@@ -58,23 +59,12 @@ namespace ModEditor
         public override void OnDiable()
         {
             base.OnDiable();
+            window.onTabChanged -= refreshBuffer;
             window.onCameraChange -= onCameraChange;
             window.onRefreshTargetDic -= refreshBuffer;
             window.onVertexViewChange -= refreshBuffer;
             if (window.camera != null && buffer != null)
                 window.camera.RemoveCommandBuffer(cameraEvent, buffer);
-        }
-
-        public override void OnFocus()
-        {
-            base.OnFocus();
-            refreshBuffer();
-        }
-
-        public override void OnLostFocus()
-        {
-            base.OnLostFocus();
-            refreshBuffer();
         }
 
         public override void Draw()

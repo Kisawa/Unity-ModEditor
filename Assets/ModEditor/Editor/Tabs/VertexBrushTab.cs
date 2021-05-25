@@ -245,9 +245,9 @@ namespace ModEditor
             EditorGUILayout.BeginHorizontal();
             GUILayout.Space(15);
             EditorGUILayout.LabelField("Brush Scope View Color:", labelStyle, GUILayout.Width(window.position.width - 160));
-            window.Manager.BrushScopeViewColor = EditorGUILayout.ColorField(window.Manager.BrushScopeViewColor, GUILayout.Width(80));
+            window.Manager.VertexBrushScopeViewColor = EditorGUILayout.ColorField(window.Manager.VertexBrushScopeViewColor, GUILayout.Width(80));
             EditorGUILayout.EndHorizontal();
-            if (window.ToolView && window.BrushLock && !BrushDisable())
+            if (window.ToolView && window.VertexBrushLock && !BrushDisable())
             {
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.Space(15);
@@ -275,17 +275,17 @@ namespace ModEditor
             EditorGUILayout.BeginHorizontal();
             GUILayout.Space(15);
             if (GUILayout.Button("Brush", "AboutWIndowLicenseLabel", GUILayout.Width(150)) ||
-                GUILayout.Button(window.Manager.BrushUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 205)))
-                window.Manager.BrushUnfold = !window.Manager.BrushUnfold;
+                GUILayout.Button(window.Manager.VertexBrushUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 205)))
+                window.Manager.VertexBrushUnfold = !window.Manager.VertexBrushUnfold;
             EditorGUILayout.EndHorizontal();
 
-            if (window.Manager.BrushUnfold)
+            if (window.Manager.VertexBrushUnfold)
             {
                 BeginCheckWriteCommand();
                 EditorGUI.indentLevel = 2;
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Strength:", CommandSyle, GUILayout.Width(80));
-                window.Manager.BrushStrength = EditorGUILayout.Slider(window.Manager.BrushStrength, -10, 10, GUILayout.Width(window.position.width - 125));
+                window.Manager.VertexBrushStrength = EditorGUILayout.Slider(window.Manager.VertexBrushStrength, -10, 10, GUILayout.Width(window.position.width - 125));
                 EditorGUILayout.EndHorizontal();
 
                 EditorGUILayout.BeginHorizontal();
@@ -300,42 +300,42 @@ namespace ModEditor
                     case VertexBrushType.Color:
                         EditorGUILayout.BeginHorizontal();
                         EditorGUILayout.LabelField("Brush Color:", CommandSyle, GUILayout.Width(100));
-                        window.Manager.BrushColor = EditorGUILayout.ColorField(window.Manager.BrushColor, GUILayout.Width(100));
+                        window.Manager.VertexBrushColor = EditorGUILayout.ColorField(window.Manager.VertexBrushColor, GUILayout.Width(100));
                         EditorGUILayout.EndHorizontal();
                         EditorGUILayout.BeginHorizontal();
                         GUILayout.Space(80);
-                        EditorGUILayout.LabelField($"( {window.Manager.BrushColor.r * window.Manager.BrushStrength}, {window.Manager.BrushColor.g * window.Manager.BrushStrength}, {window.Manager.BrushColor.b * window.Manager.BrushStrength}, {window.Manager.BrushColor.a * window.Manager.BrushStrength} )", labelStyle);
+                        EditorGUILayout.LabelField($"( {window.Manager.VertexBrushColor.r * window.Manager.VertexBrushStrength}, {window.Manager.VertexBrushColor.g * window.Manager.VertexBrushStrength}, {window.Manager.VertexBrushColor.b * window.Manager.VertexBrushStrength}, {window.Manager.VertexBrushColor.a * window.Manager.VertexBrushStrength} )", labelStyle);
                         EditorGUILayout.EndHorizontal();
                         break;
                     case VertexBrushType.TwoColorGradient:
                         EditorGUILayout.BeginHorizontal();
                         EditorGUILayout.LabelField("From:", CommandSyle, GUILayout.Width(80));
-                        window.Manager.BrushColorFrom = EditorGUILayout.ColorField(window.Manager.BrushColorFrom, GUILayout.Width(100));
+                        window.Manager.VertexBrushColorFrom = EditorGUILayout.ColorField(window.Manager.VertexBrushColorFrom, GUILayout.Width(100));
                         EditorGUILayout.EndHorizontal();
                         EditorGUILayout.BeginHorizontal();
                         GUILayout.Space(80);
-                        EditorGUILayout.LabelField($"( {window.Manager.BrushColorFrom.r * window.Manager.BrushStrength}, {window.Manager.BrushColorFrom.g * window.Manager.BrushStrength}, {window.Manager.BrushColorFrom.b * window.Manager.BrushStrength}, {window.Manager.BrushColorFrom.a * window.Manager.BrushStrength} )", labelStyle);
+                        EditorGUILayout.LabelField($"( {window.Manager.VertexBrushColorFrom.r * window.Manager.VertexBrushStrength}, {window.Manager.VertexBrushColorFrom.g * window.Manager.VertexBrushStrength}, {window.Manager.VertexBrushColorFrom.b * window.Manager.VertexBrushStrength}, {window.Manager.VertexBrushColorFrom.a * window.Manager.VertexBrushStrength} )", labelStyle);
                         EditorGUILayout.EndHorizontal();
 
                         EditorGUILayout.BeginHorizontal();
                         GUILayout.Space(10);
                         EditorGUILayout.LabelField("From Step:", CommandSyle, GUILayout.Width(100));
-                        window.Manager.BrushColorFromStep = EditorGUILayout.Slider(window.Manager.BrushColorFromStep, 0, 1, GUILayout.Width(window.position.width - 160));
+                        window.Manager.VertexBrushColorFromStep = EditorGUILayout.Slider(window.Manager.VertexBrushColorFromStep, 0, 1, GUILayout.Width(window.position.width - 160));
                         EditorGUILayout.EndHorizontal();
 
                         EditorGUILayout.BeginHorizontal();
                         GUILayout.Space(10);
                         EditorGUILayout.LabelField("To Step:", CommandSyle, GUILayout.Width(100));
-                        window.Manager.BrushColorToStep = EditorGUILayout.Slider(window.Manager.BrushColorToStep, 0, 1, GUILayout.Width(window.position.width - 160));
+                        window.Manager.VertexBrushColorToStep = EditorGUILayout.Slider(window.Manager.VertexBrushColorToStep, 0, 1, GUILayout.Width(window.position.width - 160));
                         EditorGUILayout.EndHorizontal();
 
                         EditorGUILayout.BeginHorizontal();
                         EditorGUILayout.LabelField("To:", CommandSyle, GUILayout.Width(80));
-                        window.Manager.BrushColorTo = EditorGUILayout.ColorField(window.Manager.BrushColorTo, GUILayout.Width(100));
+                        window.Manager.VertexBrushColorTo = EditorGUILayout.ColorField(window.Manager.VertexBrushColorTo, GUILayout.Width(100));
                         EditorGUILayout.EndHorizontal();
                         EditorGUILayout.BeginHorizontal();
                         GUILayout.Space(80);
-                        EditorGUILayout.LabelField($"( {window.Manager.BrushColorTo.r * window.Manager.BrushStrength}, {window.Manager.BrushColorTo.g * window.Manager.BrushStrength}, {window.Manager.BrushColorTo.b * window.Manager.BrushStrength}, {window.Manager.BrushColorTo.a * window.Manager.BrushStrength} )", labelStyle);
+                        EditorGUILayout.LabelField($"( {window.Manager.VertexBrushColorTo.r * window.Manager.VertexBrushStrength}, {window.Manager.VertexBrushColorTo.g * window.Manager.VertexBrushStrength}, {window.Manager.VertexBrushColorTo.b * window.Manager.VertexBrushStrength}, {window.Manager.VertexBrushColorTo.a * window.Manager.VertexBrushStrength} )", labelStyle);
                         EditorGUILayout.EndHorizontal();
                         break;
                 }

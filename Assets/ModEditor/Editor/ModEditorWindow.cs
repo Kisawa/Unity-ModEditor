@@ -35,6 +35,7 @@ namespace ModEditor
 
         public ModEditorManager Manager { get; private set; }
 
+        public event Action onTabChanged;
         public event Action onWindowFocus;
         public event Action onWindowLostFocus;
         public event Action onRefreshTargetDic;
@@ -77,8 +78,9 @@ namespace ModEditor
                         tabs[_tabIndex].OnLostFocus();
                     if (value < tabs.Count && value >= 0)
                         tabs[value].OnFocus();
+                    _tabIndex = value;
+                    onTabChanged?.Invoke();
                 }
-                _tabIndex = value;
             }
         }
 

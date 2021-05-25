@@ -63,9 +63,9 @@ namespace ModEditor
             set => sceneHandleType = value;
         }
 
-        public bool ZoneLock { get; set; }
+        public bool VertexZoneLock { get; set; }
 
-        public bool BrushLock { get; set; }
+        public bool VertexBrushLock { get; set; }
 
         public bool OnSceneGUI { get; set; }
 

@@ -30,7 +30,7 @@ namespace ModEditor
             get
             {
                 if (ModEditor != null && ModEditor.Manager != null)
-                    zoneLock = ModEditor.ZoneLock;
+                    zoneLock = ModEditor.VertexZoneLock;
                 return zoneLock;
             }
         }
@@ -41,7 +41,7 @@ namespace ModEditor
             get
             {
                 if (ModEditor != null && ModEditor.Manager != null)
-                    brushLock = ModEditor.BrushLock;
+                    brushLock = ModEditor.VertexBrushLock;
                 return brushLock;
             }
         }
@@ -160,18 +160,18 @@ namespace ModEditor
             get
             {
                 if (ModEditor != null && ModEditor.Manager != null)
-                    brushSize = ModEditor.Manager.BrushSize;
+                    brushSize = ModEditor.Manager.VertexBrushSize;
                 return brushSize;
             }
         }
 
-        float brushDepth = ModEditorConstants.BrushMaxDepth;
+        float brushDepth = ModEditorConstants.VertexBrushMaxDepth;
         float BrushDepth
         {
             get
             {
                 if (ModEditor != null && ModEditor.Manager != null)
-                    brushDepth = ModEditor.Manager.BrushDepth;
+                    brushDepth = ModEditor.Manager.VertexBrushDepth;
                 return brushDepth;
             }
         }
@@ -193,7 +193,7 @@ namespace ModEditor
             get
             {
                 if (ModEditor != null && ModEditor.Manager != null)
-                    brushStrength = ModEditor.Manager.BrushStrength;
+                    brushStrength = ModEditor.Manager.VertexBrushStrength;
                 return brushStrength;
             }
         }
@@ -204,7 +204,7 @@ namespace ModEditor
             get
             {
                 if (ModEditor != null && ModEditor.Manager != null)
-                    brushColor = ModEditor.Manager.BrushColor;
+                    brushColor = ModEditor.Manager.VertexBrushColor;
                 return brushColor;
             }
             set
@@ -212,7 +212,7 @@ namespace ModEditor
                 if (ModEditor == null || ModEditor.Manager == null)
                     return;
                 brushColor = value;
-                ModEditor.Manager.BrushColor = brushColor;
+                ModEditor.Manager.VertexBrushColor = brushColor;
             }
         }
 
@@ -222,7 +222,7 @@ namespace ModEditor
             get
             {
                 if (ModEditor != null && ModEditor.Manager != null)
-                    brushColorFrom = ModEditor.Manager.BrushColorFrom;
+                    brushColorFrom = ModEditor.Manager.VertexBrushColorFrom;
                 return brushColorFrom;
             }
             set
@@ -230,7 +230,7 @@ namespace ModEditor
                 if (ModEditor == null || ModEditor.Manager == null)
                     return;
                 brushColorFrom = value;
-                ModEditor.Manager.BrushColorFrom = brushColorFrom;
+                ModEditor.Manager.VertexBrushColorFrom = brushColorFrom;
             }
         }
 
@@ -240,7 +240,7 @@ namespace ModEditor
             get
             {
                 if (ModEditor != null && ModEditor.Manager != null)
-                    brushColorFromStep = ModEditor.Manager.BrushColorFromStep;
+                    brushColorFromStep = ModEditor.Manager.VertexBrushColorFromStep;
                 return brushColorFromStep;
             }
             set
@@ -248,7 +248,7 @@ namespace ModEditor
                 if (ModEditor == null || ModEditor.Manager == null)
                     return;
                 brushColorFromStep = value;
-                ModEditor.Manager.BrushColorFromStep = brushColorFromStep;
+                ModEditor.Manager.VertexBrushColorFromStep = brushColorFromStep;
             }
         }
 
@@ -258,7 +258,7 @@ namespace ModEditor
             get
             {
                 if (ModEditor != null && ModEditor.Manager != null)
-                    brushColorTo = ModEditor.Manager.BrushColorTo;
+                    brushColorTo = ModEditor.Manager.VertexBrushColorTo;
                 return brushColorTo;
             }
             set
@@ -266,7 +266,7 @@ namespace ModEditor
                 if (ModEditor == null || ModEditor.Manager == null)
                     return;
                 brushColorTo = value;
-                ModEditor.Manager.BrushColorTo = brushColorTo;
+                ModEditor.Manager.VertexBrushColorTo = brushColorTo;
             }
         }
 
@@ -276,7 +276,7 @@ namespace ModEditor
             get
             {
                 if (ModEditor != null && ModEditor.Manager != null)
-                    brushColorToStep = ModEditor.Manager.BrushColorToStep;
+                    brushColorToStep = ModEditor.Manager.VertexBrushColorToStep;
                 return brushColorToStep;
             }
             set
@@ -284,7 +284,7 @@ namespace ModEditor
                 if (ModEditor == null || ModEditor.Manager == null)
                     return;
                 brushColorToStep = value;
-                ModEditor.Manager.BrushColorToStep = brushColorToStep;
+                ModEditor.Manager.VertexBrushColorToStep = brushColorToStep;
             }
         }
 
@@ -296,10 +296,10 @@ namespace ModEditor
                 brushGradient = new Gradient();
                 if (ModEditor != null && ModEditor.Manager != null)
                 {
-                    GradientColorKey fromColor = new GradientColorKey() { color = ModEditor.Manager.BrushColorFrom, time = ModEditor.Manager.BrushColorFromStep };
-                    GradientAlphaKey fromAlpha = new GradientAlphaKey() { alpha = ModEditor.Manager.BrushColorFrom.a, time = ModEditor.Manager.BrushColorFromStep };
-                    GradientColorKey toColor = new GradientColorKey() { color = ModEditor.Manager.BrushColorTo, time = ModEditor.Manager.BrushColorToStep };
-                    GradientAlphaKey toAlpha = new GradientAlphaKey() { alpha = ModEditor.Manager.BrushColorTo.a, time = ModEditor.Manager.BrushColorToStep };
+                    GradientColorKey fromColor = new GradientColorKey() { color = ModEditor.Manager.VertexBrushColorFrom, time = ModEditor.Manager.VertexBrushColorFromStep };
+                    GradientAlphaKey fromAlpha = new GradientAlphaKey() { alpha = ModEditor.Manager.VertexBrushColorFrom.a, time = ModEditor.Manager.VertexBrushColorFromStep };
+                    GradientColorKey toColor = new GradientColorKey() { color = ModEditor.Manager.VertexBrushColorTo, time = ModEditor.Manager.VertexBrushColorToStep };
+                    GradientAlphaKey toAlpha = new GradientAlphaKey() { alpha = ModEditor.Manager.VertexBrushColorTo.a, time = ModEditor.Manager.VertexBrushColorToStep };
                     brushGradient.SetKeys(new GradientColorKey[] { fromColor, toColor }, new GradientAlphaKey[] { fromAlpha, toAlpha });
                 }
                 return brushGradient;
@@ -398,7 +398,7 @@ namespace ModEditor
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginVertical("dragtabdropwindow", GUILayout.Width(rect.width), GUILayout.Height(rect.height));
-            GUILayout.Label("Vertex View", "LODRenderersText");
+            GUILayout.Label("Vertex Brush", "LODRenderersText");
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Unselected Vertex Color", txtStyle, GUILayout.Width(120));
@@ -460,7 +460,7 @@ namespace ModEditor
                 return;
             ModEditor.Mat_Util.SetVector("_MouseTexcoord", Mouse.ScreenTexcoord);
             ModEditor.Mat_Util.SetFloat("_BrushSize", BrushSize);
-            ModEditor.Mat_Util.SetColor("_BrushScopeViewColor", ModEditor.Manager.BrushScopeViewColor * (BrushLock ? 0 : 1));
+            ModEditor.Mat_Util.SetColor("_BrushScopeViewColor", ModEditor.Manager.VertexBrushScopeViewColor * (BrushLock ? 0 : 1));
             switch (VertexBrushType)
             {
                 case VertexBrushType.Color:
@@ -501,7 +501,7 @@ namespace ModEditor
                     data.Material.SetColor("_SelectedVertexColor", SelectedVertexColor);
                     data.Material.SetFloat("_VertexScale", VertexScale);
                     data.Material.SetInt("_VertexWithZTest", VertexWithZTest ? (int)CompareFunction.LessEqual : (int)CompareFunction.Always);
-                    data.Material.SetInt("_OnlyZone", ZoneLock && Key.Shift || BrushLock ? 1 : 0);
+                    data.Material.SetInt("_OnlyZone", (ZoneLock && Key.Shift) || BrushLock ? 1 : 0);
                     bool hide = !BrushColorView;
                     if (ZoneLock && Key.Shift && !Key.Control)
                         hide = true;
