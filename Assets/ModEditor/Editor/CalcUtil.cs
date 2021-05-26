@@ -38,7 +38,7 @@ namespace ModEditor
         public int kernel_Origin2To4 { get; private set; }
         public int kernel_Origin3To4 { get; private set; }
 
-        Dictionary<Transform, CalcData.Cache> Cache;
+        Dictionary<Transform, Cache> ManagerCache;
 
         public CalcUtil()
         {
@@ -61,15 +61,15 @@ namespace ModEditor
             kernel_Origin1To4 = CalcShader.FindKernel("Origin1To4");
             kernel_Origin2To4 = CalcShader.FindKernel("Origin2To4");
             kernel_Origin3To4 = CalcShader.FindKernel("Origin3To4");
-            Cache = new Dictionary<Transform, CalcData.Cache>();
+            ManagerCache = new Dictionary<Transform, Cache>();
         }
 
-        public CalcData.Cache GetCache(Transform trans, int count)
+        public Cache GetCache(Transform trans, int count)
         {
-            if (!Cache.TryGetValue(trans, out CalcData.Cache cache))
+            if (!ManagerCache.TryGetValue(trans, out Cache cache))
             {
-                cache = new CalcData.Cache();
-                Cache.Add(trans, cache);
+                cache = new Cache();
+                ManagerCache.Add(trans, cache);
             }
             if (cache.RW_Zone == null || cache.RW_Zone.count != count)
             {
@@ -108,7 +108,7 @@ namespace ModEditor
 
         public void ClearCache()
         {
-            foreach (CalcData.Cache item in Cache.Values)
+            foreach (Cache item in ManagerCache.Values)
             {
                 if (item.RW_Zone != null)
                     item.RW_Zone.Dispose();
@@ -121,7 +121,7 @@ namespace ModEditor
                 if (item.RW_BrushResult != null)
                     item.RW_BrushResult.Dispose();
             }
-            Cache.Clear();
+            ManagerCache.Clear();
         }
 
         ComputeBuffer check_Select(ComputeBuffer _Select, int count, out bool clearSelect)
@@ -916,6 +916,42 @@ namespace ModEditor
             if (clearSelect)
                 _Select.Dispose();
             return origin;
+        }
+
+        public sealed class Cache
+        {
+            int spreadLevel = 0;
+            public int SpreadLevel
+            {
+                get => spreadLevel;
+                set
+                {
+                    if (value < 0)
+                        value = 0;
+                    spreadLevel = value;
+                }
+            }
+            /// <summary>
+            /// Buffer type is "int"
+            /// </summary>
+            public ComputeBuffer RW_Zone { get; set; }
+            /// <summary>
+            /// Buffer type is "float"
+            /// </summary>
+            public ComputeBuffer RW_Selects { get; set; }
+            /// <summary>
+            /// Buffer type is "float"
+            /// </summary>
+            public ComputeBuffer RW_Depths { get; set; }
+            /// <summary>
+            /// Buffer type is "float"
+            /// </summary>
+            public ComputeBuffer RW_Sizes { get; set; }
+            /// <summary>
+            /// Buffer type is "float4"
+            /// </summary>
+            public ComputeBuffer RW_BrushResult { get; set; }
+            public bool IsAvailable { get => !RW_Depths.IsValid() || !RW_Sizes.IsValid() || !RW_Selects.IsValid() || !RW_Zone.IsValid() || !RW_BrushResult.IsValid(); }
         }
     }
 }

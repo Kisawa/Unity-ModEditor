@@ -10,7 +10,47 @@ namespace ModEditor
 {
     public partial class VertexBrushTab
     {
+        List<CalcManager> calcShaderDatas;
+        public List<CalcManager> CalcShaderDatas
+        {
+            get
+            {
+                if (calcShaderDatas == null)
+                    calcShaderDatas = new List<CalcManager>();
+                return calcShaderDatas;
+            }
+        }
+
         List<(Transform, Mesh)> objInOperation;
+
+        public CalcManager AddCalcShaderRender(Renderer renderer, MeshFilter meshFilter)
+        {
+            if (renderer == null || meshFilter == null || meshFilter.sharedMesh == null || meshFilter.sharedMesh.vertexCount == 0)
+                return null;
+            Material material = new Material(Shader.Find("Hidden/ModEditorVertexView"));
+            CalcManager data = new CalcManager_Mesh(renderer, meshFilter);
+            data.BindMaterial(material);
+            CalcShaderDatas.Add(data);
+            return data;
+        }
+
+        public CalcManager AddCalcShaderRender(SkinnedMeshRenderer skinnedMesh)
+        {
+            if (skinnedMesh == null || skinnedMesh.sharedMesh == null || skinnedMesh.sharedMesh.vertexCount == 0)
+                return null;
+            Material material = new Material(Shader.Find("Hidden/ModEditorVertexView"));
+            CalcManager data = new CalcManager_SkinnedMesh(skinnedMesh);
+            data.BindMaterial(material);
+            CalcShaderDatas.Add(data);
+            return data;
+        }
+
+        public void ClearCalcShaderData()
+        {
+            for (int i = 0; i < CalcShaderDatas.Count; i++)
+                CalcShaderDatas[i].Clear();
+            CalcShaderDatas.Clear();
+        }
 
         public void RecordObjInOperation()
         {
@@ -40,14 +80,9 @@ namespace ModEditor
                 objInOperation.Clear();
         }
 
-        private void BackQuote_Down()
-        {
-            Tools.current = Tool.Custom;
-        }
-
         private void Tab_Down()
         {
-            if (window.ToolView)
+            if (window.ToolType == ModEditorToolType.VertexBrush)
                 window.Manager.VertexWithZTest = !window.Manager.VertexWithZTest;
         }
 
@@ -55,7 +90,7 @@ namespace ModEditor
         {
             if (window.OnSceneGUI)
                 return;
-            if (window.ToolView && !BrushDisable())
+            if (window.ToolType == ModEditorToolType.VertexBrush && !BrushDisable())
             {
                 RecordObjInOperation();
                 BrushWrite();
@@ -73,42 +108,42 @@ namespace ModEditor
         {
             if (window.OnSceneGUI)
                 return;
-            if (window.ToolView && !BrushDisable())
+            if (window.ToolType == ModEditorToolType.VertexBrush && !BrushDisable())
                 BrushWrite();
         }
 
         private void Alt_OnScrollWheel_Roll(float obj)
         {
-            if (window.OnSceneGUI || !window.ToolView)
+            if (window.OnSceneGUI || window.ToolType != ModEditorToolType.VertexBrush)
                 return;
-            for (int i = 0; i < window.CalcShaderDatas.Count; i++)
-                window.CalcShaderDatas[i].SpreadSelects(obj < 0);
+            for (int i = 0; i < CalcShaderDatas.Count; i++)
+                CalcShaderDatas[i].SpreadSelects(obj < 0);
         }
 
         private void Shift_OnMouse_Left()
         {
             if (window.OnSceneGUI || !window.VertexZoneLock || window.VertexBrushLock)
                 return;
-            for (int i = 0; i < window.CalcShaderDatas.Count; i++)
-                window.CalcShaderDatas[i].AddZoneFromSelect();
+            for (int i = 0; i < CalcShaderDatas.Count; i++)
+                CalcShaderDatas[i].AddZoneFromSelect();
         }
 
         private void Shift_OnMouse_Right()
         {
             if (window.OnSceneGUI || !window.VertexZoneLock || window.VertexBrushLock)
                 return;
-            for (int i = 0; i < window.CalcShaderDatas.Count; i++)
-                window.CalcShaderDatas[i].SubZoneFromSelect();
+            for (int i = 0; i < CalcShaderDatas.Count; i++)
+                CalcShaderDatas[i].SubZoneFromSelect();
         }
 
         private void Space_Down()
         {
-            if (!window.ToolView || window.VertexBrushLock)
+            if (window.ToolType != ModEditorToolType.VertexBrush || window.VertexBrushLock)
                 return;
             float depth = float.MaxValue;
-            for (int i = 0; i < window.CalcShaderDatas.Count; i++)
+            for (int i = 0; i < CalcShaderDatas.Count; i++)
             {
-                float _depth = window.CalcShaderDatas[i].GetMinDepth(window.camera, Mouse.ScreenTexcoord, window.Manager.VertexBrushSize);
+                float _depth = CalcShaderDatas[i].GetMinDepth(window.camera, Mouse.ScreenTexcoord, window.Manager.VertexBrushSize);
                 if (depth > _depth)
                     depth = _depth;
             }
@@ -121,8 +156,8 @@ namespace ModEditor
             if (window.VertexBrushLock)
                 return;
             window.VertexZoneLock = !window.VertexZoneLock;
-            for (int i = 0; i < window.CalcShaderDatas.Count; i++)
-                window.CalcShaderDatas[i].LockZoneFromSelect(window.VertexZoneLock);
+            for (int i = 0; i < CalcShaderDatas.Count; i++)
+                CalcShaderDatas[i].LockZoneFromSelect(window.VertexZoneLock);
         }
 
         private void Alt_CapsLock_Down()
@@ -133,7 +168,7 @@ namespace ModEditor
 
         private void Control_OnMouse_DragLeft()
         {
-            if (!window.ToolView || window.VertexBrushLock)
+            if (window.ToolType != ModEditorToolType.VertexBrush || window.VertexBrushLock)
                 return;
             window.Manager.VertexBrushSize += Event.current.delta.x * 0.01f;
             window.SceneHandleType = SceneHandleType.BrushSize;
@@ -141,7 +176,7 @@ namespace ModEditor
 
         private void Control_OnScrollWheel_Roll(float obj)
         {
-            if (!window.ToolView || window.VertexBrushLock)
+            if (window.ToolType != ModEditorToolType.VertexBrush || window.VertexBrushLock)
                 return;
             window.Manager.VertexBrushDepth -= Event.current.delta.y * 0.01f;
             window.SceneHandleType = SceneHandleType.BrushDepth;
@@ -151,16 +186,16 @@ namespace ModEditor
         {
             if (Mouse.IsButton || window.VertexBrushLock)
                 return;
-            for (int i = 0; i < window.CalcShaderDatas.Count; i++)
-                window.CalcShaderDatas[i].ClearSpread();
+            for (int i = 0; i < CalcShaderDatas.Count; i++)
+                CalcShaderDatas[i].ClearSpread();
         }
 
         private void ScrollWheel_Update()
         {
             if (Key.Alt || window.VertexBrushLock)
                 return;
-            for (int i = 0; i < window.CalcShaderDatas.Count; i++)
-                window.CalcShaderDatas[i].ClearSpread();
+            for (int i = 0; i < CalcShaderDatas.Count; i++)
+                CalcShaderDatas[i].ClearSpread();
         }
 
         private void V_Down()
@@ -236,7 +271,7 @@ namespace ModEditor
                 Mesh mesh = objInOperation[i].Item2;
                 if (trans == null || mesh == null)
                     continue;
-                CalcShaderData.CalcVertexsData data = window.CalcShaderDatas.FirstOrDefault(x => x.trans == trans);
+                CalcManager data = CalcShaderDatas.FirstOrDefault(x => x.trans == trans);
                 if (data != null && data.IsAvailable)
                 {
                     switch (window.Manager.VertexBrushType)
@@ -295,7 +330,7 @@ namespace ModEditor
             }
         }
 
-        void setCustomData(WriteType writeType, CustomTargetType customTarget, TargetPassType inPass, TargetPassType outPass, Mesh mesh, CalcShaderData.CalcVertexsData data)
+        void setCustomData(WriteType writeType, CustomTargetType customTarget, TargetPassType inPass, TargetPassType outPass, Mesh mesh, CalcManager data)
         {
             switch (customTarget)
             {
@@ -342,7 +377,7 @@ namespace ModEditor
                     ComputeBuffer _Select = null;
                     if (util.WithSelect)
                     {
-                        CalcShaderData.CalcVertexsData data = window.CalcShaderDatas.FirstOrDefault(x => x.trans == target.transform);
+                        CalcManager data = CalcShaderDatas.FirstOrDefault(x => x.trans == target.transform);
                         _Select = data.Cache.RW_Selects;
                     }
                     switch (util.PassCount)

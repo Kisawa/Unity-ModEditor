@@ -57,7 +57,7 @@ namespace ModEditor
             
         }
 
-        public virtual bool BrushWrite(Mesh mesh, CalcShaderData.CalcVertexsData data)
+        public virtual bool BrushWrite(Mesh mesh, CalcManager data)
         {
             return false;
         }

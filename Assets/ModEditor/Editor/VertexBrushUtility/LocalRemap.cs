@@ -73,7 +73,7 @@ namespace ModEditor
 
         private void Window_onSceneValidate(SceneView obj)
         {
-            if (!available || !window.ToolView)
+            if (!available || window.ToolType != ModEditorToolType.VertexBrush)
                 return;
             for (int i = 0; i < coord.Count; i++)
             {
@@ -84,7 +84,7 @@ namespace ModEditor
                 window.Repaint();
         }
 
-        public override bool BrushWrite(Mesh mesh, CalcShaderData.CalcVertexsData data)
+        public override bool BrushWrite(Mesh mesh, CalcManager data)
         {
             if (!available)
                 return false;
@@ -167,7 +167,7 @@ namespace ModEditor
             if (targetTrans == null)
                 return;
             EditorGUILayout.BeginHorizontal();
-            if (window.ToolView)
+            if (window.ToolType == ModEditorToolType.VertexBrush)
             {
                 if (checkOriginMesh())
                 {
@@ -228,9 +228,9 @@ namespace ModEditor
 
         bool checkOriginMesh()
         {
-            for (int i = 0; i < window.CalcShaderDatas.Count; i++)
+            for (int i = 0; i < window.Tab_VertexBrush.CalcShaderDatas.Count; i++)
             {
-                CalcShaderData.CalcVertexsData data = window.CalcShaderDatas[i];
+                CalcManager data = window.Tab_VertexBrush.CalcShaderDatas[i];
                 if (!originMeshDic.TryGetValue(data.trans, out Mesh mesh) || mesh == null || mesh.vertexCount != data._Vertices.count)
                 {
                     clearMesh();
@@ -243,9 +243,9 @@ namespace ModEditor
         void recordMesh()
         {
             originMeshDic.Clear();
-            for (int i = 0; i < window.CalcShaderDatas.Count; i++)
+            for (int i = 0; i < window.Tab_VertexBrush.CalcShaderDatas.Count; i++)
             {
-                CalcShaderData.CalcVertexsData data = window.CalcShaderDatas[i];
+                CalcManager data = window.Tab_VertexBrush.CalcShaderDatas[i];
                 originMeshDic.Add(data.trans, Object.Instantiate(data.OriginMesh));
             }
         }

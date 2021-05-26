@@ -33,31 +33,22 @@ namespace ModEditor
             }
         }
 
-        public List<Transform> TextureBrushTabBoardObj = new List<Transform>();
-        public List<bool> TextureBrushTabBoardSwitchs = new List<bool>();
-        public bool TextureBrushTabBoardSwitchsCheck(Transform trans)
+        [SerializeField]
+        Transform textureBrushTabCurrentDrawBoard;
+        public Transform TextureBrushTabCurrentDrawBoard
         {
-            int index = TextureBrushTabBoardObj.IndexOf(trans);
-            if (index == -1)
+            get => textureBrushTabCurrentDrawBoard;
+            set
             {
-                TextureBrushTabBoardObj.Add(trans);
-                TextureBrushTabBoardSwitchs.Add(true);
-                return true;
-            }
-            else
-                return TextureBrushTabBoardSwitchs[index];
-        }
-        public void TextureBrushTabBoardSwitchsSet(Transform trans, bool res)
-        {
-            int index = TextureBrushTabBoardObj.IndexOf(trans);
-            if (index > -1)
-            {
-                if (TextureBrushTabBoardSwitchs[index] == res)
+                if (value == textureBrushTabCurrentDrawBoard)
                     return;
-                Undo.RecordObject(this, "TextureBrushTab BoardSwitchs Changed");
-                TextureBrushTabBoardSwitchs[index] = res;
+                Undo.RecordObject(this, "TextureBrushTab CurrentDrawBoard Changed");
+                textureBrushTabCurrentDrawBoard = value;
             }
         }
+
+        public List<Transform> DrawUtilTransCache = new List<Transform>();
+        public List<DrawUtil.Cache> DrawUtilCache = new List<DrawUtil.Cache>();
         #endregion
 
         #region Copy

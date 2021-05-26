@@ -1,28 +1,19 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
-using UnityEditor.EditorTools;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace ModEditor
 {
-    [EditorTool("ModEditor VertexBrush Tool")]
-    public class VertexBrushTool : EditorTool
+    public class VertexBrushTool : SceneToolBase
     {
-        static ModEditorWindow ModEditor => ModEditorWindow.Self;
-
-        GUIContent icon;
         GUIContent toggleContent;
         GUIContent toggleOnContent;
         GUIContent lockContent;
         GUIContent unlockContent;
         GUIContent lockBrushContent;
         GUIContent unlockBrushContent;
-
-        public override GUIContent toolbarIcon => icon;
 
         bool zoneLock;
         bool ZoneLock
@@ -118,21 +109,21 @@ namespace ModEditor
             }
         }
 
-        bool hideNoSelectVertex = false;
+        bool hideUnselectedVertex = false;
         bool HideUnselectedVertex
         {
             get
             {
                 if (ModEditor != null && ModEditor.Manager != null)
-                    hideNoSelectVertex = ModEditor.Manager.HideUnselectedVertex;
-                return hideNoSelectVertex;
+                    hideUnselectedVertex = ModEditor.Manager.HideUnselectedVertex;
+                return hideUnselectedVertex;
             }
             set
             {
                 if (ModEditor == null || ModEditor.Manager == null)
                     return;
-                hideNoSelectVertex = value;
-                ModEditor.Manager.HideUnselectedVertex = hideNoSelectVertex;
+                hideUnselectedVertex = value;
+                ModEditor.Manager.HideUnselectedVertex = hideUnselectedVertex;
             }
         }
 
@@ -328,10 +319,9 @@ namespace ModEditor
             }
         }
 
-        private void OnEnable()
+        public override void OnEnable()
         {
-            if (icon == null)
-                icon = EditorGUIUtility.IconContent("d_Mesh Icon");
+            base.OnEnable();
             if (toggleContent == null)
                 toggleContent = EditorGUIUtility.IconContent("ShurikenToggleHover");
             if (toggleOnContent == null)
@@ -346,15 +336,13 @@ namespace ModEditor
                 unlockBrushContent = EditorGUIUtility.TrIconContent("d_scenepicking_pickable-mixed_hover", "Lock or unlock the brush position.   /Alt-CapsLock");
         }
 
-        public override void OnToolGUI(EditorWindow window)
+        public override bool IsAvailable()
         {
-            base.OnToolGUI(window);
-            HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Keyboard));
-            Handles.BeginGUI();
-            GUIStyle txtStyle = GUI.skin.GetStyle("AboutWIndowLicenseLabel");
-            GUIStyle hotKeyStyle = GUI.skin.GetStyle("LODSliderTextSelected");
-            GUIStyle msgStyle = GUI.skin.GetStyle("LODRendererAddButton");
+            return ModEditor.TabType == ModEditorTabType.VertexBrush;
+        }
 
+        public override Rect Draw(EditorWindow window, GUIStyle txtStyle, GUIStyle hotKeyStyle, GUIStyle msgStyle)
+        {
             Rect rect = new Rect(window.position.width - 250, window.position.height - 175, 240, 145);
             switch (VertexBrushType)
             {
@@ -437,21 +425,8 @@ namespace ModEditor
 
             EditorGUILayout.EndVertical();
             GUILayout.EndArea();
-            if (ModEditor != null)
-            {
-                if (GUI.changed)
-                    ModEditor.Validate();
-                ModEditor.OnSceneGUI = rect.Contains(Event.current.mousePosition);
-            }
-            Handles.EndGUI();
             updateVertexViewBuffer();
-        }
-
-        public override bool IsAvailable()
-        {
-            if (ModEditor != null && ModEditor.Manager.Target != null && ModEditor.TabType == ModEditorTabType.VertexBrush && (ModEditor.Manager.LockTarget || ModEditor.Manager.Target == Selection.activeGameObject))
-                return true;
-            return false;
+            return rect;
         }
 
         void updateVertexViewBuffer()
@@ -473,9 +448,9 @@ namespace ModEditor
                     break;
             }
             bool brushOn = ModEditor.TabType == ModEditorTabType.VertexBrush;
-            for (int i = 0; i < ModEditor.CalcShaderDatas.Count; i++)
+            for (int i = 0; i < ModEditor.Tab_VertexBrush.CalcShaderDatas.Count; i++)
             {
-                CalcShaderData.CalcVertexsData data = ModEditor.CalcShaderDatas[i];
+                CalcManager data = ModEditor.Tab_VertexBrush.CalcShaderDatas[i];
                 if (brushOn)
                 {
                     if (!BrushLock)
@@ -496,16 +471,18 @@ namespace ModEditor
                 if (data.IsAvailable)
                 {
                     data.Material.SetInt("_BrushOn", brushOn ? 1 : 0);
-                    data.Material.SetInt("_HideNoSelectVertex", HideUnselectedVertex ? 1 : 0);
+                    bool hideUnselectedVertex = HideUnselectedVertex;
+                    if (ZoneLock && Key.Shift)
+                        hideUnselectedVertex = false;
+                    data.Material.SetInt("_HideNoSelectVertex", hideUnselectedVertex ? 1 : 0);
                     data.Material.SetColor("_UnselectedVertexColor", UnselectedVertexColor);
                     data.Material.SetColor("_SelectedVertexColor", SelectedVertexColor);
                     data.Material.SetFloat("_VertexScale", VertexScale);
                     data.Material.SetInt("_VertexWithZTest", VertexWithZTest ? (int)CompareFunction.LessEqual : (int)CompareFunction.Always);
-                    data.Material.SetInt("_OnlyZone", (ZoneLock && Key.Shift) || BrushLock ? 1 : 0);
-                    bool hide = !BrushColorView;
+                    bool hideColorView = !BrushColorView;
                     if (ZoneLock && Key.Shift && !Key.Control)
-                        hide = true;
-                    data.Material.SetInt("_Hide", hide ? 1 : 0);
+                        hideColorView = true;
+                    data.Material.SetInt("_HideColorView", hideColorView ? 1 : 0);
                 }
             }
             SceneView.RepaintAll();
@@ -520,7 +497,7 @@ namespace ModEditor
                     if (Key.Control)
                         return false;
                 }
-                else if(!Key.Alt && !Key.Control)
+                else if (!Key.Alt && !Key.Control)
                     return false;
             }
             return true;

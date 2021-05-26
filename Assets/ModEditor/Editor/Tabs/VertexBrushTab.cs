@@ -92,13 +92,14 @@ namespace ModEditor
                 calcUtilInstances[i].OnDisable();
             for (int i = 0; i < brushUtilInstances.Length; i++)
                 brushUtilInstances[i].OnDisable();
+            ClearCalcShaderData();
+            CalcUtil.Self.ClearCache();
         }
 
         public override void OnFocus()
         {
             base.OnFocus();
             window.onSceneValidate += onSceneValidate;
-            EditorEvent.Use.OnKey.BackQuote.Down += BackQuote_Down;
             EditorEvent.Use.OnKey.Tab.Down += Tab_Down;
             EditorEvent.OnMouse.DownLeft += OnMouse_DownLeft;
             EditorEvent.ShiftAndControl.OnMouse.DownLeft += OnMouse_DownLeft;
@@ -172,7 +173,6 @@ namespace ModEditor
         {
             base.OnLostFocus();
             window.onSceneValidate -= onSceneValidate;
-            EditorEvent.Use.OnKey.BackQuote.Down -= BackQuote_Down;
             EditorEvent.Use.OnKey.Tab.Down -= Tab_Down;
             EditorEvent.OnMouse.DownLeft -= OnMouse_DownLeft;
             EditorEvent.ShiftAndControl.OnMouse.DownLeft -= OnMouse_DownLeft;
@@ -247,7 +247,7 @@ namespace ModEditor
             EditorGUILayout.LabelField("Brush Scope View Color:", labelStyle, GUILayout.Width(window.position.width - 160));
             window.Manager.VertexBrushScopeViewColor = EditorGUILayout.ColorField(window.Manager.VertexBrushScopeViewColor, GUILayout.Width(80));
             EditorGUILayout.EndHorizontal();
-            if (window.ToolView && window.VertexBrushLock && !BrushDisable())
+            if (window.ToolType == ModEditorToolType.VertexBrush && window.VertexBrushLock && !BrushDisable())
             {
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.Space(15);
@@ -549,7 +549,7 @@ namespace ModEditor
 
         private void onSceneValidate(SceneView scene)
         {
-            if (!window.ToolView)
+            if (window.ToolType != ModEditorToolType.VertexBrush)
                 return;
             if (window.SceneHandleType == SceneHandleType.None)
                 EditorGUIUtility.AddCursorRect(new Rect(0, 0, scene.position.width, scene.position.height), MouseCursor.CustomCursor);

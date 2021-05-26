@@ -49,20 +49,22 @@ namespace ModEditor
         public override void OnEnable()
         {
             base.OnEnable();
-            window.onTabChanged += refreshBuffer;
             window.onCameraChange += onCameraChange;
+            window.onTabChanged += refreshBuffer;
             window.onRefreshTargetDic += refreshBuffer;
-            window.onVertexViewChange += refreshBuffer;
+            window.onSceneToolChange += refreshBuffer;
+            window.Tab_TextureBrush.onCurrentDrawBoardChanged += refreshBuffer;
             onCameraChange(null);
         }
 
         public override void OnDiable()
         {
             base.OnDiable();
-            window.onTabChanged -= refreshBuffer;
             window.onCameraChange -= onCameraChange;
+            window.onTabChanged -= refreshBuffer;
             window.onRefreshTargetDic -= refreshBuffer;
-            window.onVertexViewChange -= refreshBuffer;
+            window.onSceneToolChange -= refreshBuffer;
+            window.Tab_TextureBrush.onCurrentDrawBoardChanged -= refreshBuffer;
             if (window.camera != null && buffer != null)
                 window.camera.RemoveCommandBuffer(cameraEvent, buffer);
         }
@@ -394,11 +396,11 @@ namespace ModEditor
         {
             if(buffer != null)
                 buffer.Clear();
-            window.ClearCalcShaderData();
+            window.Tab_VertexBrush.ClearCalcShaderData();
             if (window.camera == null)
                 return;
             updateMaterial();
-            if (window.TabType == ModEditorTabType.VertexBrush && window.ToolView)
+            if (window.ToolType == ModEditorToolType.VertexBrush)
                 buffer.DrawMesh(screenMesh, Matrix4x4.identity, window.Mat_Util, 0, 8);
             if (window.Manager.Target == null || window.Manager.TargetChildren.Count == 0)
                 return;
@@ -421,7 +423,7 @@ namespace ModEditor
                     subCount = skinnedMesh.sharedMesh.subMeshCount;
                 for (int j = 0; j < subCount; j++)
                 {
-                    if (window.Manager.GridView || window.Manager.UVView || window.Manager.VertexColorView || window.ToolView)
+                    if (window.Manager.GridView || window.Manager.UVView || window.Manager.VertexColorView || window.ToolType == ModEditorToolType.VertexBrush)
                         buffer.DrawRenderer(renderer, window.Mat_Util, j, 0);
                     if (window.Manager.NormalView)
                         buffer.DrawRenderer(renderer, window.Mat_Util, j, 1);
@@ -438,15 +440,22 @@ namespace ModEditor
                     if (window.Manager.NormalMapView)
                         buffer.DrawRenderer(renderer, window.Mat_Util, j, 7);
                 }
-                if (window.ToolView)
+                if (window.ToolType == ModEditorToolType.VertexBrush)
                 {
-                    CalcShaderData.CalcVertexsData data = addCalcShaderRender(renderer, meshFilter);
+                    CalcManager data = window.Tab_VertexBrush.AddCalcShaderRender(renderer, meshFilter);
                     if (data == null)
-                        data = addCalcShaderRender(skinnedMesh);
+                        data = window.Tab_VertexBrush.AddCalcShaderRender(skinnedMesh);
                     if (data != null)
                     {
                         for (int j = 0; j < subCount; j++)
-                            buffer.DrawRenderer(data.Renderer, data.Material, j);
+                            buffer.DrawRenderer(data.renderer, data.Material, j);
+                    }
+                }
+                if (window.ToolType == ModEditorToolType.TextureBrush)
+                {
+                    if (window.Tab_TextureBrush.TextureManager.IsAvailable && window.Tab_TextureBrush.TextureManager.trans == target.transform)
+                    {
+
                     }
                 }
             }
@@ -468,28 +477,6 @@ namespace ModEditor
             window.Mat_Util.SetFloat("_UVAlpha", window.Manager.UVAlpha);
 
             window.Mat_Util.SetFloat("_DepthCompress", window.Manager.DepthCompress);
-        }
-
-        CalcShaderData.CalcVertexsData addCalcShaderRender(Renderer renderer, MeshFilter meshFilter)
-        {
-            if (renderer == null || meshFilter == null || meshFilter.sharedMesh == null || meshFilter.sharedMesh.vertexCount == 0)
-                return null;
-            Material material = new Material(Shader.Find("Hidden/ModEditorVertexView"));
-            CalcShaderData.CalcVertexsData data = new CalcShaderData.CalcMeshVertexsData_ScreenScope(renderer, meshFilter);
-            data.BindMaterial(material);
-            window.CalcShaderDatas.Add(data);
-            return data;
-        }
-
-        CalcShaderData.CalcVertexsData addCalcShaderRender(SkinnedMeshRenderer skinnedMesh)
-        {
-            if (skinnedMesh == null || skinnedMesh.sharedMesh == null || skinnedMesh.sharedMesh.vertexCount == 0)
-                return null;
-            Material material = new Material(Shader.Find("Hidden/ModEditorVertexView"));
-            CalcShaderData.CalcVertexsData data = new CalcShaderData.CalcSkinnedMeshVertexsData_ScreenScope(skinnedMesh);
-            data.BindMaterial(material);
-            window.CalcShaderDatas.Add(data);
-            return data;
         }
     }
 }

@@ -8,7 +8,7 @@ namespace ModEditor
     {
         public event Action<Camera> onCameraChange;
         public event Action<SceneView> onSceneValidate;
-        public event Action onVertexViewChange;
+        public event Action onSceneToolChange;
 
         Camera _camera;
         public Camera camera
@@ -25,16 +25,16 @@ namespace ModEditor
             }
         }
 
-        bool toolView;
-        public bool ToolView
+        ModEditorToolType toolType;
+        public ModEditorToolType ToolType
         {
-            get => toolView;
+            get => toolType;
             set
             {
-                if (toolView == value)
+                if (toolType == value)
                     return;
-                toolView = value;
-                onVertexViewChange?.Invoke();
+                toolType = value;
+                onSceneToolChange?.Invoke();
                 Repaint();
             }
         }
@@ -74,11 +74,18 @@ namespace ModEditor
         void registerEvent()
         {
             Key.ControlOrAltStateChange += Key_ControlOrAltStateChange;
+            EditorEvent.Use.OnKey.BackQuote.Down += BackQuote_Down;
         }
 
         void logoutEvent()
         {
             Key.ControlOrAltStateChange -= Key_ControlOrAltStateChange;
+            EditorEvent.Use.OnKey.BackQuote.Down -= BackQuote_Down;
+        }
+
+        private void BackQuote_Down()
+        {
+            Tools.current = Tool.Custom;
         }
 
         private void Key_ControlOrAltStateChange(bool obj)
@@ -89,8 +96,24 @@ namespace ModEditor
         private void duringSceneGui(SceneView obj)
         {
             camera = obj.camera;
-            ToolView = Tools.current == Tool.Custom;
             EditorEvent.Update(Event.current, camera);
+            if (Tools.current == Tool.Custom)
+            {
+                switch (TabType)
+                {
+                    case ModEditorTabType.VertexBrush:
+                        ToolType = ModEditorToolType.VertexBrush;
+                        break;
+                    case ModEditorTabType.TextureBrush:
+                        ToolType = ModEditorToolType.TextureBrush;
+                        break;
+                    default:
+                        ToolType = ModEditorToolType.None;
+                        break;
+                }
+            }
+            else
+                ToolType = ModEditorToolType.None;
             viewHandle(obj);
             onSceneValidate?.Invoke(obj);
             if (Manager.GameCameraFollow)

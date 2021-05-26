@@ -22,7 +22,7 @@
 				float4 color: TEXCOORD0;
 			};
 
-			int _Hide;
+			int _HideColorView;
 			StructuredBuffer<float> _Selects;
 			StructuredBuffer<float4> _Colors;
 
@@ -30,7 +30,7 @@
 			{
 				v2f o;
 				o.pos = UnityObjectToClipPos(v.vertex);
-				o.color = _Colors[id] * any(_Selects[id]) * (1 - _Hide);
+				o.color = _Colors[id] * any(_Selects[id]) * (1 - _HideColorView);
 				return o;
 			}
 
@@ -74,7 +74,6 @@
 			int _HideNoSelectVertex;
 			int _BrushOn;
 			float _VertexScale;
-			int _OnlyZone;
 			StructuredBuffer<float> _Selects;
 			StructuredBuffer<int> _Zone;
 
@@ -84,9 +83,8 @@
 				o.worldPos = mul(unity_ObjectToWorld, v.vertex);
 				int select = any(_Selects[id]);
 				int zone = any(_Zone[id]);
-				o.select.x = max(select * _BrushOn, zone * _OnlyZone);
-				o.select.y = max(zone, _OnlyZone);
-				o.select.z = all(int3(zone, select, _OnlyZone));
+				o.select.x = select * _BrushOn;
+				o.select.y = zone;
                 return o;
             }
 
@@ -105,9 +103,7 @@
 					g2f o3;
 					o3.pos = UnityViewToClipPos(UnityWorldToViewPos(input[i].worldPos.xyz) + float3(-sqrt(3) * 0.5, -0.5, 0) * len);
 
-					fixed4 col = lerp(fixed4(_UnselectedVertexColor.rgb, _UnselectedVertexColor.a * (1 - _HideNoSelectVertex)), _SelectedVertexColor, input[i].select.x);
-					col *= input[i].select.y;
-					col = lerp(col, 1 - (1 - _UnselectedVertexColor) * (1 - _SelectedVertexColor), input[i].select.z);
+					fixed4 col = lerp(fixed4(_UnselectedVertexColor.rgb, _UnselectedVertexColor.a * (1 - _HideNoSelectVertex) * input[i].select.y), _SelectedVertexColor, input[i].select.x);
 					o1.color = col;
 					o2.color = col;
 					o3.color = col;

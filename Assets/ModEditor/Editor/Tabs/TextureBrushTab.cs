@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
@@ -17,7 +18,24 @@ namespace ModEditor
 
         Vector2 scroll;
 
+        public event Action onCurrentDrawBoardChanged;
+
         List<Transform> drawBoards;
+        Transform currentDrawBoard {
+            get => window.TextureBrushTabCurrentDrawBoard;
+            set
+            {
+                if (window.TextureBrushTabCurrentDrawBoard == value)
+                    return;
+                TextureManager.Clear();
+                if (value != null)
+                {
+                    TextureManager.Init(value, window.Manager.TextureBaseColor);
+                    onCurrentDrawBoardChanged?.Invoke();
+                }
+                window.TextureBrushTabCurrentDrawBoard = value;
+            }
+        }
         bool textureView { get => window.TextureBrushTabTextureView; set => window.TextureBrushTabTextureView = value; }
         public TextureManager TextureManager { get; } = new TextureManager();
 
@@ -25,23 +43,22 @@ namespace ModEditor
         {
             base.OnFocus();
             window.onRefreshTargetDic += refreshDrawBoards;
-            refreshDrawBoards();
-
             EditorEvent.Use.OnMouse.DownLeft += OnMouse_DownLeft;
+
+            refreshDrawBoards();
         }
 
         public override void OnLostFocus()
         {
             base.OnLostFocus();
             window.onRefreshTargetDic -= refreshDrawBoards;
-
             EditorEvent.Use.OnMouse.DownLeft -= OnMouse_DownLeft;
         }
 
         public override void OnDiable()
         {
             base.OnDiable();
-            TextureManager.Destroy();
+            DrawUtil.Self.ClearCache();
         }
 
         public override void Draw()
@@ -62,9 +79,14 @@ namespace ModEditor
                 {
                     Transform trans = drawBoards[i];
                     EditorGUILayout.BeginHorizontal();
-                    bool boardSwitch = window.TextureBrushTabBoardSwitchsCheck(trans);
-                    if (GUILayout.Button(boardSwitch ? window.toggleOnContent : window.toggleContent, "ObjectPickerTab"))
-                        window.TextureBrushTabBoardSwitchsSet(trans, !boardSwitch);
+                    bool isCurrentDrawBoard = trans == currentDrawBoard;
+                    if (GUILayout.Button(isCurrentDrawBoard ? window.toggleOnContent : window.toggleContent, "ObjectPickerTab"))
+                    {
+                        if (isCurrentDrawBoard)
+                            currentDrawBoard = null;
+                        else
+                            currentDrawBoard = trans;
+                    }
                     EditorGUI.BeginDisabledGroup(true);
                     EditorGUILayout.ObjectField(trans, typeof(GameObject), true);
                     EditorGUI.EndDisabledGroup();
@@ -83,9 +105,10 @@ namespace ModEditor
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button(textureView ? window.viewContent : window.hiddenContent, "ObjectPickerTab"))
                 textureView = !textureView;
-            EditorGUILayout.ObjectField(TextureManager.Texture, typeof(RenderTexture), false);
-            if (GUILayout.Button("New", GUILayout.Width(40)))
-                TextureManager.Init(window.Manager.TextureBaseColor);
+            RenderTexture texture = null;
+            if (TextureManager.IsAvailable)
+                texture = TextureManager.Cache.Texture;
+            EditorGUILayout.ObjectField(texture, typeof(RenderTexture), false);
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
@@ -96,13 +119,14 @@ namespace ModEditor
             if (GUILayout.Button("Save"))
                 TextureManager.Save(window.Manager.Target.name);
 
-            if (TextureManager.Texture != null && textureView)
+            if (textureView && TextureManager.IsAvailable)
             {
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.Space(17);
-                GUILayout.Box(TextureManager.Texture, GUILayout.Width(window.position.width - 34), GUILayout.Height(window.position.width - 34));
+                GUILayout.Box(TextureManager.Cache.Texture, GUILayout.Width(window.position.width - 34), GUILayout.Height(window.position.width - 34));
                 EditorGUILayout.EndHorizontal();
             }
+
             EditorGUILayout.EndScrollView();
         }
 
@@ -124,7 +148,6 @@ namespace ModEditor
                 if (collider == null || !collider.enabled)
                     continue;
                 drawBoards.Add(obj.transform);
-                window.TextureBrushTabBoardSwitchsCheck(obj.transform);
             }
         }
 
@@ -132,7 +155,7 @@ namespace ModEditor
         {
             if (window.OnSceneGUI)
                 return;
-            if (Physics.Raycast(EditorEvent.Camera.ViewportPointToRay(Mouse.ScreenTexcoord), out RaycastHit hit))
+            if (Physics.Raycast(EditorEvent.Camera.ScreenPointToRay(Mouse.ScreenPos), out RaycastHit hit))
             {
                 if (drawBoards.Contains(hit.transform))
                 {

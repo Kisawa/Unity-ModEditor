@@ -8,44 +8,65 @@ namespace ModEditor
 {
     public class TextureManager
     {
-        public RenderTexture Texture => texture;
-        RenderTexture texture;
-        RenderTexture baseTexture;
-        RenderTexture drawTexture;
+        public Transform trans { get; private set; }
+        public Renderer renderer { get; private set; }
+        public DrawUtil.Cache Cache { get; private set; }
 
-        public void Init(Color baseColor)
+        public bool IsAvailable
         {
-            Destroy();
-            DrawUtil.Self.Init(baseColor, out baseTexture, out drawTexture, out texture);
+            get
+            {
+                if (trans == null || renderer == null || Cache == null || !Cache.IsAvailable)
+                    return false;
+                return true;
+            }
+        }
+
+        public void Init(Transform trans, Color baseColor)
+        {
+            this.trans = trans;
+            renderer = trans.GetComponent<Renderer>();
+            if (renderer == null)
+                return;
+            Cache = DrawUtil.Self.GetCache(trans, baseColor);
+            Undo.undoRedoPerformed += undoRedoPerformed;
         }
 
         public void ChangeBase(Color baseColor)
         {
-            DrawUtil.Self.ChangeBase(baseColor, baseTexture, drawTexture, texture);
+            if (!IsAvailable)
+                return;
+            Cache.SetBaseTextureUndo();
+            DrawUtil.Self.Init(baseColor, Cache);
         }
 
-        public void Destroy()
+        public void Clear()
         {
-            if (baseTexture != null)
-                Object.DestroyImmediate(baseTexture);
-            if (drawTexture != null)
-                Object.DestroyImmediate(drawTexture);
-            if (texture != null)
-                Object.DestroyImmediate(texture);
+            trans = null;
+            renderer = null;
+            Cache = null;
+            Undo.undoRedoPerformed -= undoRedoPerformed;
+        }
+
+        void undoRedoPerformed()
+        {
+            if (!IsAvailable)
+                return;
+            DrawUtil.Self.Merge(Cache);
         }
 
         public void Save(string name)
         {
-            if (Texture == null)
+            if (Cache == null || Cache.Texture == null)
                 return;
             if (!AssetDatabase.IsValidFolder($"{ModEditorWindow.ModEditorPath}/Textures"))
                 AssetDatabase.CreateFolder(ModEditorWindow.ModEditorPath, "Textures");
             string path = $"{ModEditorWindow.ModEditorPath}/Textures/{name}-Editing.png";
 
-            Texture2D tex = new Texture2D(Texture.width, Texture.height, TextureFormat.ARGB32, false);
+            Texture2D tex = new Texture2D(Cache.Texture.width, Cache.Texture.height, TextureFormat.ARGB32, false);
             RenderTexture pre = RenderTexture.active;
-            RenderTexture.active = Texture;
-            tex.ReadPixels(new Rect(0, 0, Texture.width, Texture.height), 0, 0);
+            RenderTexture.active = Cache.Texture;
+            tex.ReadPixels(new Rect(0, 0, Cache.Texture.width, Cache.Texture.height), 0, 0);
 
             byte[] bytes = tex.EncodeToPNG();
             FileStream file = File.Open(path, FileMode.Create);

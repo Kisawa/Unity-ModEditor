@@ -13,7 +13,7 @@ namespace ModEditor
 
         public override WriteTargetType UtilTarget => WriteTargetType.Vertex;
 
-        public override bool BrushWrite(Mesh mesh, CalcShaderData.CalcVertexsData data)
+        public override bool BrushWrite(Mesh mesh, CalcManager data)
         {
             switch (TargetType)
             {
