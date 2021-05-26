@@ -18,6 +18,11 @@ namespace ModEditor
             }
         }
 
+        #region DrawUtil
+        public List<Transform> DrawUtilTransCache = new List<Transform>();
+        public List<DrawUtil.Cache> DrawUtilCache = new List<DrawUtil.Cache>();
+        #endregion
+
         #region TextureBrushTab
         [SerializeField]
         bool textureBrushTabTextureView = false;
@@ -46,9 +51,6 @@ namespace ModEditor
                 textureBrushTabCurrentDrawBoard = value;
             }
         }
-
-        public List<Transform> DrawUtilTransCache = new List<Transform>();
-        public List<DrawUtil.Cache> DrawUtilCache = new List<DrawUtil.Cache>();
         #endregion
 
         #region Copy
