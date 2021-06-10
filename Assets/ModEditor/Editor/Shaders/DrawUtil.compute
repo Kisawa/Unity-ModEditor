@@ -1,16 +1,59 @@
 ﻿#pragma kernel Init
+#pragma kernel InitTex
 #pragma kernel Merge
 #pragma kernel Clone
+#pragma kernel Write
+#pragma kernel Draw
 
+float2 _TexelSize;
 RWTexture2D<float4> RW_BackgroundTexture;
 RWTexture2D<float4> RW_ForegroundTexture;
 RWTexture2D<float4> RW_Texture;
+
+float pow2(float res)
+{
+	return res * res;
+}
+
+float2 rotate2(float2 res, float radian)
+{
+	return mul(float2x2(cos(radian), -sin(radian), sin(radian), cos(radian)), res);
+}
+
+float remap(float num, float inMin, float inMax, float outMin, float outMax)
+{
+	float step = inMax - inMin;
+	if(step == 0)
+		return outMin;
+	else
+		return outMin + (num - inMin) * (outMax - outMin) / (inMax - inMin);
+}
+
+float4 blend(float4 src, float4 dst, float srcF, float dstF)
+{
+	float4 col = dst * dstF + src * srcF;
+	return col;
+}
+
+float4 blend(float4 src, float4 dst, float srcF, float dstF, float srcAF, float dstAF)
+{
+	float4 col;
+	col.rgb = dst.rgb * dstF + src.rgb * srcF;
+	col.a = dst.a * dstAF + src.a * srcAF;
+	return col;
+}
+
+float4 blend(float4 src, float4 dst, float4 srcF, float4 dstF)
+{
+	float4 col = dst * dstF + src * srcF;
+	return col;
+}
 
 void merge(uint3 id)
 {
 	float4 background = RW_BackgroundTexture[id.xy];
 	float4 foreground = RW_ForegroundTexture[id.xy];
-    RW_Texture[id.xy] = lerp(background, foreground, all(foreground));
+    RW_Texture[id.xy] = blend(foreground, background, foreground.a, 1 - foreground.a);
 }
 
 float4 _BaseColor;
@@ -18,6 +61,14 @@ float4 _BaseColor;
 void Init(uint3 id : SV_DispatchThreadID)
 {
 	RW_BackgroundTexture[id.xy] = _BaseColor;
+	merge(id);
+}
+
+Texture2D<float4> _BaseTexture;
+[numthreads(32,32,1)]
+void InitTex(uint3 id : SV_DispatchThreadID)
+{
+	RW_BackgroundTexture[id.xy] = _BaseTexture[id.xy];
 	merge(id);
 }
 
@@ -31,4 +82,36 @@ void Merge(uint3 id : SV_DispatchThreadID)
 void Clone(uint3 id : SV_DispatchThreadID)
 {
 	RW_Texture[id.xy] = RW_ForegroundTexture[id.xy];
+}
+
+float4 _Color;
+[numthreads(32,32,1)]
+void Write(uint3 id : SV_DispatchThreadID)
+{
+	RW_Texture[id.xy] = _Color;
+}
+
+float2 _CursorTexcoord;
+float3 _TexBrushRange;
+float _BrushRotate;
+int GetRange(uint3 id, out float res)
+{
+	float2 dir = id.xy - _CursorTexcoord * _TexelSize;
+	dir = rotate2(dir, _BrushRotate);
+	res = pow2(dir.x) / pow2(_TexBrushRange.x * _TexelSize.x) + pow2(dir.y) / pow2(_TexBrushRange.y * _TexelSize.y);
+	int inRange = 1 - step(1, res);
+	res = saturate(1 - remap(res, _TexBrushRange.z, 1, 0, 1)) * inRange;
+	return inRange;
+}
+
+float4 _BrushColor;
+[numthreads(32,32,1)]
+void Draw(uint3 id : SV_DispatchThreadID)
+{
+	float res;
+	int inRange = GetRange(id, res);
+	float4 foreground = RW_ForegroundTexture[id.xy];
+	float4 col = _BrushColor;
+	RW_ForegroundTexture[id.xy] = blend(col, foreground, res, 1 - res);
+	merge(id);
 }

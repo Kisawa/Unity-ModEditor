@@ -39,18 +39,6 @@ namespace ModEditor
             }
         }
 
-        bool brushColorView;
-        public bool BrushColorView
-        {
-            get => brushColorView;
-            set
-            {
-                if (brushColorView == value)
-                    return;
-                brushColorView = value;
-            }
-        }
-
         SceneHandleType sceneHandleType;
         public SceneHandleType SceneHandleType
         {
@@ -62,10 +50,6 @@ namespace ModEditor
             }
             set => sceneHandleType = value;
         }
-
-        public bool VertexZoneLock { get; set; }
-
-        public bool VertexBrushLock { get; set; }
 
         public bool OnSceneGUI { get; set; }
 

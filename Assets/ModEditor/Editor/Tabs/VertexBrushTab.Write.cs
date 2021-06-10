@@ -10,6 +10,22 @@ namespace ModEditor
 {
     public partial class VertexBrushTab
     {
+        bool brushColorView;
+        public bool BrushColorView
+        {
+            get => brushColorView;
+            set
+            {
+                if (brushColorView == value)
+                    return;
+                brushColorView = value;
+            }
+        }
+
+        public bool VertexZoneLock { get; set; }
+
+        public bool VertexBrushLock { get; set; }
+
         List<CalcManager> calcShaderDatas;
         public List<CalcManager> CalcShaderDatas
         {
@@ -122,7 +138,7 @@ namespace ModEditor
 
         private void Shift_OnMouse_Left()
         {
-            if (window.OnSceneGUI || !window.VertexZoneLock || window.VertexBrushLock)
+            if (window.OnSceneGUI || !VertexZoneLock || VertexBrushLock)
                 return;
             for (int i = 0; i < CalcShaderDatas.Count; i++)
                 CalcShaderDatas[i].AddZoneFromSelect();
@@ -130,7 +146,7 @@ namespace ModEditor
 
         private void Shift_OnMouse_Right()
         {
-            if (window.OnSceneGUI || !window.VertexZoneLock || window.VertexBrushLock)
+            if (window.OnSceneGUI || !VertexZoneLock || VertexBrushLock)
                 return;
             for (int i = 0; i < CalcShaderDatas.Count; i++)
                 CalcShaderDatas[i].SubZoneFromSelect();
@@ -138,7 +154,7 @@ namespace ModEditor
 
         private void Space_Down()
         {
-            if (window.ToolType != ModEditorToolType.VertexBrush || window.VertexBrushLock)
+            if (window.ToolType != ModEditorToolType.VertexBrush || VertexBrushLock)
                 return;
             float depth = float.MaxValue;
             for (int i = 0; i < CalcShaderDatas.Count; i++)
@@ -153,22 +169,22 @@ namespace ModEditor
 
         private void CapsLock_Down()
         {
-            if (window.VertexBrushLock)
+            if (VertexBrushLock)
                 return;
-            window.VertexZoneLock = !window.VertexZoneLock;
+            VertexZoneLock = !VertexZoneLock;
             for (int i = 0; i < CalcShaderDatas.Count; i++)
-                CalcShaderDatas[i].LockZoneFromSelect(window.VertexZoneLock);
+                CalcShaderDatas[i].LockZoneFromSelect(VertexZoneLock);
         }
 
         private void Alt_CapsLock_Down()
         {
-            window.VertexBrushLock = !window.VertexBrushLock;
+            VertexBrushLock = !VertexBrushLock;
             Repaint();
         }
 
         private void Control_OnMouse_DragLeft()
         {
-            if (window.ToolType != ModEditorToolType.VertexBrush || window.VertexBrushLock)
+            if (window.ToolType != ModEditorToolType.VertexBrush || VertexBrushLock)
                 return;
             window.Manager.VertexBrushSize += Event.current.delta.x * 0.01f;
             window.SceneHandleType = SceneHandleType.BrushSize;
@@ -176,7 +192,7 @@ namespace ModEditor
 
         private void Control_OnScrollWheel_Roll(float obj)
         {
-            if (window.ToolType != ModEditorToolType.VertexBrush || window.VertexBrushLock)
+            if (window.ToolType != ModEditorToolType.VertexBrush || VertexBrushLock)
                 return;
             window.Manager.VertexBrushDepth -= Event.current.delta.y * 0.01f;
             window.SceneHandleType = SceneHandleType.BrushDepth;
@@ -184,7 +200,7 @@ namespace ModEditor
 
         private void Mouse_Update()
         {
-            if (Mouse.IsButton || window.VertexBrushLock)
+            if (Mouse.IsButton || VertexBrushLock)
                 return;
             for (int i = 0; i < CalcShaderDatas.Count; i++)
                 CalcShaderDatas[i].ClearSpread();
@@ -192,7 +208,7 @@ namespace ModEditor
 
         private void ScrollWheel_Update()
         {
-            if (Key.Alt || window.VertexBrushLock)
+            if (Key.Alt || VertexBrushLock)
                 return;
             for (int i = 0; i < CalcShaderDatas.Count; i++)
                 CalcShaderDatas[i].ClearSpread();
@@ -200,7 +216,7 @@ namespace ModEditor
 
         private void V_Down()
         {
-            window.BrushColorView = !window.BrushColorView;
+            BrushColorView = !BrushColorView;
         }
 
         private void C_Down()

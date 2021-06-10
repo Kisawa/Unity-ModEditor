@@ -2067,7 +2067,6 @@ namespace ModEditor
         public static event Action Update;
         static Vector3 screenTexcoord;
         public static Vector3 ScreenTexcoord => screenTexcoord;
-        public static Vector2 ScreenPos { get; private set; }
         public static void UpdateMouseState(bool res, bool buttonRes)
         {
             Is = res;
@@ -2077,7 +2076,6 @@ namespace ModEditor
         }
         public static void UpdateMousePos(Event @event, Camera camera)
         {
-            ScreenPos = @event.mousePosition;
             screenTexcoord = camera.ScreenToViewportPoint(@event.mousePosition);
             screenTexcoord.y = 1 - ScreenTexcoord.y;
             screenTexcoord.z = camera.aspect;

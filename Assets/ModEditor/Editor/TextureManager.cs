@@ -40,6 +40,29 @@ namespace ModEditor
             DrawUtil.Self.Init(baseColor, Cache);
         }
 
+        public void ChangeBase(Texture tex)
+        {
+            if (!IsAvailable)
+                return;
+            Cache.SetBaseTextureUndo();
+            DrawUtil.Self.Init(tex, Cache);
+        }
+
+        public void DrawStart(Color brushColor, Vector2 cursorTexcoord, Vector3 texBrushRange, float brushRotation)
+        {
+            if (!IsAvailable)
+                return;
+            Cache.SetDrawTextureUndo();
+            DrawUtil.Self.Draw(Cache, brushColor, cursorTexcoord, texBrushRange, brushRotation);
+        }
+
+        public void Draw(Color brushColor, Vector2 cursorTexcoord, Vector3 texBrushRange, float brushRotation)
+        {
+            if (!IsAvailable)
+                return;
+            DrawUtil.Self.Draw(Cache, brushColor, cursorTexcoord, texBrushRange, brushRotation);
+        }
+
         public void Clear()
         {
             trans = null;

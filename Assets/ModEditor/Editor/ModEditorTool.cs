@@ -47,6 +47,15 @@ namespace ModEditor
             GUIStyle txtStyle = GUI.skin.GetStyle("AboutWIndowLicenseLabel");
             GUIStyle hotKeyStyle = GUI.skin.GetStyle("LODSliderTextSelected");
             GUIStyle msgStyle = GUI.skin.GetStyle("LODRendererAddButton");
+            switch (ToolType)
+            {
+                case ModEditorToolType.VertexBrush:
+                    vertexBrushTool.OnSceneGUI(window);
+                    break;
+                case ModEditorToolType.TextureBrush:
+                    textureBrushTool.OnSceneGUI(window);
+                    break;
+            }
             Handles.BeginGUI();
             Rect rect = new Rect(window.position.width - 250, window.position.height - 65, 240, 50);
             switch (ToolType)

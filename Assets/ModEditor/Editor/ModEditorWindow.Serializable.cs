@@ -51,6 +51,34 @@ namespace ModEditor
                 textureBrushTabCurrentDrawBoard = value;
             }
         }
+
+        [SerializeField]
+        float textureBrushTabBrushRotation;
+        public float TextureBrushTabBrushRotation
+        {
+            get => textureBrushTabBrushRotation;
+            set
+            {
+                if (value == textureBrushTabBrushRotation)
+                    return;
+                Undo.RecordObject(this, "TextureBrushTab BrushRotation Changed");
+                textureBrushTabBrushRotation = value;
+            }
+        }
+
+        [SerializeField]
+        Texture textureBrushTabBaseTex;
+        public Texture TextureBrushTabBaseTex
+        {
+            get => textureBrushTabBaseTex;
+            set
+            {
+                if (value == textureBrushTabBaseTex)
+                    return;
+                Undo.RecordObject(this, "TextureBrushTab BaseTex Changed");
+                textureBrushTabBaseTex = value;
+            }
+        }
         #endregion
 
         #region Copy

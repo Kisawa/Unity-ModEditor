@@ -247,7 +247,7 @@ namespace ModEditor
             EditorGUILayout.LabelField("Brush Scope View Color:", labelStyle, GUILayout.Width(window.position.width - 160));
             window.Manager.VertexBrushScopeViewColor = EditorGUILayout.ColorField(window.Manager.VertexBrushScopeViewColor, GUILayout.Width(80));
             EditorGUILayout.EndHorizontal();
-            if (window.ToolType == ModEditorToolType.VertexBrush && window.VertexBrushLock && !BrushDisable())
+            if (window.ToolType == ModEditorToolType.VertexBrush && VertexBrushLock && !BrushDisable())
             {
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.Space(15);

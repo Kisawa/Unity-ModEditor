@@ -13,6 +13,11 @@ namespace ModEditor
 
         public virtual void OnEnable() { }
 
+        public virtual void OnSceneGUI(EditorWindow window)
+        { 
+            
+        }
+
         public virtual Rect Draw(EditorWindow window, GUIStyle txtStyle, GUIStyle hotKeyStyle, GUIStyle msgStyle)
         {
             return window.position;

@@ -21,7 +21,7 @@ namespace ModEditor
             get
             {
                 if (ModEditor != null && ModEditor.Manager != null)
-                    zoneLock = ModEditor.VertexZoneLock;
+                    zoneLock = ModEditor.Tab_VertexBrush.VertexZoneLock;
                 return zoneLock;
             }
         }
@@ -32,7 +32,7 @@ namespace ModEditor
             get
             {
                 if (ModEditor != null && ModEditor.Manager != null)
-                    brushLock = ModEditor.VertexBrushLock;
+                    brushLock = ModEditor.Tab_VertexBrush.VertexBrushLock;
                 return brushLock;
             }
         }
@@ -133,7 +133,7 @@ namespace ModEditor
             get
             {
                 if (ModEditor != null)
-                    brushColorView = ModEditor.BrushColorView;
+                    brushColorView = ModEditor.Tab_VertexBrush.BrushColorView;
                 return brushColorView;
             }
             set
@@ -141,7 +141,7 @@ namespace ModEditor
                 if (ModEditor == null)
                     return;
                 brushColorView = value;
-                ModEditor.BrushColorView = brushColorView;
+                ModEditor.Tab_VertexBrush.BrushColorView = brushColorView;
             }
         }
 

@@ -51,6 +51,21 @@
 
 		float _DepthCompress;
 
+		float pow2(float res)
+		{
+			return res * res;
+		}
+
+		float2 rotate2(float2 res, float radian)
+		{
+			return mul(float2x2(cos(radian), -sin(radian), sin(radian), cos(radian)), res);
+		}
+
+		float remap(float num, float inMin, float inMax, float outMin, float outMax)
+		{
+			return outMin + (num - inMin) * (outMax - outMin) / (inMax - inMin);
+		}
+
 		v2g vertToGeom(appdata v)
         {
             v2g o;
@@ -200,6 +215,39 @@
 			col = max(col, lerp(0, _BrushScopeViewColor, step(_BrushSize * _ToStep, dis) - step(_BrushSize, dis)));
 			return col;
 		}
+
+		int _TexRender;
+		sampler2D _EditorTex;
+		fixed4 frag_TexView(g2f i) : SV_Target
+		{
+			fixed4 col = tex2D(_EditorTex, i.uv) * _TexRender;
+			return col;
+		}
+
+		fixed4 _TexBrushRangeViewColor;
+		int _CursorOn;
+		float2 _CursorTexcoord;
+		float3 _TexBrushRange;
+		float _BrushRotate;
+		fixed4 frag_TexBrushRange(g2f i) : SV_Target
+		{
+			fixed4 col = 0;
+			float2 dir = i.uv - _CursorTexcoord;
+			dir = rotate2(dir, _BrushRotate);
+			float res = pow2(dir.x) / pow2(_TexBrushRange.x) + pow2(dir.y) / pow2(_TexBrushRange.y);
+			int inRange = 1 - step(1, res);
+			int inRange1 = 1 - step(0.95, res);
+			
+			res = (1 - remap(res, min(_TexBrushRange.z, 0.999), 1, 0, 1)) * inRange;
+			col = lerp(col, _TexBrushRangeViewColor, res);
+
+			col = lerp(col, _TexBrushRangeViewColor, inRange - inRange1);
+			inRange = 1 - step(1, res);
+			inRange1 = 1 - step(1 - 0.1 * max(_TexBrushRange.z, 0.01), res);
+			col = lerp(col, 1, inRange - inRange1);
+			col *= _CursorOn;
+			return col;
+		}
 		ENDCG
 
 		Pass
@@ -281,5 +329,25 @@
 			#pragma fragment frag_ScreenMesh
 			ENDCG
         }
+
+		Pass
+		{
+			ZWrite Off
+			Blend SrcAlpha OneMinusSrcAlpha
+			CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag_TexView
+			ENDCG
+		}
+
+		Pass
+		{
+			ZWrite Off
+			Blend SrcAlpha OneMinusSrcAlpha
+			CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag_TexBrushRange
+			ENDCG
+		}
     }
 }

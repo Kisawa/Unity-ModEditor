@@ -392,7 +392,7 @@ namespace ModEditor
             }
         }
 
-        void refreshBuffer()
+        public void refreshBuffer()
         {
             if(buffer != null)
                 buffer.Clear();
@@ -423,7 +423,7 @@ namespace ModEditor
                     subCount = skinnedMesh.sharedMesh.subMeshCount;
                 for (int j = 0; j < subCount; j++)
                 {
-                    if (window.Manager.GridView || window.Manager.UVView || window.Manager.VertexColorView || window.ToolType == ModEditorToolType.VertexBrush)
+                    if (window.Manager.GridView || window.Manager.UVView || window.Manager.VertexColorView || window.ToolType != ModEditorToolType.None)
                         buffer.DrawRenderer(renderer, window.Mat_Util, j, 0);
                     if (window.Manager.NormalView)
                         buffer.DrawRenderer(renderer, window.Mat_Util, j, 1);
@@ -451,11 +451,12 @@ namespace ModEditor
                             buffer.DrawRenderer(data.renderer, data.Material, j);
                     }
                 }
-                if (window.ToolType == ModEditorToolType.TextureBrush)
+                else if (window.ToolType == ModEditorToolType.TextureBrush)
                 {
                     if (window.Tab_TextureBrush.TextureManager.IsAvailable && window.Tab_TextureBrush.TextureManager.trans == target.transform)
                     {
-
+                        buffer.DrawRenderer(renderer, window.Mat_Util, 0, 9);
+                        buffer.DrawRenderer(renderer, window.Mat_Util, 0, 10);
                     }
                 }
             }

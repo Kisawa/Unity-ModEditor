@@ -11,7 +11,7 @@ namespace ModEditor
     {
         [SerializeField]
         bool lockTarget;
-        public bool LockTarget 
+        public bool LockTarget
         {
             get => lockTarget;
             set {
@@ -24,7 +24,7 @@ namespace ModEditor
 
         [SerializeField]
         ExposedReference<GameObject> target;
-        public GameObject Target 
+        public GameObject Target
         {
             get => target.Resolve(ModEditorWindow.ExposedManagement);
             set
@@ -149,10 +149,10 @@ namespace ModEditor
         #region Normal Shading
         [SerializeField]
         bool normalView;
-        public bool NormalView 
+        public bool NormalView
         {
             get => normalView;
-            set 
+            set
             {
                 if (value == normalView)
                     return;
@@ -846,6 +846,48 @@ namespace ModEditor
 
         #region TextureBrush
         [SerializeField]
+        bool texBrushUnfold = true;
+        public bool TexBrushUnfold
+        {
+            get => texBrushUnfold;
+            set
+            {
+                if (value == texBrushUnfold)
+                    return;
+                Undo.RecordObject(this, "ModEditor TexBrushUnfold");
+                texBrushUnfold = value;
+            }
+        }
+
+        [SerializeField]
+        bool texBrushForegroundUnfold = true;
+        public bool TexBrushForegroundUnfold
+        {
+            get => texBrushForegroundUnfold;
+            set
+            {
+                if (value == texBrushForegroundUnfold)
+                    return;
+                Undo.RecordObject(this, "ModEditor TexBrushForegroundUnfold");
+                texBrushForegroundUnfold = value;
+            }
+        }
+
+        [SerializeField]
+        Color texBrushRangeViewColor = Color.green;
+        public Color TexBrushRangeViewColor
+        {
+            get => texBrushRangeViewColor;
+            set
+            {
+                if (value == texBrushRangeViewColor)
+                    return;
+                Undo.RecordObject(this, "ModEditor TexBrushRangeViewColor");
+                texBrushRangeViewColor = value;
+            }
+        }
+
+        [SerializeField]
         Color textureBaseColor = Color.clear;
         public Color TextureBaseColor
         {
@@ -870,6 +912,32 @@ namespace ModEditor
                     return;
                 Undo.RecordObject(this, "ModEditor TextureBrushColor");
                 textureBrushColor = value;
+            }
+        }
+
+        [SerializeField]
+        Vector3 texBrushRange;
+        public Vector3 TexBrushRange
+        {
+            get => texBrushRange;
+            set
+            {
+                if (value.x <= 0)
+                    value.x = 0.001f;
+                if (value.y <= 0)
+                    value.y = 0.001f;
+                if (value.z < 0)
+                    value.z = 0;
+                if (value.x > 0.5f)
+                    value.x = 0.5f;
+                if (value.y > 0.5f)
+                    value.y = 0.5f;
+                if (value.z > 1)
+                    value.z = 1;
+                if (value == texBrushRange)
+                    return;
+                Undo.RecordObject(this, "ModEditor TexBrushRange");
+                texBrushRange = value;
             }
         }
         #endregion

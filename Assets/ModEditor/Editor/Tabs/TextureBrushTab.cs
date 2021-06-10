@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace ModEditor
 {
-    public class TextureBrushTab : WindowTabBase
+    public partial class TextureBrushTab : WindowTabBase
     {
         new ModEditorWindow window;
 
@@ -18,41 +18,52 @@ namespace ModEditor
 
         Vector2 scroll;
 
-        public event Action onCurrentDrawBoardChanged;
-
-        List<Transform> drawBoards;
-        Transform currentDrawBoard {
-            get => window.TextureBrushTabCurrentDrawBoard;
-            set
-            {
-                if (window.TextureBrushTabCurrentDrawBoard == value)
-                    return;
-                TextureManager.Clear();
-                if (value != null)
-                {
-                    TextureManager.Init(value, window.Manager.TextureBaseColor);
-                    onCurrentDrawBoardChanged?.Invoke();
-                }
-                window.TextureBrushTabCurrentDrawBoard = value;
-            }
-        }
-        bool textureView { get => window.TextureBrushTabTextureView; set => window.TextureBrushTabTextureView = value; }
-        public TextureManager TextureManager { get; } = new TextureManager();
-
         public override void OnFocus()
         {
             base.OnFocus();
+            Undo.undoRedoPerformed += undoRedoPerformed;
             window.onRefreshTargetDic += refreshDrawBoards;
-            EditorEvent.Use.OnMouse.DownLeft += OnMouse_DownLeft;
+
+            EditorEvent.OnMouse.Move += OnMouse_Move;
+            EditorEvent.OnMouse.DownLeft += OnMouse_DrawStart;
+            EditorEvent.OnMouse.DragLeft += OnMouse_Draw;
+            EditorEvent.OnMouse.DragRight += OnMouse_Move;
+            EditorEvent.Control.OnMouse.Move += OnMouse_Move;
+            EditorEvent.Control.OnMouse.DragLeft += OnMouse_Move;
+            EditorEvent.Control.OnMouse.DragRight += OnMouse_Move;
+            EditorEvent.Alt.OnMouse.Move += OnMouse_Move;
+            EditorEvent.Alt.OnMouse.DragLeft += OnMouse_Move;
+            EditorEvent.Alt.OnMouse.DragRight += OnMouse_Move;
+            
+            EditorEvent.Use.Control.OnMouse.DragLeft += Control_OnMouse_DragLeft;
+            EditorEvent.Use.Control.OnMouse.DragRight += Control_OnMouse_DragRight;
+            EditorEvent.Use.Control.OnScrollWheel.Roll += OnScrollWheel_Roll;
+            EditorEvent.Use.OnKey.V.Down += V_Down;
 
             refreshDrawBoards();
+            currentDrawBoard = currentDrawBoard;
         }
 
         public override void OnLostFocus()
         {
             base.OnLostFocus();
+            Undo.undoRedoPerformed -= undoRedoPerformed;
             window.onRefreshTargetDic -= refreshDrawBoards;
-            EditorEvent.Use.OnMouse.DownLeft -= OnMouse_DownLeft;
+
+            EditorEvent.OnMouse.Move -= OnMouse_Move;
+            EditorEvent.OnMouse.DownLeft -= OnMouse_DrawStart;
+            EditorEvent.OnMouse.DragLeft -= OnMouse_Draw;
+            EditorEvent.OnMouse.DragRight -= OnMouse_Move;
+            EditorEvent.Control.OnMouse.Move -= OnMouse_Move;
+            EditorEvent.Control.OnMouse.DragLeft -= OnMouse_Move;
+            EditorEvent.Control.OnMouse.DragRight -= OnMouse_Move;
+            EditorEvent.Alt.OnMouse.Move -= OnMouse_Move;
+            EditorEvent.Alt.OnMouse.DragLeft -= OnMouse_Move;
+            EditorEvent.Alt.OnMouse.DragRight -= OnMouse_Move;
+            EditorEvent.Use.Control.OnMouse.DragLeft -= Control_OnMouse_DragLeft;
+            EditorEvent.Use.Control.OnMouse.DragRight -= Control_OnMouse_DragRight;
+            EditorEvent.Use.Control.OnScrollWheel.Roll -= OnScrollWheel_Roll;
+            EditorEvent.Use.OnKey.V.Down -= V_Down;
         }
 
         public override void OnDiable()
@@ -65,6 +76,7 @@ namespace ModEditor
         {
             scroll = EditorGUILayout.BeginScrollView(scroll);
             GUIStyle labelStyle = GUI.skin.GetStyle("LODRenderersText");
+
             EditorGUILayout.BeginVertical("flow background");
             if (drawBoards == null || drawBoards.Count == 0)
             {
@@ -95,12 +107,9 @@ namespace ModEditor
             }
             EditorGUILayout.EndVertical();
 
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Base Color:", labelStyle, GUILayout.Width(100));
-            window.Manager.TextureBaseColor = EditorGUILayout.ColorField(window.Manager.TextureBaseColor, GUILayout.Width(80));
-            if (GUILayout.Button("Refresh"))
-                TextureManager.ChangeBase(window.Manager.TextureBaseColor);
-            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.Space(10);
+            drawBrush(labelStyle);
+            EditorGUILayout.Space(10);
 
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button(textureView ? window.viewContent : window.hiddenContent, "ObjectPickerTab"))
@@ -109,11 +118,6 @@ namespace ModEditor
             if (TextureManager.IsAvailable)
                 texture = TextureManager.Cache.Texture;
             EditorGUILayout.ObjectField(texture, typeof(RenderTexture), false);
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Brush Color:", labelStyle, GUILayout.Width(100));
-            window.Manager.TextureBrushColor = EditorGUILayout.ColorField(window.Manager.TextureBrushColor, GUILayout.Width(80));
             EditorGUILayout.EndHorizontal();
 
             if (GUILayout.Button("Save"))
@@ -129,39 +133,83 @@ namespace ModEditor
 
             EditorGUILayout.EndScrollView();
         }
-
-        void refreshDrawBoards()
+        
+        void drawBrush(GUIStyle labelStyle)
         {
-            if (drawBoards == null)
-                drawBoards = new List<Transform>();
-            else
-                drawBoards.Clear();
-            for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
-            {
-                GameObject obj = window.Manager.TargetChildren[i];
-                if (!window.Manager.ActionableDic[obj])
-                    continue;
-                Renderer renderer = obj.GetComponent<Renderer>();
-                if (renderer == null)
-                    continue;
-                Collider collider = obj.GetComponent<Collider>();
-                if (collider == null || !collider.enabled)
-                    continue;
-                drawBoards.Add(obj.transform);
-            }
-        }
+            EditorGUILayout.BeginVertical("AnimationEventTooltip");
 
-        private void OnMouse_DownLeft()
-        {
-            if (window.OnSceneGUI)
-                return;
-            if (Physics.Raycast(EditorEvent.Camera.ScreenPointToRay(Mouse.ScreenPos), out RaycastHit hit))
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Space(15);
+            if (GUILayout.Button("Background", "AboutWIndowLicenseLabel", GUILayout.Width(150)) ||
+                GUILayout.Button(window.Manager.TexBrushUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 205)))
+                window.Manager.TexBrushUnfold = !window.Manager.TexBrushUnfold;
+            EditorGUILayout.EndHorizontal();
+
+            if (window.Manager.TexBrushUnfold)
             {
-                if (drawBoards.Contains(hit.transform))
-                {
-                    Debug.LogError(hit.transform.name);
-                }
+                EditorGUI.indentLevel = 2;
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Base Color:", labelStyle, GUILayout.Width(100));
+                window.Manager.TextureBaseColor = EditorGUILayout.ColorField(window.Manager.TextureBaseColor, GUILayout.Width(100));
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(15);
+                if (GUILayout.Button("Refresh With Color", "EditModeSingleButton", GUILayout.Width(window.position.width - 60)))
+                    TextureManager.ChangeBase(window.Manager.TextureBaseColor);
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Base Tex:", labelStyle, GUILayout.Width(100));
+                baseTex = (Texture)EditorGUILayout.ObjectField(baseTex, typeof(Texture), false, GUILayout.Width(window.position.width - 150));
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(15);
+                if (GUILayout.Button("Refresh With Texture", "EditModeSingleButton", GUILayout.Width(window.position.width - 60)))
+                    TextureManager.ChangeBase(baseTex);
+                EditorGUILayout.EndHorizontal();
             }
+            GUILayout.Space(10);
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Space(15);
+            if (GUILayout.Button("Foreground", "AboutWIndowLicenseLabel", GUILayout.Width(150)) ||
+                GUILayout.Button(window.Manager.TexBrushForegroundUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 205)))
+                window.Manager.TexBrushForegroundUnfold = !window.Manager.TexBrushForegroundUnfold;
+            EditorGUILayout.EndHorizontal();
+
+            if (window.Manager.TexBrushForegroundUnfold)
+            {
+                EditorGUI.indentLevel = 2;
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Brush Color:", labelStyle, GUILayout.Width(125));
+                window.Manager.TextureBrushColor = EditorGUILayout.ColorField(window.Manager.TextureBrushColor, GUILayout.Width(100));
+                EditorGUILayout.EndHorizontal();
+                GUILayout.Space(5);
+
+                Vector3 texBrushRange = window.Manager.TexBrushRange;
+                EditorGUILayout.LabelField("BurshRange Width:", labelStyle, GUILayout.Width(125));
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(30);
+                texBrushRange.x = EditorGUILayout.Slider(texBrushRange.x, 0, 0.5f, GUILayout.Width(window.position.width - 100));
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.LabelField("BurshRange Height:", labelStyle, GUILayout.Width(125));
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(30);
+                texBrushRange.y = EditorGUILayout.Slider(texBrushRange.y, 0, 0.5f, GUILayout.Width(window.position.width - 100));
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.LabelField("BrushRange Inner:", labelStyle, GUILayout.Width(125));
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(30);
+                texBrushRange.z = EditorGUILayout.Slider(texBrushRange.z, 0, 1, GUILayout.Width(window.position.width - 100));
+                EditorGUILayout.EndHorizontal();
+                window.Manager.TexBrushRange = texBrushRange;
+            }
+
+            EditorGUILayout.EndVertical();
+            EditorGUI.indentLevel = 0;
         }
     }
 }

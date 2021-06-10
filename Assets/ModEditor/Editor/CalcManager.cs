@@ -309,7 +309,7 @@ namespace ModEditor
             CalcUtil.Self.CalcShader.SetMatrix("_P", GL.GetGPUProjectionMatrix(camera.projectionMatrix, false));
             CalcUtil.Self.CalcShader.SetInt("_ClearSpread", clearSpread ? 1 : 0);
             CalcUtil.Self.CalcShader.SetInt("_OnlyZone", Key.Shift ? 1 : 0);
-            CalcUtil.Self.CalcShader.SetInt("_ZoneInSelect", ModEditor.VertexZoneLock && Key.ShiftAndControl ? 1 : 0);
+            CalcUtil.Self.CalcShader.SetInt("_ZoneInSelect", ModEditor.Tab_VertexBrush.VertexZoneLock && Key.ShiftAndControl ? 1 : 0);
             CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "_Vertices", _Vertices);
             CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "RW_Selects", Cache.RW_Selects);
             CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "RW_Depths", Cache.RW_Depths);
@@ -359,7 +359,7 @@ namespace ModEditor
             CalcUtil.Self.CalcShader.SetMatrix("_P", GL.GetGPUProjectionMatrix(camera.projectionMatrix, false));
             CalcUtil.Self.CalcShader.SetInt("_ClearSpread", clearSpread ? 1 : 0);
             CalcUtil.Self.CalcShader.SetInt("_OnlyZone", Key.Shift ? 1 : 0);
-            CalcUtil.Self.CalcShader.SetInt("_ZoneInSelect", ModEditor.VertexZoneLock && Key.ShiftAndControl ? 1 : 0);
+            CalcUtil.Self.CalcShader.SetInt("_ZoneInSelect", ModEditor.Tab_VertexBrush.VertexZoneLock && Key.ShiftAndControl ? 1 : 0);
             CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "_Vertices", _Vertices);
             CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "RW_Selects", Cache.RW_Selects);
             CalcUtil.Self.CalcShader.SetBuffer(CalcUtil.Self.kernel_SelectWithScreenScope, "RW_Depths", Cache.RW_Depths);
