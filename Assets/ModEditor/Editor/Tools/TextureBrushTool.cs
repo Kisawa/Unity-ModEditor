@@ -92,10 +92,11 @@ namespace ModEditor
             }
             set
             {
-                if (ModEditor == null)
+                if (ModEditor == null || texBrushRange == value)
                     return;
                 texBrushRange = value;
                 ModEditor.Manager.TexBrushRange = texBrushRange;
+                ModEditor.Repaint();
             }
         }
 
@@ -143,42 +144,36 @@ namespace ModEditor
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("BurshRange Width:", txtStyle, GUILayout.Width(100));
-            GUILayout.Label(TexBrushRange.x.ToString("F3"), txtStyle, GUILayout.Width(35));
-            GUILayout.Label("/Ctrl-DragLeft-X", hotKeyStyle, GUILayout.Width(100));
+            GUILayout.Label(TexBrushRange.x.ToString("F3"), txtStyle, GUILayout.Width(32));
+            GUILayout.Label("/Ctrl-DragLeft-X", hotKeyStyle, GUILayout.Width(95));
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("BurshRange Height:", txtStyle, GUILayout.Width(100));
-            GUILayout.Label(TexBrushRange.y.ToString("F3"), txtStyle, GUILayout.Width(35));
-            GUILayout.Label("/Ctrl-DragLeft-Y", hotKeyStyle, GUILayout.Width(100));
+            GUILayout.Label(TexBrushRange.y.ToString("F3"), txtStyle, GUILayout.Width(32));
+            GUILayout.Label("/Ctrl-DragLeft-Y", hotKeyStyle, GUILayout.Width(95));
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("BurshRange Inner:", txtStyle, GUILayout.Width(100));
-            GUILayout.Label(TexBrushRange.z.ToString("F3"), txtStyle, GUILayout.Width(35));
-            GUILayout.Label("/Ctrl-DragRight-X", hotKeyStyle, GUILayout.Width(100));
+            GUILayout.Label(TexBrushRange.z.ToString("F3"), txtStyle, GUILayout.Width(32));
+            GUILayout.Label("/Ctrl-DragRight-X", hotKeyStyle, GUILayout.Width(95));
             EditorGUILayout.EndHorizontal();
 
+            Vector3 range = TexBrushRange;
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("Align Width", "EditModeSingleButton", GUILayout.Width(105)))
-            {
-                Vector3 range = TexBrushRange;
                 range.y = range.x;
-                TexBrushRange = range;
-            }
             GUILayout.Space(12);
             if (GUILayout.Button("Align Height", "EditModeSingleButton", GUILayout.Width(105)))
-            {
-                Vector3 range = TexBrushRange;
                 range.x = range.y;
-                TexBrushRange = range;
-            }
             EditorGUILayout.EndHorizontal();
+            TexBrushRange = range;
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Bursh Rotation:", txtStyle, GUILayout.Width(100));
-            GUILayout.Label((BrushRotation * Mathf.Rad2Deg).ToString("F1"), txtStyle, GUILayout.Width(35));
-            GUILayout.Label("/Ctrl-ScrollWheel", hotKeyStyle, GUILayout.Width(100));
+            GUILayout.Label((BrushRotation * Mathf.Rad2Deg).ToString("F1"), txtStyle, GUILayout.Width(32));
+            GUILayout.Label("/Ctrl-ScrollWheel", hotKeyStyle, GUILayout.Width(95));
             EditorGUILayout.EndHorizontal();
 
             if (GUILayout.Button("Reset brush rotation", "EditModeSingleButton", GUILayout.Width(225)))
