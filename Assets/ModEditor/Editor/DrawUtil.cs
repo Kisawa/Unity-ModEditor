@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -110,6 +111,8 @@ namespace ModEditor
         public void Init(Texture tex, Cache cache)
         {
             RenderTexture _tex = RenderTexture.GetTemporary((int)TexelSize.x, (int)TexelSize.y, 0);
+            _tex.enableRandomWrite = true;
+            _tex.Create();
             Graphics.Blit(tex, _tex);
             if (cache == null)
                 cache = new Cache();
@@ -150,6 +153,15 @@ namespace ModEditor
             DrawShader.Dispatch(kernel_Merge, Mathf.CeilToInt(cache.Texture.width / 32f), Mathf.CeilToInt(cache.Texture.height / 32f), 1);
         }
 
+        public void DownSample(RenderTexture texture, int downSample)
+        {
+            if (downSample <= 1)
+                return;
+            RenderTexture tex = RenderTexture.GetTemporary(texture.width / downSample, texture.height / downSample, texture.depth, texture.format);
+            Graphics.Blit(texture, tex);
+            Graphics.Blit(tex, texture);
+        }
+
         public RenderTexture Clone(RenderTexture texture)
         {
             if (texture == null)
@@ -163,6 +175,24 @@ namespace ModEditor
             return clone;
         }
 
+        public RenderTexture Clone(Texture texture)
+        {
+            if (texture == null)
+                return null;
+            RenderTexture _tex = RenderTexture.GetTemporary(texture.width, texture.height, 0);
+            _tex.enableRandomWrite = true;
+            _tex.Create();
+            Graphics.Blit(texture, _tex);
+            RenderTexture clone = new RenderTexture(texture.width, texture.height, 0);
+            clone.enableRandomWrite = true;
+            clone.Create();
+            DrawShader.SetTexture(kernel_Clone, "RW_ForegroundTexture", _tex);
+            DrawShader.SetTexture(kernel_Clone, "RW_Texture", clone);
+            DrawShader.Dispatch(kernel_Clone, Mathf.CeilToInt(clone.width / 32f), Mathf.CeilToInt(clone.height / 32f), 1);
+            RenderTexture.ReleaseTemporary(_tex);
+            return clone;
+        }
+
         public void Write(RenderTexture texture, Color color)
         {
             if (texture == null)
@@ -170,6 +200,29 @@ namespace ModEditor
             DrawShader.SetVector("_Color", color);
             DrawShader.SetTexture(kernel_Write, "RW_Texture", texture);
             DrawShader.Dispatch(kernel_Write, Mathf.CeilToInt(texture.width / 32f), Mathf.CeilToInt(texture.height / 32f), 1);
+        }
+
+        public void Write(RenderTexture texture, RenderTexture origin)
+        {
+            if (texture == null || origin == null)
+                return;
+            DrawShader.SetTexture(kernel_Clone, "RW_ForegroundTexture", origin);
+            DrawShader.SetTexture(kernel_Clone, "RW_Texture", texture);
+            DrawShader.Dispatch(kernel_Clone, Mathf.CeilToInt(texture.width / 32f), Mathf.CeilToInt(texture.height / 32f), 1);
+        }
+
+        public void Write(RenderTexture texture, Texture origin)
+        {
+            if (texture == null || origin == null)
+                return;
+            RenderTexture _tex = RenderTexture.GetTemporary(origin.width, origin.height, 0);
+            _tex.enableRandomWrite = true;
+            _tex.Create();
+            Graphics.Blit(origin, _tex);
+            DrawShader.SetTexture(kernel_Clone, "RW_ForegroundTexture", _tex);
+            DrawShader.SetTexture(kernel_Clone, "RW_Texture", texture);
+            DrawShader.Dispatch(kernel_Clone, Mathf.CeilToInt(texture.width / 32f), Mathf.CeilToInt(texture.height / 32f), 1);
+            RenderTexture.ReleaseTemporary(_tex);
         }
 
         public void Draw(Cache cache, Color brushColor, Vector2 cursorTexcoord, Vector3 texBrushRange, float brushRotation)
@@ -187,6 +240,30 @@ namespace ModEditor
             DrawShader.Dispatch(kernel_Draw, Mathf.CeilToInt(cache.Texture.width / 32f), Mathf.CeilToInt(cache.Texture.height / 32f), 1);
         }
 
+        public void Save(RenderTexture texture, string name)
+        {
+            if (texture == null)
+                return;
+            if (!AssetDatabase.IsValidFolder($"{ModEditorWindow.ModEditorPath}/Textures"))
+                AssetDatabase.CreateFolder(ModEditorWindow.ModEditorPath, "Textures");
+            string path = $"{ModEditorWindow.ModEditorPath}/Textures/{name}-Editing.png";
+
+            Texture2D tex = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false);
+            RenderTexture pre = RenderTexture.active;
+            RenderTexture.active = texture;
+            tex.ReadPixels(new Rect(0, 0, texture.width, texture.height), 0, 0);
+
+            byte[] bytes = tex.EncodeToPNG();
+            FileStream file = File.Open(path, FileMode.Create);
+            BinaryWriter write = new BinaryWriter(file);
+            write.Write(bytes);
+            file.Close();
+
+            Object.DestroyImmediate(tex);
+            RenderTexture.active = pre;
+            AssetDatabase.ImportAsset(path);
+        }
+
         [System.Serializable]
         public class Cache
         {
@@ -198,11 +275,9 @@ namespace ModEditor
 
             public void SetUndo()
             {
-                RenderTexture baseTexture = Self.Clone(BaseTexture);
-                RenderTexture drawTexture = Self.Clone(DrawTexture);
+                RenderTexture texture = Self.Clone(Texture);
                 Undo.RecordObject(ModEditor, "DrawUtil Cache Changed");
-                BaseTexture = baseTexture;
-                DrawTexture = drawTexture;
+                Texture = texture;
             }
 
             public void SetBaseTextureUndo()

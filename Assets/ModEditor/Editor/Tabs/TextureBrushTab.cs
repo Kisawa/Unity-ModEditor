@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -14,9 +15,26 @@ namespace ModEditor
         public TextureBrushTab(EditorWindow window) : base(window)
         {
             this.window = window as ModEditorWindow;
+
+            Type[] calcTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(x => x.GetTypes().Where(y => typeof(TextureUtilBase).IsAssignableFrom(y) && y.IsClass && !y.IsAbstract)).ToArray();
+            utilNames = new string[calcTypes.Length];
+            utilTipContents = new GUIContent[calcTypes.Length];
+            utilInstances = new TextureUtilBase[calcTypes.Length];
+            for (int i = 0; i < calcTypes.Length; i++)
+            {
+                TextureUtilBase util = (TextureUtilBase)Activator.CreateInstance(calcTypes[i]);
+                utilNames[i] = util.Name;
+                utilTipContents[i] = new GUIContent(util.Tip, util.Tip);
+                utilInstances[i] = util;
+                util.window = this.window;
+            }
         }
 
         Vector2 scroll;
+        string[] utilNames;
+        GUIContent[] utilTipContents;
+        TextureUtilBase[] utilInstances;
 
         public override void OnFocus()
         {
@@ -42,6 +60,9 @@ namespace ModEditor
 
             refreshDrawBoards();
             currentDrawBoard = currentDrawBoard;
+            if (window.Manager.TexUtilIndex >= utilTipContents.Length)
+                window.Manager.texUtilIndex = utilTipContents.Length - 1;
+            utilInstances[window.Manager.TexUtilIndex].OnFocus();
         }
 
         public override void OnLostFocus()
@@ -64,11 +85,15 @@ namespace ModEditor
             EditorEvent.Use.Control.OnMouse.DragRight -= Control_OnMouse_DragRight;
             EditorEvent.Use.Control.OnScrollWheel.Roll -= OnScrollWheel_Roll;
             EditorEvent.Use.OnKey.V.Down -= V_Down;
+
+            utilInstances[window.Manager.TexUtilIndex].OnLostFocus();
         }
 
         public override void OnDiable()
         {
             base.OnDiable();
+            for (int i = 0; i < utilInstances.Length; i++)
+                utilInstances[i].OnDisable();
             DrawUtil.Self.ClearCache();
         }
 
@@ -109,6 +134,8 @@ namespace ModEditor
 
             EditorGUILayout.Space(10);
             drawBrush(labelStyle);
+            EditorGUILayout.Space(10);
+            drawUtil(labelStyle);
             EditorGUILayout.Space(10);
 
             EditorGUILayout.BeginHorizontal();
@@ -208,6 +235,91 @@ namespace ModEditor
                 window.Manager.TexBrushRange = texBrushRange;
             }
 
+            EditorGUILayout.EndVertical();
+            EditorGUI.indentLevel = 0;
+        }
+
+        void drawUtil(GUIStyle labelStyle)
+        {
+            EditorGUILayout.BeginVertical("AnimationEventTooltip");
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Space(15);
+            if (GUILayout.Button("Util", "AboutWIndowLicenseLabel", GUILayout.Width(150)) ||
+                GUILayout.Button(window.Manager.TexUtilUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 205)))
+                window.Manager.TexUtilUnfold = !window.Manager.TexUtilUnfold;
+            EditorGUILayout.EndHorizontal();
+            if (window.Manager.TexUtilUnfold)
+            {
+                EditorGUI.indentLevel = 2;
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Util Select:", labelStyle, GUILayout.Width(100));
+                if (window.Manager.TexUtilIndex >= utilTipContents.Length)
+                    window.Manager.texUtilIndex = utilTipContents.Length - 1;
+                int preUtilIndex = window.Manager.TexUtilIndex;
+                window.Manager.TexUtilIndex = EditorGUILayout.Popup(window.Manager.TexUtilIndex, utilNames, GUILayout.Width(140));
+                if (preUtilIndex != window.Manager.TexUtilIndex)
+                {
+                    utilInstances[preUtilIndex].OnLostFocus();
+                    utilInstances[window.Manager.TexUtilIndex].OnFocus();
+                }
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(10);
+                EditorGUILayout.LabelField("", GUI.skin.GetStyle("CN EntryInfoIconSmall"), GUILayout.Width(20));
+                EditorGUILayout.LabelField(utilTipContents[window.Manager.TexUtilIndex], GUI.skin.GetStyle("MiniLabel"), GUILayout.Width(window.position.width - 70));
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Texture Select:", labelStyle, GUILayout.Width(125));
+                utilTargetTextureType = (TargetTextureType)EditorGUILayout.EnumPopup(utilTargetTextureType, GUILayout.Width(140));
+                EditorGUILayout.EndHorizontal();
+
+                if (utilTargetTextureType == TargetTextureType.Custom)
+                {
+                    EditorGUILayout.BeginVertical("SelectionRect", GUILayout.Width(window.position.width - 40));
+
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.LabelField("Origin Tex:", labelStyle, GUILayout.Width(90));
+                    utilCustomOriginTex = (Texture)EditorGUILayout.ObjectField(utilCustomOriginTex, typeof(Texture), false, GUILayout.Width(window.position.width - 140));
+                    EditorGUILayout.EndHorizontal();
+
+                    if (utilCustomOriginTex != null)
+                    {
+                        EditorGUILayout.BeginHorizontal();
+                        GUILayout.Space(30);
+                        if (utilCustomResultTex == null)
+                            GUILayout.Box(utilCustomOriginTex, GUILayout.Width(window.position.width - 80), GUILayout.Height(window.position.width - 80));
+                        else
+                            GUILayout.Box(utilCustomResultTex, GUILayout.Width(window.position.width - 80), GUILayout.Height(window.position.width - 80));
+                        EditorGUILayout.EndHorizontal();
+
+                        if (utilCustomResultTex != null)
+                        {
+                            EditorGUILayout.BeginHorizontal();
+                            GUILayout.Space(32);
+                            if (GUILayout.Button($"Save", "EditModeSingleButton", GUILayout.Width((window.position.width - 90) / 2)))
+                                DrawUtil.Self.Save(utilCustomResultTex, utilCustomOriginTex.name);
+                            GUILayout.Space(3);
+                            if (GUILayout.Button($"Clear", "EditModeSingleButton", GUILayout.Width((window.position.width - 90) / 2)))
+                                utilCustomResultTex = null;
+                            EditorGUILayout.EndHorizontal();
+                        }
+                    }
+
+                    EditorGUILayout.EndVertical();
+                }
+
+                TextureUtilBase util = utilInstances[window.Manager.TexUtilIndex];
+                util.Draw(labelStyle, window.position.width - 45);
+                GUILayout.Space(5);
+                EditorGUI.BeginDisabledGroup(utilTargetTextureType != TargetTextureType.Custom && !TextureManager.IsAvailable);
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(15);
+                if (GUILayout.Button($"Execute", "EditModeSingleButton", GUILayout.Width(window.position.width - 60)))
+                    excuteUtil(util);
+                EditorGUILayout.EndHorizontal();
+                EditorGUI.EndDisabledGroup();
+            }
             EditorGUILayout.EndVertical();
             EditorGUI.indentLevel = 0;
         }

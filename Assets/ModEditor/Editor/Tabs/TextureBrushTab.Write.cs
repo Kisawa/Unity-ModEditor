@@ -67,6 +67,63 @@ namespace ModEditor
                 currentDrawBoard = null;
         }
 
+        TargetTextureType utilTargetTextureType { get => window.TextureBrushTabTargetTextureType; set => window.TextureBrushTabTargetTextureType = value; }
+        Texture utilCustomOriginTex 
+        { 
+            get => window.TextureBrushTabUtilCustomOriginTex;
+            set
+            {
+                if (window.TextureBrushTabUtilCustomOriginTex == value)
+                    return;
+                window.TextureBrushTabUtilCustomOriginTex = value;
+                window.textureBrushTabUtilCustomResultTex = null;
+            }
+        }
+        RenderTexture utilCustomResultTex { get => window.TextureBrushTabUtilCustomResultTex; set => window.TextureBrushTabUtilCustomResultTex = value; }
+
+        void excuteUtil(TextureUtilBase util)
+        {
+            RenderTexture tex = null;
+            switch (utilTargetTextureType)
+            {
+                case TargetTextureType.Background:
+                    if (TextureManager.IsAvailable)
+                    {
+                        TextureManager.Cache.SetBaseTextureUndo();
+                        tex = TextureManager.Cache.BaseTexture;
+                    }
+                    break;
+                case TargetTextureType.Foreground:
+                    if (TextureManager.IsAvailable)
+                    {
+                        TextureManager.Cache.SetDrawTextureUndo();
+                        tex = TextureManager.Cache.DrawTexture;
+                    }
+                    break;
+                case TargetTextureType.Both:
+                    if (TextureManager.IsAvailable)
+                    {
+                        TextureManager.Cache.SetUndo();
+                        tex = TextureManager.Cache.Texture;
+                    }
+                    break;
+                case TargetTextureType.Custom:
+                    {
+                        if (utilCustomOriginTex != null)
+                        {
+                            if(utilCustomResultTex == null)
+                                utilCustomResultTex = DrawUtil.Self.Clone(utilCustomOriginTex);
+                            else
+                                utilCustomResultTex = DrawUtil.Self.Clone(utilCustomResultTex);
+                            tex = utilCustomResultTex;
+                        }
+                    }
+                    break;
+            }
+            if(tex != null)
+                util.Excute(tex);
+        }
+
         private void OnMouse_Move()
         {
             if (collider == null)

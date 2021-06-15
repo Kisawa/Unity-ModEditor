@@ -64,7 +64,7 @@ void Init(uint3 id : SV_DispatchThreadID)
 	merge(id);
 }
 
-Texture2D<float4> _BaseTexture;
+RWTexture2D<float4> _BaseTexture;
 [numthreads(32,32,1)]
 void InitTex(uint3 id : SV_DispatchThreadID)
 {

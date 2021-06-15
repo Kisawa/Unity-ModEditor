@@ -53,7 +53,7 @@ namespace ModEditor
         }
 
         ComputeShader calcShader;
-        public int kernel_DirectionPull_Vertex;
+        int kernel_DirectionPull_Vertex;
 
         DirectionType directionType { get => window.DirectionPullDirectionType; set => window.DirectionPullDirectionType = value; }
         bool calcNormal { get => window.DirectionPullCalcNormal; set => window.DirectionPullCalcNormal = value; }

@@ -55,4 +55,12 @@ namespace ModEditor
         Color,
         Other
     }
+
+    public enum TargetTextureType
+    { 
+        Background,
+        Foreground,
+        Both,
+        Custom
+    }
 }

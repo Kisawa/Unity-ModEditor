@@ -79,6 +79,47 @@ namespace ModEditor
                 textureBrushTabBaseTex = value;
             }
         }
+
+        [SerializeField]
+        TargetTextureType textureBrushTabTargetTextureType;
+        public TargetTextureType TextureBrushTabTargetTextureType
+        {
+            get => textureBrushTabTargetTextureType;
+            set
+            {
+                if (value == textureBrushTabTargetTextureType)
+                    return;
+                Undo.RecordObject(this, "TextureBrushTab TargetTextureType Changed");
+                textureBrushTabTargetTextureType = value;
+            }
+        }
+
+        [SerializeField]
+        Texture textureBrushTabUtilCustomOriginTex;
+        public Texture TextureBrushTabUtilCustomOriginTex
+        {
+            get => textureBrushTabUtilCustomOriginTex;
+            set
+            {
+                if (value == textureBrushTabUtilCustomOriginTex)
+                    return;
+                Undo.RecordObject(this, "TextureBrushTab UtilCustomOriginTex Changed");
+                textureBrushTabUtilCustomOriginTex = value;
+            }
+        }
+
+        public RenderTexture textureBrushTabUtilCustomResultTex;
+        public RenderTexture TextureBrushTabUtilCustomResultTex
+        {
+            get => textureBrushTabUtilCustomResultTex;
+            set
+            {
+                if (value == textureBrushTabUtilCustomResultTex)
+                    return;
+                Undo.RecordObject(this, "TextureBrushTab UtilCustomResultTex Changed");
+                textureBrushTabUtilCustomResultTex = value;
+            }
+        }
         #endregion
 
         #region Copy
@@ -218,6 +259,50 @@ namespace ModEditor
             Undo.RecordObject(this, "LocalRemap Rotation Changed");
             LocalRemapRotation.Clear();
             LocalRemapRotation.Add(Quaternion.identity);
+        }
+        #endregion
+
+        #region Blur
+        [SerializeField]
+        int blurDownSample = 1;
+        public int BlurDownSample
+        {
+            get => blurDownSample;
+            set
+            {
+                if (value == blurDownSample)
+                    return;
+                Undo.RecordObject(this, "Blur DownSample Changed");
+                blurDownSample = value;
+            }
+        }
+
+        [SerializeField]
+        int blurIterations = 5;
+        public int BlurIterations
+        {
+            get => blurIterations;
+            set
+            {
+                if (value == blurIterations)
+                    return;
+                Undo.RecordObject(this, "Blur BlurIterations Changed");
+                blurIterations = value;
+            }
+        }
+
+        [SerializeField]
+        int blurSpread = 1;
+        public int BlurSpread
+        {
+            get => blurSpread;
+            set
+            {
+                if (value == blurSpread)
+                    return;
+                Undo.RecordObject(this, "Blur Spread Changed");
+                blurSpread = value;
+            }
         }
         #endregion
     }

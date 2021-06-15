@@ -802,7 +802,7 @@ namespace ModEditor
         }
         #endregion
 
-        #region Util
+        #region VertexUtil
         [SerializeField]
         bool calcUtilUnfold = true;
         public bool CalcUtilUnfold
@@ -938,6 +938,35 @@ namespace ModEditor
                     return;
                 Undo.RecordObject(this, "ModEditor TexBrushRange");
                 texBrushRange = value;
+            }
+        }
+        #endregion
+
+        #region TextureUtil
+        [SerializeField]
+        bool texUtilUnfold = true;
+        public bool TexUtilUnfold
+        {
+            get => texUtilUnfold;
+            set
+            {
+                if (value == texUtilUnfold)
+                    return;
+                Undo.RecordObject(this, "ModEditor TexUtilUnfold");
+                texUtilUnfold = value;
+            }
+        }
+
+        public int texUtilIndex;
+        public int TexUtilIndex
+        {
+            get => texUtilIndex;
+            set
+            {
+                if (value == texUtilIndex)
+                    return;
+                Undo.RecordObject(this, "ModEditor TexUtilIndex");
+                texUtilIndex = value;
             }
         }
         #endregion

@@ -259,7 +259,7 @@ namespace ModEditor
         {
             VertexCalcUtilBase util = calcUtilInstances[window.Manager.CalcUtilIndex];
             if (util.WithSelect)
-                executeCalcUtil(util);
+                excuteCalcUtil(util);
         }
 
         public bool BrushDisable()
@@ -369,7 +369,7 @@ namespace ModEditor
             }
         }
 
-        void executeCalcUtil(VertexCalcUtilBase util)
+        void excuteCalcUtil(VertexCalcUtilBase util)
         {
             if (BrushDisable())
                 return;

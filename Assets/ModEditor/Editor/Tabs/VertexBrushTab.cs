@@ -390,8 +390,11 @@ namespace ModEditor
                     EditorGUILayout.EndHorizontal();
                 }
                 EditorGUI.BeginDisabledGroup(util.AllowSelect && util.WithSelect);
-                if (GUILayout.Button($"Execute Write - {passCountStr(util.PassCount)} Pass", "EditModeSingleButton", GUILayout.Width(window.position.width - 40)))
-                    executeCalcUtil(util);
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(15);
+                if (GUILayout.Button($"Execute Write - {passCountStr(util.PassCount)} Pass", "EditModeSingleButton", GUILayout.Width(window.position.width - 60)))
+                    excuteCalcUtil(util);
+                EditorGUILayout.EndHorizontal();
                 EditorGUI.EndDisabledGroup();
             }
             EditorGUILayout.EndVertical();
