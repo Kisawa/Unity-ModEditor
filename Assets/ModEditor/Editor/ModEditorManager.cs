@@ -971,6 +971,64 @@ namespace ModEditor
         }
         #endregion
 
+        #region TextureColorMask
+        [SerializeField]
+        bool colorMaskUnfold = true;
+        public bool ColorMaskUnfold
+        {
+            get => colorMaskUnfold;
+            set
+            {
+                if (value == colorMaskUnfold)
+                    return;
+                Undo.RecordObject(this, "ModEditor ColorMaskUnfold");
+                colorMaskUnfold = value;
+            }
+        }
+
+        [SerializeField]
+        Color colorMask = Color.white;
+        public Color ColorMask
+        {
+            get => colorMask;
+            set
+            {
+                if (value == colorMask)
+                    return;
+                Undo.RecordObject(this, "ModEditor ColorMask");
+                colorMask = value;
+            }
+        }
+
+        [SerializeField]
+        bool texturePassView = false;
+        public bool TexturePassView
+        {
+            get => texturePassView;
+            set
+            {
+                if (value == texturePassView)
+                    return;
+                Undo.RecordObject(this, "ModEditor TexturePassView");
+                texturePassView = value;
+            }
+        }
+
+        [SerializeField]
+        ColorPass textureViewPass = ColorPass.R;
+        public ColorPass TextureViewPass
+        {
+            get => textureViewPass;
+            set
+            {
+                if (value == textureViewPass)
+                    return;
+                Undo.RecordObject(this, "ModEditor TextureViewPass");
+                textureViewPass = value;
+            }
+        }
+        #endregion
+
         private void Awake()
         {
             if (actionableDic == null)

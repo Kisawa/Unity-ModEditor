@@ -30,7 +30,9 @@ namespace ModEditor
             DrawUtil.Self.DownSample(texture, downSample);
             for (int i = 0; i < iterations; i++)
             {
+                drawShader.SetInts("_TexelSize", texture.width, texture.height);
                 drawShader.SetInt("_Spread", blurSpread);
+                drawShader.SetVector("_ColorMask", window.Manager.ColorMask);
                 drawShader.SetTexture(kernel_blur, "RW_Texture", texture);
                 drawShader.Dispatch(kernel_blur, Mathf.CeilToInt(texture.width / 32f), Mathf.CeilToInt(texture.height / 32f), 1);
             }
@@ -46,7 +48,7 @@ namespace ModEditor
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Iterations:", labelStyle, GUILayout.Width(100));
-            iterations = EditorGUILayout.IntSlider(iterations, 1, 10, GUILayout.Width(maxWidth - 100));
+            iterations = EditorGUILayout.IntSlider(iterations, 1, 25, GUILayout.Width(maxWidth - 100));
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();

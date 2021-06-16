@@ -120,6 +120,47 @@ namespace ModEditor
                 textureBrushTabUtilCustomResultTex = value;
             }
         }
+
+        [SerializeField]
+        bool textureBrushTabUtilCustomTexPassView;
+        public bool TextureBrushTabUtilCustomTexPassView
+        {
+            get => textureBrushTabUtilCustomTexPassView;
+            set
+            {
+                if (value == textureBrushTabUtilCustomTexPassView)
+                    return;
+                Undo.RecordObject(this, "TextureBrushTab UtilCustomTexPassView Changed");
+                textureBrushTabUtilCustomTexPassView = value;
+            }
+        }
+
+        [SerializeField]
+        ColorPass textureBrushTabUtilCustomTexViewPass;
+        public ColorPass TextureBrushTabUtilCustomTexViewPass
+        {
+            get => textureBrushTabUtilCustomTexViewPass;
+            set
+            {
+                if (value == textureBrushTabUtilCustomTexViewPass)
+                    return;
+                Undo.RecordObject(this, "TextureBrushTab UtilCustomTexViewPass Changed");
+                textureBrushTabUtilCustomTexViewPass = value;
+            }
+        }
+
+        public RenderTexture textureBrushTabUtilCustomViewTex;
+        public RenderTexture TextureBrushTabUtilCustomViewTex
+        {
+            get => textureBrushTabUtilCustomViewTex;
+            set
+            {
+                if (value == textureBrushTabUtilCustomViewTex)
+                    return;
+                Undo.RecordObject(this, "TextureBrushTab UtilCustomViewTex Changed");
+                textureBrushTabUtilCustomViewTex = value;
+            }
+        }
         #endregion
 
         #region Copy

@@ -60,7 +60,14 @@ namespace ModEditor
     { 
         Background,
         Foreground,
-        Both,
         Custom
+    }
+
+    public enum ColorPass
+    { 
+        R,
+        G,
+        B,
+        A
     }
 }

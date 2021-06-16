@@ -38,7 +38,8 @@ public class GUIStyleViewer : EditorWindow
             //EditorGUILayout.EndVertical();
 
             EditorGUILayout.BeginVertical();
-            GUILayout.Button("Command", style);
+            int viewPass = 0;
+            viewPass = GUILayout.Toolbar(viewPass, new string[] { "RGBA", "R", "G", "B", "A" }, style);
             if (GUILayout.Button("Game Camera Follow"))
             {
                 GUIUtility.systemCopyBuffer = style.name;

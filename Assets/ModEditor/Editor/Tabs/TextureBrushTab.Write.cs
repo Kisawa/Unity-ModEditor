@@ -68,8 +68,8 @@ namespace ModEditor
         }
 
         TargetTextureType utilTargetTextureType { get => window.TextureBrushTabTargetTextureType; set => window.TextureBrushTabTargetTextureType = value; }
-        Texture utilCustomOriginTex 
-        { 
+        Texture utilCustomOriginTex
+        {
             get => window.TextureBrushTabUtilCustomOriginTex;
             set
             {
@@ -80,6 +80,9 @@ namespace ModEditor
             }
         }
         RenderTexture utilCustomResultTex { get => window.TextureBrushTabUtilCustomResultTex; set => window.TextureBrushTabUtilCustomResultTex = value; }
+        bool utilCustomTexPassView { get => window.TextureBrushTabUtilCustomTexPassView; set => window.TextureBrushTabUtilCustomTexPassView = value; }
+        ColorPass utilCustomViewPass { get => window.TextureBrushTabUtilCustomTexViewPass; set => window.TextureBrushTabUtilCustomTexViewPass = value; }
+        RenderTexture utilCustomViewTex { get => window.TextureBrushTabUtilCustomViewTex; set => window.TextureBrushTabUtilCustomViewTex = value; }
 
         void excuteUtil(TextureUtilBase util)
         {
@@ -100,18 +103,11 @@ namespace ModEditor
                         tex = TextureManager.Cache.DrawTexture;
                     }
                     break;
-                case TargetTextureType.Both:
-                    if (TextureManager.IsAvailable)
-                    {
-                        TextureManager.Cache.SetUndo();
-                        tex = TextureManager.Cache.Texture;
-                    }
-                    break;
                 case TargetTextureType.Custom:
                     {
                         if (utilCustomOriginTex != null)
                         {
-                            if(utilCustomResultTex == null)
+                            if (utilCustomResultTex == null)
                                 utilCustomResultTex = DrawUtil.Self.Clone(utilCustomOriginTex);
                             else
                                 utilCustomResultTex = DrawUtil.Self.Clone(utilCustomResultTex);
@@ -120,8 +116,34 @@ namespace ModEditor
                     }
                     break;
             }
-            if(tex != null)
+            if (tex != null)
                 util.Excute(tex);
+
+            switch (utilTargetTextureType)
+            {
+                case TargetTextureType.Background:
+                case TargetTextureType.Foreground:
+                    if (TextureManager.IsAvailable)
+                        TextureManager.Merge();
+                    break;
+                case TargetTextureType.Custom:
+                    refreshUtilCustomViewTex();
+                    break;
+            }
+        }
+
+        void refreshUtilCustomViewTex()
+        {
+            if (utilCustomOriginTex == null || !utilCustomTexPassView)
+                return;
+            int viewPass = utilCustomTexPassView ? (int)utilCustomViewPass : -1;
+            utilCustomViewTex = new RenderTexture(utilCustomOriginTex.width, utilCustomOriginTex.height, 0);
+            utilCustomViewTex.enableRandomWrite = true;
+            utilCustomViewTex.Create();
+            if (utilCustomResultTex == null)
+                DrawUtil.Self.RefreshView(utilCustomOriginTex, utilCustomViewTex, viewPass);
+            else
+                DrawUtil.Self.RefreshView(utilCustomResultTex, utilCustomViewTex, viewPass);
         }
 
         private void OnMouse_Move()
@@ -147,19 +169,22 @@ namespace ModEditor
             OnMouse_Move();
             if (!CursorOn)
                 return;
-            TextureManager.DrawStart(window.Manager.TextureBrushColor, CursorTexcoord, window.Manager.TexBrushRange, BrushRotation);
+            TextureManager.DrawStart(window.Manager.TextureBrushColor, CursorTexcoord, window.Manager.TexBrushRange, BrushRotation, window.Manager.ColorMask);
             Repaint();
         }
 
         private void OnMouse_Draw()
         {
-            if (window.OnSceneGUI)
-                return;
             OnMouse_Move();
             if (!CursorOn)
                 return;
-            TextureManager.Draw(window.Manager.TextureBrushColor, CursorTexcoord, window.Manager.TexBrushRange, BrushRotation);
+            TextureManager.Draw(window.Manager.TextureBrushColor, CursorTexcoord, window.Manager.TexBrushRange, BrushRotation, window.Manager.ColorMask);
             Repaint();
+        }
+
+        private void OnMouse_DrawEnd()
+        {
+            TextureManager.DrawEnd();
         }
 
         private void Control_OnMouse_DragLeft()

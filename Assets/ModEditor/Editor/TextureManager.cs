@@ -8,6 +8,8 @@ namespace ModEditor
 {
     public class TextureManager
     {
+        ModEditorWindow ModEditor => ModEditorWindow.Self;
+        int viewTexPass => ModEditor.Manager.TexturePassView ? (int)ModEditor.Manager.TextureViewPass : -1;
         public Transform trans { get; private set; }
         public Renderer renderer { get; private set; }
         public DrawUtil.Cache Cache { get; private set; }
@@ -28,8 +30,8 @@ namespace ModEditor
             renderer = trans.GetComponent<Renderer>();
             if (renderer == null)
                 return;
-            Cache = DrawUtil.Self.GetCache(trans, baseColor);
-            Undo.undoRedoPerformed += undoRedoPerformed;
+            Cache = DrawUtil.Self.GetCache(trans, baseColor, viewTexPass);
+            Undo.undoRedoPerformed += Merge;
         }
 
         public void ChangeBase(Color baseColor)
@@ -37,7 +39,7 @@ namespace ModEditor
             if (!IsAvailable)
                 return;
             Cache.SetBaseTextureUndo();
-            DrawUtil.Self.Init(baseColor, Cache);
+            DrawUtil.Self.Init(baseColor, Cache, viewTexPass);
         }
 
         public void ChangeBase(Texture tex)
@@ -45,22 +47,50 @@ namespace ModEditor
             if (!IsAvailable)
                 return;
             Cache.SetBaseTextureUndo();
-            DrawUtil.Self.Init(tex, Cache);
+            DrawUtil.Self.Init(tex, Cache, viewTexPass);
         }
 
-        public void DrawStart(Color brushColor, Vector2 cursorTexcoord, Vector3 texBrushRange, float brushRotation)
+        public void DrawStart(Color brushColor, Vector2 cursorTexcoord, Vector3 texBrushRange, float brushRotation, Color colorMask)
         {
             if (!IsAvailable)
                 return;
             Cache.SetDrawTextureUndo();
-            DrawUtil.Self.Draw(Cache, brushColor, cursorTexcoord, texBrushRange, brushRotation);
+            DrawUtil.Self.DrawStart(Cache, brushColor, cursorTexcoord, texBrushRange, brushRotation, colorMask, viewTexPass);
         }
 
-        public void Draw(Color brushColor, Vector2 cursorTexcoord, Vector3 texBrushRange, float brushRotation)
+        public void Draw(Color brushColor, Vector2 cursorTexcoord, Vector3 texBrushRange, float brushRotation, Color colorMask)
         {
             if (!IsAvailable)
                 return;
-            DrawUtil.Self.Draw(Cache, brushColor, cursorTexcoord, texBrushRange, brushRotation);
+            DrawUtil.Self.Draw(Cache, brushColor, cursorTexcoord, texBrushRange, brushRotation, colorMask, viewTexPass);
+        }
+
+        public void DrawEnd()
+        {
+            DrawUtil.Self.DrawEnd();
+        }
+
+        public void Merge()
+        {
+            if (!IsAvailable)
+                return;
+            DrawUtil.Self.Merge(Cache, viewTexPass);
+        }
+
+        public void RefreshView()
+        {
+            if (!IsAvailable || viewTexPass < 0)
+                return;
+            DrawUtil.Self.RefreshView(Cache, viewTexPass);
+        }
+
+        public void ClearDraw()
+        {
+            if (!IsAvailable)
+                return;
+            Cache.SetDrawTextureUndo();
+            DrawUtil.Self.Write(Cache.DrawTexture, Color.clear);
+            Merge();
         }
 
         public void Clear()
@@ -68,14 +98,7 @@ namespace ModEditor
             trans = null;
             renderer = null;
             Cache = null;
-            Undo.undoRedoPerformed -= undoRedoPerformed;
-        }
-
-        void undoRedoPerformed()
-        {
-            if (!IsAvailable)
-                return;
-            DrawUtil.Self.Merge(Cache);
+            Undo.undoRedoPerformed -= Merge;
         }
 
         public void Save(string name)

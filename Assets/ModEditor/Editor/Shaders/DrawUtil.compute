@@ -1,6 +1,7 @@
 ﻿#pragma kernel Init
 #pragma kernel InitTex
 #pragma kernel Merge
+#pragma kernel RefreshView
 #pragma kernel Clone
 #pragma kernel Write
 #pragma kernel Draw
@@ -9,6 +10,8 @@ float2 _TexelSize;
 RWTexture2D<float4> RW_BackgroundTexture;
 RWTexture2D<float4> RW_ForegroundTexture;
 RWTexture2D<float4> RW_Texture;
+int _ViewType;
+RWTexture2D<float4> RW_ViewTexture;
 
 float pow2(float res)
 {
@@ -35,25 +38,32 @@ float4 blend(float4 src, float4 dst, float srcF, float dstF)
 	return col;
 }
 
-float4 blend(float4 src, float4 dst, float srcF, float dstF, float srcAF, float dstAF)
+void refreshView(uint3 id, float4 col)
 {
-	float4 col;
-	col.rgb = dst.rgb * dstF + src.rgb * srcF;
-	col.a = dst.a * dstAF + src.a * srcAF;
-	return col;
-}
-
-float4 blend(float4 src, float4 dst, float4 srcF, float4 dstF)
-{
-	float4 col = dst * dstF + src * srcF;
-	return col;
+	switch(_ViewType)
+	{
+		case 0:
+			RW_ViewTexture[id.xy] = float4(col.r, 0, 0, 1);
+			break;
+		case 1:
+			RW_ViewTexture[id.xy] = float4(0, col.g, 0, 1);
+			break;
+		case 2:
+			RW_ViewTexture[id.xy] = float4(0, 0, col.b, 1);
+			break;
+		case 3:
+			RW_ViewTexture[id.xy] = float4(col.a, col.a, col.a, 1);
+			break;
+	}
 }
 
 void merge(uint3 id)
 {
 	float4 background = RW_BackgroundTexture[id.xy];
 	float4 foreground = RW_ForegroundTexture[id.xy];
-    RW_Texture[id.xy] = blend(foreground, background, foreground.a, 1 - foreground.a);
+	float4 col = blend(foreground, background, foreground.a, 1 - foreground.a);
+    RW_Texture[id.xy] = col;
+	refreshView(id, col);
 }
 
 float4 _BaseColor;
@@ -76,6 +86,12 @@ void InitTex(uint3 id : SV_DispatchThreadID)
 void Merge(uint3 id : SV_DispatchThreadID)
 {
 	merge(id);
+}
+
+[numthreads(32,32,1)]
+void RefreshView(uint3 id : SV_DispatchThreadID)
+{
+	refreshView(id, RW_Texture[id.xy]);
 }
 
 [numthreads(32,32,1)]
@@ -105,6 +121,7 @@ int GetRange(uint3 id, out float res)
 }
 
 float4 _BrushColor;
+float4 _ColorMask;
 [numthreads(32,32,1)]
 void Draw(uint3 id : SV_DispatchThreadID)
 {
@@ -112,6 +129,8 @@ void Draw(uint3 id : SV_DispatchThreadID)
 	int inRange = GetRange(id, res);
 	float4 foreground = RW_ForegroundTexture[id.xy];
 	float4 col = _BrushColor;
-	RW_ForegroundTexture[id.xy] = blend(col, foreground, res, 1 - res);
+	col = blend(col, foreground, res, 1 - res);
+	col = lerp(foreground, col, _ColorMask);
+	RW_ForegroundTexture[id.xy] = col;
 	merge(id);
 }

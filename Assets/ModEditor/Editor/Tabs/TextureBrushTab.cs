@@ -44,6 +44,7 @@ namespace ModEditor
 
             EditorEvent.OnMouse.Move += OnMouse_Move;
             EditorEvent.OnMouse.DownLeft += OnMouse_DrawStart;
+            EditorEvent.OnMouse.UpLeft += OnMouse_DrawEnd;
             EditorEvent.OnMouse.DragLeft += OnMouse_Draw;
             EditorEvent.OnMouse.DragRight += OnMouse_Move;
             EditorEvent.Control.OnMouse.Move += OnMouse_Move;
@@ -73,6 +74,7 @@ namespace ModEditor
 
             EditorEvent.OnMouse.Move -= OnMouse_Move;
             EditorEvent.OnMouse.DownLeft -= OnMouse_DrawStart;
+            EditorEvent.OnMouse.UpLeft -= OnMouse_DrawEnd;
             EditorEvent.OnMouse.DragLeft -= OnMouse_Draw;
             EditorEvent.OnMouse.DragRight -= OnMouse_Move;
             EditorEvent.Control.OnMouse.Move -= OnMouse_Move;
@@ -137,27 +139,49 @@ namespace ModEditor
             EditorGUILayout.Space(10);
             drawUtil(labelStyle);
             EditorGUILayout.Space(10);
+            drawColorMask(labelStyle);
+            EditorGUILayout.Space(10);
 
-            EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button(textureView ? window.viewContent : window.hiddenContent, "ObjectPickerTab"))
-                textureView = !textureView;
-            RenderTexture texture = null;
             if (TextureManager.IsAvailable)
-                texture = TextureManager.Cache.Texture;
-            EditorGUILayout.ObjectField(texture, typeof(RenderTexture), false);
-            EditorGUILayout.EndHorizontal();
-
-            if (GUILayout.Button("Save"))
-                TextureManager.Save(window.Manager.Target.name);
-
-            if (textureView && TextureManager.IsAvailable)
             {
+                int viewPass = textureView ? window.Manager.TexturePassView ? (int)window.Manager.TextureViewPass + 2 : 1 : 0;
+                int pre = viewPass;
                 EditorGUILayout.BeginHorizontal();
-                GUILayout.Space(17);
-                GUILayout.Box(TextureManager.Cache.Texture, GUILayout.Width(window.position.width - 34), GUILayout.Height(window.position.width - 34));
+                GUILayout.Space(window.position.width - 250);
+                viewPass = GUILayout.Toolbar(viewPass, new string[] { "None", "RGBA", "R", "G", "B", "A" }, "sv_iconselector_back", GUILayout.Width(230));
                 EditorGUILayout.EndHorizontal();
+                if (viewPass == 0)
+                {
+                    textureView = false;
+                    window.Manager.TexturePassView = false;
+                }
+                else
+                {
+                    textureView = true;
+                    if (viewPass == 1)
+                        window.Manager.TexturePassView = false;
+                    else
+                    {
+                        window.Manager.TexturePassView = true;
+                        window.Manager.TextureViewPass = (ColorPass)(viewPass - 2);
+                    }
+                    if (pre != viewPass)
+                        TextureManager.RefreshView();
+                }
+                if (textureView)
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    GUILayout.Space(17);
+                    if (window.Manager.TexturePassView)
+                        GUILayout.Box(TextureManager.Cache.ViewTexture, GUILayout.Width(window.position.width - 34), GUILayout.Height(window.position.width - 34));
+                    else
+                        GUILayout.Box(TextureManager.Cache.Texture, GUILayout.Width(window.position.width - 34), GUILayout.Height(window.position.width - 34));
+                    EditorGUILayout.EndHorizontal();
+                }
+                if (GUILayout.Button("Save"))
+                    TextureManager.Save(window.Manager.Target.name);
             }
-
+            
             EditorGUILayout.EndScrollView();
         }
         
@@ -233,6 +257,11 @@ namespace ModEditor
                 texBrushRange.z = EditorGUILayout.Slider(texBrushRange.z, 0, 1, GUILayout.Width(window.position.width - 100));
                 EditorGUILayout.EndHorizontal();
                 window.Manager.TexBrushRange = texBrushRange;
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(15);
+                if (GUILayout.Button("Clear", "EditModeSingleButton", GUILayout.Width(window.position.width - 60)))
+                    TextureManager.ClearDraw();
+                EditorGUILayout.EndHorizontal();
             }
 
             EditorGUILayout.EndVertical();
@@ -280,30 +309,53 @@ namespace ModEditor
 
                     EditorGUILayout.BeginHorizontal();
                     EditorGUILayout.LabelField("Origin Tex:", labelStyle, GUILayout.Width(90));
-                    utilCustomOriginTex = (Texture)EditorGUILayout.ObjectField(utilCustomOriginTex, typeof(Texture), false, GUILayout.Width(window.position.width - 140));
+                    utilCustomOriginTex = (Texture)EditorGUILayout.ObjectField(utilCustomOriginTex, typeof(Texture), false, GUILayout.Width(window.position.width - 150));
                     EditorGUILayout.EndHorizontal();
 
                     if (utilCustomOriginTex != null)
                     {
+                        int viewPass = utilCustomTexPassView ? (int)utilCustomViewPass + 1 : 0;
+                        int pre = viewPass;
+                        EditorGUILayout.BeginHorizontal();
+                        GUILayout.Space(window.position.width - 255);
+                        viewPass = GUILayout.Toolbar(viewPass, new string[] { "RGBA", "R", "G", "B", "A" }, "sv_iconselector_back", GUILayout.Width(200));
+                        EditorGUILayout.EndHorizontal();
+                        if (viewPass == 0)
+                            utilCustomTexPassView = false;
+                        else
+                        {
+                            utilCustomTexPassView = true;
+                            utilCustomViewPass = (ColorPass)(viewPass - 1);
+                        }
+                        if (pre != viewPass)
+                            refreshUtilCustomViewTex();
+
                         EditorGUILayout.BeginHorizontal();
                         GUILayout.Space(30);
-                        if (utilCustomResultTex == null)
-                            GUILayout.Box(utilCustomOriginTex, GUILayout.Width(window.position.width - 80), GUILayout.Height(window.position.width - 80));
+                        if (utilCustomTexPassView)
+                            GUILayout.Box(utilCustomViewTex, GUILayout.Width(window.position.width - 80), GUILayout.Height(window.position.width - 80));
                         else
-                            GUILayout.Box(utilCustomResultTex, GUILayout.Width(window.position.width - 80), GUILayout.Height(window.position.width - 80));
+                        {
+                            if (utilCustomResultTex == null)
+                                GUILayout.Box(utilCustomOriginTex, GUILayout.Width(window.position.width - 80), GUILayout.Height(window.position.width - 80));
+                            else
+                                GUILayout.Box(utilCustomResultTex, GUILayout.Width(window.position.width - 80), GUILayout.Height(window.position.width - 80));
+                        }
                         EditorGUILayout.EndHorizontal();
 
-                        if (utilCustomResultTex != null)
+                        EditorGUI.BeginDisabledGroup(utilCustomResultTex == null);
+                        EditorGUILayout.BeginHorizontal();
+                        GUILayout.Space(32);
+                        if (GUILayout.Button($"Save", "EditModeSingleButton", GUILayout.Width((window.position.width - 90) / 2)))
+                            DrawUtil.Self.Save(utilCustomResultTex, utilCustomOriginTex.name);
+                        GUILayout.Space(3);
+                        if (GUILayout.Button($"Clear", "EditModeSingleButton", GUILayout.Width((window.position.width - 90) / 2)))
                         {
-                            EditorGUILayout.BeginHorizontal();
-                            GUILayout.Space(32);
-                            if (GUILayout.Button($"Save", "EditModeSingleButton", GUILayout.Width((window.position.width - 90) / 2)))
-                                DrawUtil.Self.Save(utilCustomResultTex, utilCustomOriginTex.name);
-                            GUILayout.Space(3);
-                            if (GUILayout.Button($"Clear", "EditModeSingleButton", GUILayout.Width((window.position.width - 90) / 2)))
-                                utilCustomResultTex = null;
-                            EditorGUILayout.EndHorizontal();
+                            utilCustomResultTex = null;
+                            refreshUtilCustomViewTex();
                         }
+                        EditorGUILayout.EndHorizontal();
+                        EditorGUI.EndDisabledGroup();
                     }
 
                     EditorGUILayout.EndVertical();
@@ -320,6 +372,44 @@ namespace ModEditor
                 EditorGUILayout.EndHorizontal();
                 EditorGUI.EndDisabledGroup();
             }
+            EditorGUILayout.EndVertical();
+            EditorGUI.indentLevel = 0;
+        }
+
+        void drawColorMask(GUIStyle labelStyle)
+        {
+            EditorGUILayout.BeginVertical("AnimationEventTooltip");
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Space(15);
+            if (GUILayout.Button("Color Mask", "AboutWIndowLicenseLabel", GUILayout.Width(150)) ||
+                GUILayout.Button(window.Manager.ColorMaskUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 205)))
+                window.Manager.ColorMaskUnfold = !window.Manager.ColorMaskUnfold;
+            EditorGUILayout.EndHorizontal();
+
+            if (window.Manager.ColorMaskUnfold)
+            {
+                EditorGUI.indentLevel = 2;
+                EditorGUILayout.BeginHorizontal();
+                Color mask = window.Manager.ColorMask;
+                EditorGUILayout.LabelField("R:", labelStyle, GUILayout.Width(45));
+                if (GUILayout.Button(mask.r == 1 ? window.toggleOnContent : window.toggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(15)))
+                    mask.r = Math.Abs(mask.r - 1);
+
+                EditorGUILayout.LabelField("G:", labelStyle, GUILayout.Width(45));
+                if (GUILayout.Button(mask.g == 1 ? window.toggleOnContent : window.toggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(15)))
+                    mask.g = Math.Abs(mask.g - 1);
+
+                EditorGUILayout.LabelField("B:", labelStyle, GUILayout.Width(45));
+                if (GUILayout.Button(mask.b == 1 ? window.toggleOnContent : window.toggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(15)))
+                    mask.b = Math.Abs(mask.b - 1);
+
+                EditorGUILayout.LabelField("A:", labelStyle, GUILayout.Width(45));
+                if (GUILayout.Button(mask.a == 1 ? window.toggleOnContent : window.toggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(15)))
+                    mask.a = Math.Abs(mask.a - 1);
+                window.Manager.ColorMask = mask;
+                EditorGUILayout.EndHorizontal();
+            }
+
             EditorGUILayout.EndVertical();
             EditorGUI.indentLevel = 0;
         }

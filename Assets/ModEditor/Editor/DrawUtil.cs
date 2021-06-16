@@ -27,6 +27,7 @@ namespace ModEditor
         public int kernel_Init { get; private set; }
         public int kernel_InitTex { get; private set; }
         public int kernel_Merge { get; private set; }
+        public int kernel_RefreshView { get; private set; }
         public int kernel_Clone { get; private set; }
         public int kernel_Write { get; private set; }
         public int kernel_Draw { get; private set; }
@@ -37,12 +38,13 @@ namespace ModEditor
             kernel_Init = DrawShader.FindKernel("Init");
             kernel_InitTex = DrawShader.FindKernel("InitTex");
             kernel_Merge = DrawShader.FindKernel("Merge");
+            kernel_RefreshView = DrawShader.FindKernel("RefreshView");
             kernel_Clone = DrawShader.FindKernel("Clone");
             kernel_Write = DrawShader.FindKernel("Write");
             kernel_Draw = DrawShader.FindKernel("Draw");
         }
 
-        public Cache GetCache(Transform trans, Color baseColor)
+        public Cache GetCache(Transform trans, Color baseColor, int viewPass = -1)
         {
             if (ModEditor == null)
                 return null;
@@ -57,7 +59,7 @@ namespace ModEditor
             else
                 cache = ModEditor.DrawUtilCache[index];
             if (!cache.IsAvailable)
-                Init(baseColor, cache);
+                Init(baseColor, cache, viewPass);
             return cache;
         }
 
@@ -74,12 +76,14 @@ namespace ModEditor
                     Object.DestroyImmediate(cache.DrawTexture);
                 if (cache.Texture != null)
                     Object.DestroyImmediate(cache.Texture);
+                if (cache.ViewTexture != null)
+                    Object.DestroyImmediate(cache.ViewTexture);
             }
             ModEditor.DrawUtilTransCache.Clear();
             ModEditor.DrawUtilCache.Clear();
         }
 
-        public void Init(Color baseColor, Cache cache)
+        public void Init(Color baseColor, Cache cache, int viewPass = -1)
         {
             if (cache == null)
                 cache = new Cache();
@@ -101,14 +105,22 @@ namespace ModEditor
                 cache.Texture.enableRandomWrite = true;
                 cache.Texture.Create();
             }
+            if (cache.ViewTexture == null)
+            {
+                cache.ViewTexture = new RenderTexture((int)TexelSize.x, (int)TexelSize.y, 0);
+                cache.ViewTexture.enableRandomWrite = true;
+                cache.ViewTexture.Create();
+            }
+            DrawShader.SetInt("_ViewType", viewPass);
             DrawShader.SetVector("_BaseColor", baseColor);
             DrawShader.SetTexture(kernel_Init, "RW_BackgroundTexture", cache.BaseTexture);
             DrawShader.SetTexture(kernel_Init, "RW_ForegroundTexture", cache.DrawTexture);
             DrawShader.SetTexture(kernel_Init, "RW_Texture", cache.Texture);
+            DrawShader.SetTexture(kernel_Init, "RW_ViewTexture", cache.ViewTexture);
             DrawShader.Dispatch(kernel_Init, Mathf.CeilToInt(cache.Texture.width / 32f), Mathf.CeilToInt(cache.Texture.height / 32f), 1);
         }
 
-        public void Init(Texture tex, Cache cache)
+        public void Init(Texture tex, Cache cache, int viewPass = -1)
         {
             RenderTexture _tex = RenderTexture.GetTemporary((int)TexelSize.x, (int)TexelSize.y, 0);
             _tex.enableRandomWrite = true;
@@ -134,23 +146,67 @@ namespace ModEditor
                 cache.Texture.enableRandomWrite = true;
                 cache.Texture.Create();
             }
+            if (cache.ViewTexture == null)
+            {
+                cache.ViewTexture = new RenderTexture((int)TexelSize.x, (int)TexelSize.y, 0);
+                cache.ViewTexture.enableRandomWrite = true;
+                cache.ViewTexture.Create();
+            }
+            DrawShader.SetInt("_ViewType", viewPass);
             DrawShader.SetVector("_BaseTexTexelSize", new Vector2(_tex.width, _tex.height));
             DrawShader.SetTexture(kernel_InitTex, "_BaseTexture", _tex);
             DrawShader.SetTexture(kernel_InitTex, "RW_BackgroundTexture", cache.BaseTexture);
             DrawShader.SetTexture(kernel_InitTex, "RW_ForegroundTexture", cache.DrawTexture);
             DrawShader.SetTexture(kernel_InitTex, "RW_Texture", cache.Texture);
+            DrawShader.SetTexture(kernel_InitTex, "RW_ViewTexture", cache.ViewTexture);
             DrawShader.Dispatch(kernel_InitTex, Mathf.CeilToInt(cache.Texture.width / 32f), Mathf.CeilToInt(cache.Texture.height / 32f), 1);
             RenderTexture.ReleaseTemporary(_tex);
         }
 
-        public void Merge(Cache cache)
+        public void Merge(Cache cache, int viewPass = -1)
         {
             if (cache == null || !cache.IsAvailable)
                 return;
+            DrawShader.SetInt("_ViewType", viewPass);
             DrawShader.SetTexture(kernel_Merge, "RW_BackgroundTexture", cache.BaseTexture);
             DrawShader.SetTexture(kernel_Merge, "RW_ForegroundTexture", cache.DrawTexture);
             DrawShader.SetTexture(kernel_Merge, "RW_Texture", cache.Texture);
+            DrawShader.SetTexture(kernel_Merge, "RW_ViewTexture", cache.ViewTexture);
             DrawShader.Dispatch(kernel_Merge, Mathf.CeilToInt(cache.Texture.width / 32f), Mathf.CeilToInt(cache.Texture.height / 32f), 1);
+        }
+
+        public void RefreshView(Cache cache, int viewPass = -1)
+        {
+            if (cache == null || !cache.IsAvailable)
+                return;
+            DrawShader.SetInt("_ViewType", viewPass);
+            DrawShader.SetTexture(kernel_RefreshView, "RW_Texture", cache.Texture);
+            DrawShader.SetTexture(kernel_RefreshView, "RW_ViewTexture", cache.ViewTexture);
+            DrawShader.Dispatch(kernel_RefreshView, Mathf.CeilToInt(cache.Texture.width / 32f), Mathf.CeilToInt(cache.Texture.height / 32f), 1);
+        }
+
+        public void RefreshView(Texture texture, RenderTexture viewTexture, int viewPass = -1)
+        {
+            if (texture == null || viewTexture == null)
+                return;
+            RenderTexture _tex = RenderTexture.GetTemporary(texture.width, texture.height, 0);
+            _tex.enableRandomWrite = true;
+            _tex.Create();
+            Graphics.Blit(texture, _tex);
+            DrawShader.SetInt("_ViewType", viewPass);
+            DrawShader.SetTexture(kernel_RefreshView, "RW_Texture", _tex);
+            DrawShader.SetTexture(kernel_RefreshView, "RW_ViewTexture", viewTexture);
+            DrawShader.Dispatch(kernel_RefreshView, Mathf.CeilToInt(viewTexture.width / 32f), Mathf.CeilToInt(viewTexture.height / 32f), 1);
+        }
+
+        public void RefreshView(RenderTexture texture, RenderTexture viewTexture, int viewPass = -1)
+        {
+            if (texture == null || viewTexture == null)
+                return;
+            DrawShader.SetInt("_ViewType", viewPass);
+            DrawShader.SetTexture(kernel_RefreshView, "RW_Texture", texture);
+            DrawShader.SetTexture(kernel_RefreshView, "RW_ViewTexture", viewTexture);
+            DrawShader.Dispatch(kernel_RefreshView, Mathf.CeilToInt(viewTexture.width / 32f), Mathf.CeilToInt(viewTexture.height / 32f), 1);
         }
 
         public void DownSample(RenderTexture texture, int downSample)
@@ -225,7 +281,14 @@ namespace ModEditor
             RenderTexture.ReleaseTemporary(_tex);
         }
 
-        public void Draw(Cache cache, Color brushColor, Vector2 cursorTexcoord, Vector3 texBrushRange, float brushRotation)
+        public void DrawStart(Cache cache, Color brushColor, Vector2 cursorTexcoord, Vector3 texBrushRange, float brushRotation, Color colorMask, int viewPass = -1)
+        {
+            if (cache == null || !cache.IsAvailable)
+                return;
+            Draw(cache, brushColor, cursorTexcoord, texBrushRange, brushRotation, colorMask, viewPass);
+        }
+
+        public void Draw(Cache cache, Color brushColor, Vector2 cursorTexcoord, Vector3 texBrushRange, float brushRotation, Color colorMask, int viewPass = -1)
         {
             if (cache == null || !cache.IsAvailable)
                 return;
@@ -233,11 +296,20 @@ namespace ModEditor
             DrawShader.SetVector("_BrushColor", brushColor);
             DrawShader.SetVector("_CursorTexcoord", cursorTexcoord);
             DrawShader.SetVector("_TexBrushRange", texBrushRange);
+            DrawShader.SetVector("_TexBrushRange", texBrushRange);
             DrawShader.SetFloat("_BrushRotate", brushRotation);
+            DrawShader.SetVector("_ColorMask", colorMask);
+            DrawShader.SetInt("_ViewType", viewPass);
             DrawShader.SetTexture(kernel_Draw, "RW_BackgroundTexture", cache.BaseTexture);
             DrawShader.SetTexture(kernel_Draw, "RW_ForegroundTexture", cache.DrawTexture);
             DrawShader.SetTexture(kernel_Draw, "RW_Texture", cache.Texture);
+            DrawShader.SetTexture(kernel_Draw, "RW_ViewTexture", cache.ViewTexture);
             DrawShader.Dispatch(kernel_Draw, Mathf.CeilToInt(cache.Texture.width / 32f), Mathf.CeilToInt(cache.Texture.height / 32f), 1);
+        }
+
+        public void DrawEnd()
+        {
+
         }
 
         public void Save(RenderTexture texture, string name)
@@ -270,15 +342,9 @@ namespace ModEditor
             public RenderTexture BaseTexture;
             public RenderTexture DrawTexture;
             public RenderTexture Texture;
+            public RenderTexture ViewTexture;
 
-            public bool IsAvailable { get => BaseTexture != null && DrawTexture != null && Texture != null; }
-
-            public void SetUndo()
-            {
-                RenderTexture texture = Self.Clone(Texture);
-                Undo.RecordObject(ModEditor, "DrawUtil Cache Changed");
-                Texture = texture;
-            }
+            public bool IsAvailable { get => BaseTexture != null && DrawTexture != null && Texture != null && ViewTexture != null; }
 
             public void SetBaseTextureUndo()
             {

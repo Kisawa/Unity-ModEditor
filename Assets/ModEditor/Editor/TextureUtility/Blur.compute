@@ -1,25 +1,29 @@
 ﻿#pragma kernel Blur
 
 RWTexture2D<float4> RW_Texture;
+int _TexelSize[2];
 int _Spread;
+float4 _ColorMask;
 
 [numthreads(32,32,1)]
 void Blur(uint3 id : SV_DispatchThreadID)
 {
 	const float weight[3] = { 0.4026, 0.2442, 0.0545 };
-	float4 col = RW_Texture[id.xy] * weight[0];
+	float4 _col = RW_Texture[id.xy];
+	float4 col = _col * weight[0];
 	for(int i = 1; i < 3; i++)
 	{
 		col += RW_Texture[uint2(id.x + _Spread * i, id.y)] * weight[i];
 		col += RW_Texture[uint2(id.x - _Spread * i, id.y)] * weight[i];
 	}
-	RW_Texture[id.xy] = col;
+	RW_Texture[id.xy] = lerp(_col, col, _ColorMask);
 	GroupMemoryBarrierWithGroupSync();
-	col = RW_Texture[id.xy] * weight[0];
-	for(int i = 1; i < 3; i++)
+	_col = RW_Texture[id.xy];
+	col = _col * weight[0];
+	for(int j = 1; j < 3; j++)
 	{
-		col += RW_Texture[uint2(id.x, id.y + _Spread * i)] * weight[i];
-		col += RW_Texture[uint2(id.x, id.y - _Spread * i)] * weight[i];
+		col += RW_Texture[uint2(id.x, id.y + _Spread * j)] * weight[j];
+		col += RW_Texture[uint2(id.x, id.y - _Spread * j)] * weight[j];
 	}
-    RW_Texture[id.xy] = col;
+    RW_Texture[id.xy] = lerp(_col, col, _ColorMask);
 }
