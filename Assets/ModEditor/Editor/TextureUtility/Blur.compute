@@ -1,7 +1,6 @@
 ﻿#pragma kernel Blur
 
 RWTexture2D<float4> RW_Texture;
-int _TexelSize[2];
 int _Spread;
 float4 _ColorMask;
 

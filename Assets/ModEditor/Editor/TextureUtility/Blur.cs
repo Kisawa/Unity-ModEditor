@@ -30,7 +30,6 @@ namespace ModEditor
             DrawUtil.Self.DownSample(texture, downSample);
             for (int i = 0; i < iterations; i++)
             {
-                drawShader.SetInts("_TexelSize", texture.width, texture.height);
                 drawShader.SetInt("_Spread", blurSpread);
                 drawShader.SetVector("_ColorMask", window.Manager.ColorMask);
                 drawShader.SetTexture(kernel_blur, "RW_Texture", texture);

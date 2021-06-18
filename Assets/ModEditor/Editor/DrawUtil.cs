@@ -21,11 +21,12 @@ namespace ModEditor
             }
         }
 
-        readonly static Vector2 TexelSize = Vector2.one * 1024;
+        Vector2Int TexelSize => ModEditor.Manager.TexBrushTexelSize;
 
         public ComputeShader DrawShader { get; private set; }
         public int kernel_Init { get; private set; }
         public int kernel_InitTex { get; private set; }
+        public int kernel_BlendTex { get; private set; }
         public int kernel_Merge { get; private set; }
         public int kernel_RefreshView { get; private set; }
         public int kernel_Clone { get; private set; }
@@ -37,6 +38,7 @@ namespace ModEditor
             DrawShader = AssetDatabase.LoadAssetAtPath<ComputeShader>($"{ModEditorWindow.ModEditorPath}/Editor/Shaders/DrawUtil.compute");
             kernel_Init = DrawShader.FindKernel("Init");
             kernel_InitTex = DrawShader.FindKernel("InitTex");
+            kernel_BlendTex = DrawShader.FindKernel("BlendTex");
             kernel_Merge = DrawShader.FindKernel("Merge");
             kernel_RefreshView = DrawShader.FindKernel("RefreshView");
             kernel_Clone = DrawShader.FindKernel("Clone");
@@ -89,25 +91,25 @@ namespace ModEditor
                 cache = new Cache();
             if (cache.BaseTexture == null)
             {
-                cache.BaseTexture = new RenderTexture((int)TexelSize.x, (int)TexelSize.y, 0);
+                cache.BaseTexture = new RenderTexture(TexelSize.x, TexelSize.y, 0);
                 cache.BaseTexture.enableRandomWrite = true;
                 cache.BaseTexture.Create();
             }
             if (cache.DrawTexture == null)
             {
-                cache.DrawTexture = new RenderTexture((int)TexelSize.x, (int)TexelSize.y, 0);
+                cache.DrawTexture = new RenderTexture(TexelSize.x, TexelSize.y, 0);
                 cache.DrawTexture.enableRandomWrite = true;
                 cache.DrawTexture.Create();
             }
             if (cache.Texture == null)
             {
-                cache.Texture = new RenderTexture((int)TexelSize.x, (int)TexelSize.y, 0);
+                cache.Texture = new RenderTexture(TexelSize.x, TexelSize.y, 0);
                 cache.Texture.enableRandomWrite = true;
                 cache.Texture.Create();
             }
             if (cache.ViewTexture == null)
             {
-                cache.ViewTexture = new RenderTexture((int)TexelSize.x, (int)TexelSize.y, 0);
+                cache.ViewTexture = new RenderTexture(TexelSize.x, TexelSize.y, 0);
                 cache.ViewTexture.enableRandomWrite = true;
                 cache.ViewTexture.Create();
             }
@@ -122,7 +124,7 @@ namespace ModEditor
 
         public void Init(Texture tex, Cache cache, int viewPass = -1)
         {
-            RenderTexture _tex = RenderTexture.GetTemporary((int)TexelSize.x, (int)TexelSize.y, 0);
+            RenderTexture _tex = RenderTexture.GetTemporary(TexelSize.x, TexelSize.y, 0);
             _tex.enableRandomWrite = true;
             _tex.Create();
             Graphics.Blit(tex, _tex);
@@ -130,36 +132,116 @@ namespace ModEditor
                 cache = new Cache();
             if (cache.BaseTexture == null)
             {
-                cache.BaseTexture = new RenderTexture((int)TexelSize.x, (int)TexelSize.y, 0);
+                cache.BaseTexture = new RenderTexture(TexelSize.x, TexelSize.y, 0);
                 cache.BaseTexture.enableRandomWrite = true;
                 cache.BaseTexture.Create();
             }
             if (cache.DrawTexture == null)
             {
-                cache.DrawTexture = new RenderTexture((int)TexelSize.x, (int)TexelSize.y, 0);
+                cache.DrawTexture = new RenderTexture(TexelSize.x, TexelSize.y, 0);
                 cache.DrawTexture.enableRandomWrite = true;
                 cache.DrawTexture.Create();
             }
             if (cache.Texture == null)
             {
-                cache.Texture = new RenderTexture((int)TexelSize.x, (int)TexelSize.y, 0);
+                cache.Texture = new RenderTexture(TexelSize.x, TexelSize.y, 0);
                 cache.Texture.enableRandomWrite = true;
                 cache.Texture.Create();
             }
             if (cache.ViewTexture == null)
             {
-                cache.ViewTexture = new RenderTexture((int)TexelSize.x, (int)TexelSize.y, 0);
+                cache.ViewTexture = new RenderTexture(TexelSize.x, TexelSize.y, 0);
                 cache.ViewTexture.enableRandomWrite = true;
                 cache.ViewTexture.Create();
             }
             DrawShader.SetInt("_ViewType", viewPass);
             DrawShader.SetVector("_BaseTexTexelSize", new Vector2(_tex.width, _tex.height));
-            DrawShader.SetTexture(kernel_InitTex, "_BaseTexture", _tex);
+            DrawShader.SetTexture(kernel_InitTex, "RW_BaseTexture", _tex);
             DrawShader.SetTexture(kernel_InitTex, "RW_BackgroundTexture", cache.BaseTexture);
             DrawShader.SetTexture(kernel_InitTex, "RW_ForegroundTexture", cache.DrawTexture);
             DrawShader.SetTexture(kernel_InitTex, "RW_Texture", cache.Texture);
             DrawShader.SetTexture(kernel_InitTex, "RW_ViewTexture", cache.ViewTexture);
             DrawShader.Dispatch(kernel_InitTex, Mathf.CeilToInt(cache.Texture.width / 32f), Mathf.CeilToInt(cache.Texture.height / 32f), 1);
+            RenderTexture.ReleaseTemporary(_tex);
+        }
+
+        public void Blend(RenderTexture originTex, RenderTexture blendTex, BlendType blendType, BlendFactor originTexFactor, BlendFactor blendTexFactor)
+        {
+            if (originTex == null || blendTex == null)
+                return;
+            originTex.enableRandomWrite = true;
+            if (!originTex.IsCreated())
+                originTex.Create();
+            blendTex.enableRandomWrite = true;
+            if (!blendTex.IsCreated())
+                blendTex.Create();
+            DrawShader.SetInt("_BlendType", (int)blendType);
+            DrawShader.SetInt("_SrcFactor", (int)blendTexFactor);
+            DrawShader.SetInt("_DstFactor", (int)originTexFactor);
+            DrawShader.SetTexture(kernel_BlendTex, "RW_Texture", originTex);
+            DrawShader.SetTexture(kernel_BlendTex, "RW_ForegroundTexture", blendTex);
+            DrawShader.Dispatch(kernel_BlendTex, Mathf.CeilToInt(originTex.width / 32f), Mathf.CeilToInt(originTex.height / 32f), 1);
+        }
+
+        public void Blend(Texture originTex, RenderTexture blendTex, BlendType blendType, BlendFactor originTexFactor, BlendFactor blendTexFactor)
+        {
+            if (originTex == null || blendTex == null)
+                return;
+            RenderTexture tex = RenderTexture.GetTemporary(originTex.width, originTex.height, 0);
+            tex.enableRandomWrite = true;
+            tex.Create();
+            Graphics.Blit(originTex, tex);
+            blendTex.enableRandomWrite = true;
+            if (!blendTex.IsCreated())
+                blendTex.Create();
+            DrawShader.SetInt("_BlendType", (int)blendType);
+            DrawShader.SetInt("_SrcFactor", (int)blendTexFactor);
+            DrawShader.SetInt("_DstFactor", (int)originTexFactor);
+            DrawShader.SetTexture(kernel_BlendTex, "RW_Texture", tex);
+            DrawShader.SetTexture(kernel_BlendTex, "RW_ForegroundTexture", blendTex);
+            DrawShader.Dispatch(kernel_BlendTex, Mathf.CeilToInt(originTex.width / 32f), Mathf.CeilToInt(originTex.height / 32f), 1);
+            RenderTexture.ReleaseTemporary(tex);
+        }
+
+        public void Blend(RenderTexture originTex, Texture blendTex, BlendType blendType, BlendFactor originTexFactor, BlendFactor blendTexFactor)
+        {
+            if (originTex == null || blendTex == null)
+                return;
+            RenderTexture tex = RenderTexture.GetTemporary(originTex.width, originTex.height, 0);
+            tex.enableRandomWrite = true;
+            tex.Create();
+            Graphics.Blit(blendTex, tex);
+            originTex.enableRandomWrite = true;
+            if (!originTex.IsCreated())
+                originTex.Create();
+            DrawShader.SetInt("_BlendType", (int)blendType);
+            DrawShader.SetInt("_SrcFactor", (int)blendTexFactor);
+            DrawShader.SetInt("_DstFactor", (int)originTexFactor);
+            DrawShader.SetTexture(kernel_BlendTex, "RW_Texture", originTex);
+            DrawShader.SetTexture(kernel_BlendTex, "RW_ForegroundTexture", tex);
+            DrawShader.Dispatch(kernel_BlendTex, Mathf.CeilToInt(originTex.width / 32f), Mathf.CeilToInt(originTex.height / 32f), 1);
+            RenderTexture.ReleaseTemporary(tex);
+        }
+
+        public void Blend(Texture originTex, Texture blendTex, BlendType blendType, BlendFactor originTexFactor, BlendFactor blendTexFactor)
+        {
+            if (originTex == null || blendTex == null)
+                return;
+            RenderTexture tex = RenderTexture.GetTemporary(originTex.width, originTex.height, 0);
+            tex.enableRandomWrite = true;
+            tex.Create();
+            Graphics.Blit(originTex, tex);
+            RenderTexture _tex = RenderTexture.GetTemporary(originTex.width, originTex.height, 0);
+            _tex.enableRandomWrite = true;
+            _tex.Create();
+            Graphics.Blit(blendTex, _tex);
+            DrawShader.SetInt("_BlendType", (int)blendType);
+            DrawShader.SetInt("_SrcFactor", (int)blendTexFactor);
+            DrawShader.SetInt("_DstFactor", (int)originTexFactor);
+            DrawShader.SetTexture(kernel_BlendTex, "RW_Texture", tex);
+            DrawShader.SetTexture(kernel_BlendTex, "RW_ForegroundTexture", _tex);
+            DrawShader.Dispatch(kernel_BlendTex, Mathf.CeilToInt(originTex.width / 32f), Mathf.CeilToInt(originTex.height / 32f), 1);
+            RenderTexture.ReleaseTemporary(tex);
             RenderTexture.ReleaseTemporary(_tex);
         }
 
@@ -197,6 +279,7 @@ namespace ModEditor
             DrawShader.SetTexture(kernel_RefreshView, "RW_Texture", _tex);
             DrawShader.SetTexture(kernel_RefreshView, "RW_ViewTexture", viewTexture);
             DrawShader.Dispatch(kernel_RefreshView, Mathf.CeilToInt(viewTexture.width / 32f), Mathf.CeilToInt(viewTexture.height / 32f), 1);
+            RenderTexture.ReleaseTemporary(_tex);
         }
 
         public void RefreshView(RenderTexture texture, RenderTexture viewTexture, int viewPass = -1)
@@ -216,12 +299,16 @@ namespace ModEditor
             RenderTexture tex = RenderTexture.GetTemporary(texture.width / downSample, texture.height / downSample, texture.depth, texture.format);
             Graphics.Blit(texture, tex);
             Graphics.Blit(tex, texture);
+            RenderTexture.ReleaseTemporary(tex);
         }
 
         public RenderTexture Clone(RenderTexture texture)
         {
             if (texture == null)
                 return null;
+            texture.enableRandomWrite = true;
+            if (!texture.IsCreated())
+                texture.Create();
             RenderTexture clone = new RenderTexture(texture.descriptor);
             clone.enableRandomWrite = true;
             clone.Create();
@@ -253,6 +340,9 @@ namespace ModEditor
         {
             if (texture == null)
                 return;
+            texture.enableRandomWrite = true;
+            if (!texture.IsCreated())
+                texture.Create();
             DrawShader.SetVector("_Color", color);
             DrawShader.SetTexture(kernel_Write, "RW_Texture", texture);
             DrawShader.Dispatch(kernel_Write, Mathf.CeilToInt(texture.width / 32f), Mathf.CeilToInt(texture.height / 32f), 1);
@@ -262,6 +352,12 @@ namespace ModEditor
         {
             if (texture == null || origin == null)
                 return;
+            texture.enableRandomWrite = true;
+            if (!texture.IsCreated())
+                texture.Create();
+            origin.enableRandomWrite = true;
+            if (!origin.IsCreated())
+                origin.Create();
             DrawShader.SetTexture(kernel_Clone, "RW_ForegroundTexture", origin);
             DrawShader.SetTexture(kernel_Clone, "RW_Texture", texture);
             DrawShader.Dispatch(kernel_Clone, Mathf.CeilToInt(texture.width / 32f), Mathf.CeilToInt(texture.height / 32f), 1);
@@ -271,6 +367,9 @@ namespace ModEditor
         {
             if (texture == null || origin == null)
                 return;
+            texture.enableRandomWrite = true;
+            if (!texture.IsCreated())
+                texture.Create();
             RenderTexture _tex = RenderTexture.GetTemporary(origin.width, origin.height, 0);
             _tex.enableRandomWrite = true;
             _tex.Create();
@@ -292,7 +391,7 @@ namespace ModEditor
         {
             if (cache == null || !cache.IsAvailable)
                 return;
-            DrawShader.SetVector("_TexelSize", TexelSize);
+            DrawShader.SetVector("_TexelSize", new Vector2(TexelSize.x, TexelSize.y));
             DrawShader.SetVector("_BrushColor", brushColor);
             DrawShader.SetVector("_CursorTexcoord", cursorTexcoord);
             DrawShader.SetVector("_TexBrushRange", texBrushRange);

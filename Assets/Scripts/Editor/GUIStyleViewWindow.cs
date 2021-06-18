@@ -11,11 +11,13 @@ public class GUIStyleViewer : EditorWindow
         GUIStyleViewer window = GetWindow<GUIStyleViewer>("GUIStyle View");
         string path = $"{ModEditorWindow.ModEditorPath}/Textures/Sphere-Editing.png";
         window.texture = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+        window.subContent = EditorGUIUtility.IconContent("ShurikenToggleNormalMixed");
     }
 
     float innerWidth = 300;
     Vector2 scroll;
     Texture2D texture;
+    GUIContent subContent;
 
     void OnGUI()
     {
@@ -38,8 +40,7 @@ public class GUIStyleViewer : EditorWindow
             //EditorGUILayout.EndVertical();
 
             EditorGUILayout.BeginVertical();
-            int viewPass = 0;
-            viewPass = GUILayout.Toolbar(viewPass, new string[] { "RGBA", "R", "G", "B", "A" }, style);
+            EditorGUILayout.Popup(0, new string[] { "none", "first" }, style, GUILayout.Width(50));
             if (GUILayout.Button("Game Camera Follow"))
             {
                 GUIUtility.systemCopyBuffer = style.name;

@@ -168,6 +168,7 @@ namespace ModEditor
             if (toggleOnContent == null)
                 toggleOnContent = EditorGUIUtility.IconContent("ShurikenToggleFocusedOn");
             refreshWindow();
+            enable_serializableData();
             targetChanged_serializableData();
 
             for (int i = 0; i < tabs.Count; i++)

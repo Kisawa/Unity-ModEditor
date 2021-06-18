@@ -846,6 +846,20 @@ namespace ModEditor
 
         #region TextureBrush
         [SerializeField]
+        Vector2Int texBrushTexelSize = Vector2Int.one * 1024;
+        public Vector2Int TexBrushTexelSize
+        {
+            get => texBrushTexelSize;
+            set
+            {
+                if (value == texBrushTexelSize)
+                    return;
+                Undo.RecordObject(this, "ModEditor TexBrushTexelSize");
+                texBrushTexelSize = value;
+            }
+        }
+
+        [SerializeField]
         bool texBrushUnfold = true;
         public bool TexBrushUnfold
         {
@@ -1015,8 +1029,8 @@ namespace ModEditor
         }
 
         [SerializeField]
-        ColorPass textureViewPass = ColorPass.R;
-        public ColorPass TextureViewPass
+        TexViewPass textureViewPass = TexViewPass.R;
+        public TexViewPass TextureViewPass
         {
             get => textureViewPass;
             set

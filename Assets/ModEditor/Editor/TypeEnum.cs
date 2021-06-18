@@ -63,11 +63,35 @@ namespace ModEditor
         Custom
     }
 
-    public enum ColorPass
+    public enum TexViewPass
     { 
         R,
         G,
         B,
-        A
+        A,
+        Gray
+    }
+
+    public enum BlendType
+    {
+        Add,
+        Sub,
+        RevSub,
+        Min,
+        Max
+    }
+
+    public enum BlendFactor
+    { 
+        One,
+        Zero,
+        BlendTexColor,
+        BlendTexAlpha,
+        OriginTexColor,
+        OriginTexAlpha,
+        OneMinusBlendTexColor,
+        OneMinusBlendTexAlpha,
+        OneMinusOriginTexColor,
+        OneMinusOriginTexAlpha
     }
 }

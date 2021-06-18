@@ -1,5 +1,6 @@
 ﻿#pragma kernel Init
 #pragma kernel InitTex
+#pragma kernel BlendTex
 #pragma kernel Merge
 #pragma kernel RefreshView
 #pragma kernel Clone
@@ -32,10 +33,304 @@ float remap(float num, float inMin, float inMax, float outMin, float outMax)
 		return outMin + (num - inMin) * (outMax - outMin) / (inMax - inMin);
 }
 
-float4 blend(float4 src, float4 dst, float srcF, float dstF)
+float4 blendAdd(float4 src, float4 dst, float srcF, float dstF)
 {
-	float4 col = dst * dstF + src * srcF;
+	float4 col = src * srcF + dst * dstF;
 	return col;
+}
+
+float4 blendSub(float4 src, float4 dst, float srcF, float dstF)
+{
+	float4 col = src * srcF - dst * dstF;
+	return col;
+}
+
+float4 blendRevSub(float4 src, float4 dst, float srcF, float dstF)
+{
+	float4 col = dst * dstF - src * srcF;
+	return col;
+}
+
+float4 blendMin(float4 src, float4 dst, float srcF, float dstF)
+{
+	float4 col = min(src * srcF, dst * dstF);
+	return col;
+}
+
+float4 blendMax(float4 src, float4 dst, float srcF, float dstF)
+{
+	float4 col = max(src * srcF, dst * dstF);
+	return col;
+}
+
+float4 blendAdd(float4 src, float4 dst, float4 srcF, float4 dstF)
+{
+	float4 col = src * srcF + dst * dstF;
+	return col;
+}
+
+float4 blendSub(float4 src, float4 dst, float4 srcF, float4 dstF)
+{
+	float4 col = src * srcF - dst * dstF;
+	return col;
+}
+
+float4 blendRevSub(float4 src, float4 dst, float4 srcF, float4 dstF)
+{
+	float4 col = dst * dstF - src * srcF;
+	return col;
+}
+
+float4 blendMin(float4 src, float4 dst, float4 srcF, float4 dstF)
+{
+	float4 col = min(src * srcF, dst * dstF);
+	return col;
+}
+
+float4 blendMax(float4 src, float4 dst, float4 srcF, float4 dstF)
+{
+	float4 col = max(src * srcF, dst * dstF);
+	return col;
+}
+
+float4 blendAdd(float4 src, float4 dst, float srcF, float4 dstF)
+{
+	float4 col = src * srcF + dst * dstF;
+	return col;
+}
+
+float4 blendSub(float4 src, float4 dst, float srcF, float4 dstF)
+{
+	float4 col = src * srcF - dst * dstF;
+	return col;
+}
+
+float4 blendRevSub(float4 src, float4 dst, float srcF, float4 dstF)
+{
+	float4 col = dst * dstF - src * srcF;
+	return col;
+}
+
+float4 blendMin(float4 src, float4 dst, float srcF, float4 dstF)
+{
+	float4 col = min(src * srcF, dst * dstF);
+	return col;
+}
+
+float4 blendMax(float4 src, float4 dst, float srcF, float4 dstF)
+{
+	float4 col = max(src * srcF, dst * dstF);
+	return col;
+}
+
+float4 blendAdd(float4 src, float4 dst, float4 srcF, float dstF)
+{
+	float4 col = src * srcF + dst * dstF;
+	return col;
+}
+
+float4 blendSub(float4 src, float4 dst, float4 srcF, float dstF)
+{
+	float4 col = src * srcF - dst * dstF;
+	return col;
+}
+
+float4 blendRevSub(float4 src, float4 dst, float4 srcF, float dstF)
+{
+	float4 col = dst * dstF - src * srcF;
+	return col;
+}
+
+float4 blendMin(float4 src, float4 dst, float4 srcF, float dstF)
+{
+	float4 col = min(src * srcF, dst * dstF);
+	return col;
+}
+
+float4 blendMax(float4 src, float4 dst, float4 srcF, float dstF)
+{
+	float4 col = max(src * srcF, dst * dstF);
+	return col;
+}
+
+float4 blend(float4 src, float4 dst, int blendType, int srcFactorType, int dstFactorType)
+{
+	float srcFactor = -1;
+	float4 srcFactorCol = -1;
+	switch(srcFactorType)
+	{
+		case 0:
+			srcFactor = 1;
+			break;
+		case 1:
+			srcFactor = 0;
+			break;
+		case 2:
+			srcFactorCol = src;
+			break;
+		case 3:
+			srcFactor = src.a;
+			break;
+		case 4:
+			srcFactorCol = dst;
+			break;
+		case 5:
+			srcFactor = dst.a;
+			break;
+		case 6:
+			srcFactorCol = 1 - src;
+			break;
+		case 7:
+			srcFactor = 1 - src.a;
+			break;
+		case 8:
+			srcFactorCol = 1 - dst;
+			break;
+		case 9:
+			srcFactor = 1 - dst.a;
+			break;
+	}
+	float dstFactor = -1;
+	float4 dstFactorCol = -1;
+	switch(dstFactorType)
+	{
+		case 0:
+			dstFactor = 1;
+			break;
+		case 1:
+			dstFactor = 0;
+			break;
+		case 2:
+			dstFactorCol = src;
+			break;
+		case 3:
+			dstFactor = src.a;
+			break;
+		case 4:
+			dstFactorCol = dst;
+			break;
+		case 5:
+			dstFactor = dst.a;
+			break;
+		case 6:
+			dstFactorCol = 1 - src;
+			break;
+		case 7:
+			dstFactor = 1 - src.a;
+			break;
+		case 8:
+			dstFactorCol = 1 - dst;
+			break;
+		case 9:
+			dstFactor = 1 - dst.a;
+			break;
+	}
+	float4 res;
+	switch(blendType)
+	{
+		case 0:
+			{
+				if(srcFactor == -1)
+				{
+					if(dstFactor == -1)
+						res = blendAdd(src, dst, srcFactorCol, dstFactorCol);
+					else
+						res = blendAdd(src, dst, srcFactorCol, dstFactor);
+				}
+				else
+				{
+					if(dstFactor == -1)
+						res = blendAdd(src, dst, srcFactor, dstFactorCol);
+					else
+						res = blendAdd(src, dst, srcFactor, dstFactor);
+				}
+			}
+			break;
+		case 1:
+			{
+				if(srcFactor == -1)
+				{
+					if(dstFactor == -1)
+						res = blendSub(src, dst, srcFactorCol, dstFactorCol);
+					else
+						res = blendSub(src, dst, srcFactorCol, dstFactor);
+				}
+				else
+				{
+					if(dstFactor == -1)
+						res = blendSub(src, dst, srcFactor, dstFactorCol);
+					else
+						res = blendSub(src, dst, srcFactor, dstFactor);
+				}
+			}
+			break;
+		case 2:
+			{
+				if(srcFactor == -1)
+				{
+					if(dstFactor == -1)
+						res = blendRevSub(src, dst, srcFactorCol, dstFactorCol);
+					else
+						res = blendRevSub(src, dst, srcFactorCol, dstFactor);
+				}
+				else
+				{
+					if(dstFactor == -1)
+						res = blendRevSub(src, dst, srcFactor, dstFactorCol);
+					else
+						res = blendRevSub(src, dst, srcFactor, dstFactor);
+				}
+			}
+			break;
+		case 3:
+			{
+				if(srcFactor == -1)
+				{
+					if(dstFactor == -1)
+						res = blendMin(src, dst, srcFactorCol, dstFactorCol);
+					else
+						res = blendMin(src, dst, srcFactorCol, dstFactor);
+				}
+				else
+				{
+					if(dstFactor == -1)
+						res = blendMin(src, dst, srcFactor, dstFactorCol);
+					else
+						res = blendMin(src, dst, srcFactor, dstFactor);
+				}
+			}
+			break;
+		case 4:
+			{
+				if(srcFactor == -1)
+				{
+					if(dstFactor == -1)
+						res = blendMax(src, dst, srcFactorCol, dstFactorCol);
+					else
+						res = blendMax(src, dst, srcFactorCol, dstFactor);
+				}
+				else
+				{
+					if(dstFactor == -1)
+						res = blendMax(src, dst, srcFactor, dstFactorCol);
+					else
+						res = blendMax(src, dst, srcFactor, dstFactor);
+				}
+			}
+			break;
+	}
+	return res;
+}
+
+int _BlendType;
+int _SrcFactor;
+int _DstFactor;
+[numthreads(32,32,1)]
+void BlendTex(uint3 id : SV_DispatchThreadID)
+{
+	float4 src = RW_ForegroundTexture[id.xy];
+	float4 dst = RW_Texture[id.xy];
+	RW_Texture[id.xy] = blend(src, dst, _BlendType, _SrcFactor, _DstFactor);
 }
 
 void refreshView(uint3 id, float4 col)
@@ -54,6 +349,13 @@ void refreshView(uint3 id, float4 col)
 		case 3:
 			RW_ViewTexture[id.xy] = float4(col.a, col.a, col.a, 1);
 			break;
+		case 4:
+			float gray = dot(col.rgb, float3(0.299, 0.587, 0.114));
+			RW_ViewTexture[id.xy] = float4(gray, gray, gray, 1);
+			break;
+		default:
+			RW_ViewTexture[id.xy] = col;
+			break;
 	}
 }
 
@@ -61,7 +363,7 @@ void merge(uint3 id)
 {
 	float4 background = RW_BackgroundTexture[id.xy];
 	float4 foreground = RW_ForegroundTexture[id.xy];
-	float4 col = blend(foreground, background, foreground.a, 1 - foreground.a);
+	float4 col = blendAdd(foreground, background, foreground.a, 1 - foreground.a);
     RW_Texture[id.xy] = col;
 	refreshView(id, col);
 }
@@ -74,11 +376,11 @@ void Init(uint3 id : SV_DispatchThreadID)
 	merge(id);
 }
 
-RWTexture2D<float4> _BaseTexture;
+RWTexture2D<float4> RW_BaseTexture;
 [numthreads(32,32,1)]
 void InitTex(uint3 id : SV_DispatchThreadID)
 {
-	RW_BackgroundTexture[id.xy] = _BaseTexture[id.xy];
+	RW_BackgroundTexture[id.xy] = RW_BaseTexture[id.xy];
 	merge(id);
 }
 
@@ -129,7 +431,7 @@ void Draw(uint3 id : SV_DispatchThreadID)
 	int inRange = GetRange(id, res);
 	float4 foreground = RW_ForegroundTexture[id.xy];
 	float4 col = _BrushColor;
-	col = blend(col, foreground, res, 1 - res);
+	col = blendAdd(col, foreground, res, 1 - res);
 	col = lerp(foreground, col, _ColorMask);
 	RW_ForegroundTexture[id.xy] = col;
 	merge(id);

@@ -7,6 +7,14 @@ namespace ModEditor
 {
     public partial class ModEditorWindow
     {
+        void enable_serializableData()
+        {
+            if(TextureBrushTabuUtilCustomViewTexPanel == null)
+                TextureBrushTabuUtilCustomViewTexPanel = new TexturePanel(this);
+            if (BlendTexPanel == null)
+                BlendTexPanel = new TexturePanel(this);
+        }
+        
         void targetChanged_serializableData()
         {
             LocalRemapCoordClear();
@@ -121,46 +129,7 @@ namespace ModEditor
             }
         }
 
-        [SerializeField]
-        bool textureBrushTabUtilCustomTexPassView;
-        public bool TextureBrushTabUtilCustomTexPassView
-        {
-            get => textureBrushTabUtilCustomTexPassView;
-            set
-            {
-                if (value == textureBrushTabUtilCustomTexPassView)
-                    return;
-                Undo.RecordObject(this, "TextureBrushTab UtilCustomTexPassView Changed");
-                textureBrushTabUtilCustomTexPassView = value;
-            }
-        }
-
-        [SerializeField]
-        ColorPass textureBrushTabUtilCustomTexViewPass;
-        public ColorPass TextureBrushTabUtilCustomTexViewPass
-        {
-            get => textureBrushTabUtilCustomTexViewPass;
-            set
-            {
-                if (value == textureBrushTabUtilCustomTexViewPass)
-                    return;
-                Undo.RecordObject(this, "TextureBrushTab UtilCustomTexViewPass Changed");
-                textureBrushTabUtilCustomTexViewPass = value;
-            }
-        }
-
-        public RenderTexture textureBrushTabUtilCustomViewTex;
-        public RenderTexture TextureBrushTabUtilCustomViewTex
-        {
-            get => textureBrushTabUtilCustomViewTex;
-            set
-            {
-                if (value == textureBrushTabUtilCustomViewTex)
-                    return;
-                Undo.RecordObject(this, "TextureBrushTab UtilCustomViewTex Changed");
-                textureBrushTabUtilCustomViewTex = value;
-            }
-        }
+        public TexturePanel TextureBrushTabuUtilCustomViewTexPanel;
         #endregion
 
         #region Copy
@@ -343,6 +312,78 @@ namespace ModEditor
                     return;
                 Undo.RecordObject(this, "Blur Spread Changed");
                 blurSpread = value;
+            }
+        }
+        #endregion
+
+        #region Blend
+        [SerializeField]
+        Texture blendTexture;
+        public Texture BlendTexture
+        {
+            get => blendTexture;
+            set
+            {
+                if (blendTexture == value)
+                    return;
+                Undo.RecordObject(this, "Blend Texture Changed");
+                blendTexture = value;
+            }
+        }
+
+        [SerializeField]
+        TexturePanel blendTexPanel;
+        public TexturePanel BlendTexPanel
+        {
+            get => blendTexPanel;
+            set
+            {
+                if (blendTexPanel == value)
+                    return;
+                Undo.RecordObject(this, "Blend TexPanel Changed");
+                blendTexPanel = value;
+            }
+        }
+
+        [SerializeField]
+        BlendType blendBlendType;
+        public BlendType BlendBlendType
+        {
+            get => blendBlendType;
+            set
+            {
+                if (blendBlendType == value)
+                    return;
+                Undo.RecordObject(this, "Blend BlendType Changed");
+                blendBlendType = value;
+            }
+        }
+
+        [SerializeField]
+        BlendFactor blendBlendTexFactor = BlendFactor.BlendTexAlpha;
+        public BlendFactor BlendBlendTexFactor
+        {
+            get => blendBlendTexFactor;
+            set
+            {
+                if (blendBlendTexFactor == value)
+                    return;
+                Undo.RecordObject(this, "Blend BlendTexFactor Changed");
+                blendBlendTexFactor = value;
+            }
+        }
+
+        [SerializeField]
+        BlendFactor blendOriginTexFactor = BlendFactor.OneMinusBlendTexAlpha;
+        public BlendFactor BlendOriginTexFactor
+        {
+            get => blendOriginTexFactor;
+            set
+            {
+                if (blendOriginTexFactor == value)
+                    return;
+                Undo.RecordObject(this, "Blend OriginTexFactor Changed");
+                blendOriginTexFactor = value;
             }
         }
         #endregion

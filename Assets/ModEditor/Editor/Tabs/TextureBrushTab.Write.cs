@@ -77,12 +77,12 @@ namespace ModEditor
                     return;
                 window.TextureBrushTabUtilCustomOriginTex = value;
                 window.textureBrushTabUtilCustomResultTex = null;
+                utilCustomViewTexPanel.BindTexture(value);
             }
         }
         RenderTexture utilCustomResultTex { get => window.TextureBrushTabUtilCustomResultTex; set => window.TextureBrushTabUtilCustomResultTex = value; }
-        bool utilCustomTexPassView { get => window.TextureBrushTabUtilCustomTexPassView; set => window.TextureBrushTabUtilCustomTexPassView = value; }
-        ColorPass utilCustomViewPass { get => window.TextureBrushTabUtilCustomTexViewPass; set => window.TextureBrushTabUtilCustomTexViewPass = value; }
-        RenderTexture utilCustomViewTex { get => window.TextureBrushTabUtilCustomViewTex; set => window.TextureBrushTabUtilCustomViewTex = value; }
+
+        TexturePanel utilCustomViewTexPanel { get => window.TextureBrushTabuUtilCustomViewTexPanel; set => window.TextureBrushTabuUtilCustomViewTexPanel = value; }
 
         void excuteUtil(TextureUtilBase util)
         {
@@ -105,14 +105,20 @@ namespace ModEditor
                     break;
                 case TargetTextureType.Custom:
                     {
-                        if (utilCustomOriginTex != null)
+                        if (utilCustomResultTex == null)
                         {
-                            if (utilCustomResultTex == null)
-                                utilCustomResultTex = DrawUtil.Self.Clone(utilCustomOriginTex);
+                            if (utilCustomOriginTex == null)
+                            {
+                                utilCustomResultTex = new RenderTexture(window.Manager.TexBrushTexelSize.x, window.Manager.TexBrushTexelSize.y, 0);
+                                utilCustomResultTex.enableRandomWrite = true;
+                                utilCustomResultTex.Create();
+                            }
                             else
-                                utilCustomResultTex = DrawUtil.Self.Clone(utilCustomResultTex);
-                            tex = utilCustomResultTex;
+                                utilCustomResultTex = DrawUtil.Self.Clone(utilCustomOriginTex);
                         }
+                        else
+                            utilCustomResultTex = DrawUtil.Self.Clone(utilCustomResultTex);
+                        tex = utilCustomResultTex;
                     }
                     break;
             }
@@ -127,23 +133,9 @@ namespace ModEditor
                         TextureManager.Merge();
                     break;
                 case TargetTextureType.Custom:
-                    refreshUtilCustomViewTex();
+                    utilCustomViewTexPanel.BindTexture(utilCustomResultTex);
                     break;
             }
-        }
-
-        void refreshUtilCustomViewTex()
-        {
-            if (utilCustomOriginTex == null || !utilCustomTexPassView)
-                return;
-            int viewPass = utilCustomTexPassView ? (int)utilCustomViewPass : -1;
-            utilCustomViewTex = new RenderTexture(utilCustomOriginTex.width, utilCustomOriginTex.height, 0);
-            utilCustomViewTex.enableRandomWrite = true;
-            utilCustomViewTex.Create();
-            if (utilCustomResultTex == null)
-                DrawUtil.Self.RefreshView(utilCustomOriginTex, utilCustomViewTex, viewPass);
-            else
-                DrawUtil.Self.RefreshView(utilCustomResultTex, utilCustomViewTex, viewPass);
         }
 
         private void OnMouse_Move()
@@ -224,6 +216,10 @@ namespace ModEditor
         void undoRedoPerformed()
         {
             currentDrawBoard = currentDrawBoard;
+            if (utilCustomResultTex == null)
+                utilCustomViewTexPanel.BindTexture(utilCustomOriginTex);
+            else
+                utilCustomViewTexPanel.BindTexture(utilCustomResultTex);
         }
     }
 }

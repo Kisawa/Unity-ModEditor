@@ -12,6 +12,8 @@ namespace ModEditor
 
         public abstract string Tip { get; }
 
+        public virtual bool IsAvailable { get; } = true;
+
         public TextureUtilBase() { }
 
         public virtual void OnFocus()

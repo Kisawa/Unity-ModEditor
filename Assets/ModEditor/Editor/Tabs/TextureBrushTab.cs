@@ -104,6 +104,12 @@ namespace ModEditor
             scroll = EditorGUILayout.BeginScrollView(scroll);
             GUIStyle labelStyle = GUI.skin.GetStyle("LODRenderersText");
 
+            EditorGUILayout.BeginHorizontal("Badge");
+            GUILayout.Space(15);
+            EditorGUILayout.LabelField("Texel Size:", labelStyle, GUILayout.Width(100));
+            window.Manager.TexBrushTexelSize = EditorGUILayout.Vector2IntField("", window.Manager.TexBrushTexelSize, GUILayout.Width(window.position.width - 170));
+            EditorGUILayout.EndHorizontal();
+            GUILayout.Space(5);
             EditorGUILayout.BeginVertical("flow background");
             if (drawBoards == null || drawBoards.Count == 0)
             {
@@ -147,8 +153,8 @@ namespace ModEditor
                 int viewPass = textureView ? window.Manager.TexturePassView ? (int)window.Manager.TextureViewPass + 2 : 1 : 0;
                 int pre = viewPass;
                 EditorGUILayout.BeginHorizontal();
-                GUILayout.Space(window.position.width - 250);
-                viewPass = GUILayout.Toolbar(viewPass, new string[] { "None", "RGBA", "R", "G", "B", "A" }, "sv_iconselector_back", GUILayout.Width(230));
+                GUILayout.Space(window.position.width - 272);
+                viewPass = GUILayout.Toolbar(viewPass, new string[] { "None", "RGBA", "R", "G", "B", "A", "Gray" }, "sv_iconselector_back", GUILayout.Width(250), GUILayout.Height(15));
                 EditorGUILayout.EndHorizontal();
                 if (viewPass == 0)
                 {
@@ -163,7 +169,7 @@ namespace ModEditor
                     else
                     {
                         window.Manager.TexturePassView = true;
-                        window.Manager.TextureViewPass = (ColorPass)(viewPass - 2);
+                        window.Manager.TextureViewPass = (TexViewPass)(viewPass - 2);
                     }
                     if (pre != viewPass)
                         TextureManager.RefreshView();
@@ -233,7 +239,7 @@ namespace ModEditor
             {
                 EditorGUI.indentLevel = 2;
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("Brush Color:", labelStyle, GUILayout.Width(125));
+                EditorGUILayout.LabelField("Brush Color:", labelStyle, GUILayout.Width(100));
                 window.Manager.TextureBrushColor = EditorGUILayout.ColorField(window.Manager.TextureBrushColor, GUILayout.Width(100));
                 EditorGUILayout.EndHorizontal();
                 GUILayout.Space(5);
@@ -285,7 +291,7 @@ namespace ModEditor
                 if (window.Manager.TexUtilIndex >= utilTipContents.Length)
                     window.Manager.texUtilIndex = utilTipContents.Length - 1;
                 int preUtilIndex = window.Manager.TexUtilIndex;
-                window.Manager.TexUtilIndex = EditorGUILayout.Popup(window.Manager.TexUtilIndex, utilNames, GUILayout.Width(140));
+                window.Manager.TexUtilIndex = EditorGUILayout.Popup(window.Manager.TexUtilIndex, utilNames, GUILayout.Width(165));
                 if (preUtilIndex != window.Manager.TexUtilIndex)
                 {
                     utilInstances[preUtilIndex].OnLostFocus();
@@ -312,36 +318,9 @@ namespace ModEditor
                     utilCustomOriginTex = (Texture)EditorGUILayout.ObjectField(utilCustomOriginTex, typeof(Texture), false, GUILayout.Width(window.position.width - 150));
                     EditorGUILayout.EndHorizontal();
 
-                    if (utilCustomOriginTex != null)
+                    if (utilCustomOriginTex != null || utilCustomResultTex != null)
                     {
-                        int viewPass = utilCustomTexPassView ? (int)utilCustomViewPass + 1 : 0;
-                        int pre = viewPass;
-                        EditorGUILayout.BeginHorizontal();
-                        GUILayout.Space(window.position.width - 255);
-                        viewPass = GUILayout.Toolbar(viewPass, new string[] { "RGBA", "R", "G", "B", "A" }, "sv_iconselector_back", GUILayout.Width(200));
-                        EditorGUILayout.EndHorizontal();
-                        if (viewPass == 0)
-                            utilCustomTexPassView = false;
-                        else
-                        {
-                            utilCustomTexPassView = true;
-                            utilCustomViewPass = (ColorPass)(viewPass - 1);
-                        }
-                        if (pre != viewPass)
-                            refreshUtilCustomViewTex();
-
-                        EditorGUILayout.BeginHorizontal();
-                        GUILayout.Space(30);
-                        if (utilCustomTexPassView)
-                            GUILayout.Box(utilCustomViewTex, GUILayout.Width(window.position.width - 80), GUILayout.Height(window.position.width - 80));
-                        else
-                        {
-                            if (utilCustomResultTex == null)
-                                GUILayout.Box(utilCustomOriginTex, GUILayout.Width(window.position.width - 80), GUILayout.Height(window.position.width - 80));
-                            else
-                                GUILayout.Box(utilCustomResultTex, GUILayout.Width(window.position.width - 80), GUILayout.Height(window.position.width - 80));
-                        }
-                        EditorGUILayout.EndHorizontal();
+                        utilCustomViewTexPanel.Draw(window.position.width - 55);
 
                         EditorGUI.BeginDisabledGroup(utilCustomResultTex == null);
                         EditorGUILayout.BeginHorizontal();
@@ -352,7 +331,7 @@ namespace ModEditor
                         if (GUILayout.Button($"Clear", "EditModeSingleButton", GUILayout.Width((window.position.width - 90) / 2)))
                         {
                             utilCustomResultTex = null;
-                            refreshUtilCustomViewTex();
+                            utilCustomViewTexPanel.BindTexture(utilCustomOriginTex);
                         }
                         EditorGUILayout.EndHorizontal();
                         EditorGUI.EndDisabledGroup();
@@ -364,7 +343,7 @@ namespace ModEditor
                 TextureUtilBase util = utilInstances[window.Manager.TexUtilIndex];
                 util.Draw(labelStyle, window.position.width - 45);
                 GUILayout.Space(5);
-                EditorGUI.BeginDisabledGroup(utilTargetTextureType != TargetTextureType.Custom && !TextureManager.IsAvailable);
+                EditorGUI.BeginDisabledGroup((utilTargetTextureType != TargetTextureType.Custom && !TextureManager.IsAvailable) || !util.IsAvailable);
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.Space(15);
                 if (GUILayout.Button($"Execute", "EditModeSingleButton", GUILayout.Width(window.position.width - 60)))
