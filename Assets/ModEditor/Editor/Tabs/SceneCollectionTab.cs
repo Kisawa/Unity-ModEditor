@@ -455,8 +455,8 @@ namespace ModEditor
                 {
                     if (window.Tab_TextureBrush.TextureManager.IsAvailable && window.Tab_TextureBrush.TextureManager.trans == target.transform)
                     {
-                        buffer.DrawRenderer(renderer, window.Mat_Util, 0, 9);
-                        buffer.DrawRenderer(renderer, window.Mat_Util, 0, 10);
+                        buffer.DrawRenderer(renderer, window.Mat_Util, window.TextureBrushTabCurrentDrawBoardSubNum, 9);
+                        buffer.DrawRenderer(renderer, window.Mat_Util, window.TextureBrushTabCurrentDrawBoardSubNum, 10);
                     }
                 }
             }

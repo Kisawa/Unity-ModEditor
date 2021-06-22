@@ -48,7 +48,7 @@ namespace ModEditor
         public override void Excute(RenderTexture texture)
         {
             base.Excute(texture);
-            DrawUtil.Self.Blend(texture, this.texture, blendType, originTexFactor, blendTexFactor);
+            DrawUtil.Self.Blend(texture, this.texture, blendType, originTexFactor, blendTexFactor, window.Manager.ColorMask);
         }
 
         public override void Draw(GUIStyle labelStyle, float maxWidth)
@@ -58,12 +58,12 @@ namespace ModEditor
             EditorGUILayout.LabelField("Blend Tex:", labelStyle, GUILayout.Width(100));
             texture = (Texture)EditorGUILayout.ObjectField(texture, typeof(Texture), false, GUILayout.Width(maxWidth - 100));
             EditorGUILayout.EndHorizontal();
+            int preIndentLevel = EditorGUI.indentLevel;
+            EditorGUI.indentLevel = 0;
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Space(20);
-            panel.Draw((maxWidth - 20) / 3);
-            GUILayout.Space(-50);
+            panel.Draw(maxWidth / 3);
             EditorGUILayout.BeginVertical();
-            float _width = (maxWidth - 20) / 3 * 2;
+            float _width = maxWidth / 3 * 2 - 20;
             EditorGUILayout.LabelField("Blend Type:", labelStyle, GUILayout.Width(_width));
             blendType = (BlendType)EditorGUILayout.EnumPopup(blendType, GUILayout.Width(_width));
             EditorGUILayout.LabelField("Blend Tex Factor:", labelStyle, GUILayout.Width(_width));
@@ -72,6 +72,7 @@ namespace ModEditor
             originTexFactor = (BlendFactor)EditorGUILayout.EnumPopup(originTexFactor, GUILayout.Width(_width));
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndHorizontal();
+            EditorGUI.indentLevel = preIndentLevel;
         }
     }
 }

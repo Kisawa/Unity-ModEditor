@@ -12,7 +12,7 @@ namespace ModEditor
         public override string Tip => "Gaussian Blur";
 
         ComputeShader drawShader;
-        int kernel_blur;
+        int kernel_Blur;
 
         int downSample { get => window.BlurDownSample; set => window.BlurDownSample = value; }
         int iterations { get => window.BlurIterations; set => window.BlurIterations = value; }
@@ -21,7 +21,7 @@ namespace ModEditor
         public Blur()
         {
             drawShader = AssetDatabase.LoadAssetAtPath<ComputeShader>($"{ModEditorWindow.ModEditorPath}/Editor/TextureUtility/Blur.compute");
-            kernel_blur = drawShader.FindKernel("Blur");
+            kernel_Blur = drawShader.FindKernel("Blur");
         }
 
         public override void Excute(RenderTexture texture)
@@ -32,8 +32,8 @@ namespace ModEditor
             {
                 drawShader.SetInt("_Spread", blurSpread);
                 drawShader.SetVector("_ColorMask", window.Manager.ColorMask);
-                drawShader.SetTexture(kernel_blur, "RW_Texture", texture);
-                drawShader.Dispatch(kernel_blur, Mathf.CeilToInt(texture.width / 32f), Mathf.CeilToInt(texture.height / 32f), 1);
+                drawShader.SetTexture(kernel_Blur, "RW_Texture", texture);
+                drawShader.Dispatch(kernel_Blur, Mathf.CeilToInt(texture.width / 32f), Mathf.CeilToInt(texture.height / 32f), 1);
             }
         }
 

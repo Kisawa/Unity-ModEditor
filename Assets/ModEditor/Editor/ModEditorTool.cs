@@ -62,8 +62,8 @@ namespace ModEditor
             {
                 case ModEditorToolType.None:
                     GUILayout.BeginArea(rect);
-                    GUILayout.Label("ModEditor Tool Ready", "ToolbarButtonFlat");
-                    GUILayout.Label("Switch tabs to select the desired workbench", "ToolbarButtonFlat");
+                    GUILayout.Label("ModEditor Tool Ready", "Badge");
+                    GUILayout.Label("Switch tabs to select the desired workbench.", "Badge");
                     GUILayout.EndArea();
                     break;
                 case ModEditorToolType.VertexBrush:

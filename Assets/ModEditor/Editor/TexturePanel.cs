@@ -52,7 +52,14 @@ namespace ModEditor
             }
         }
 
+        public TexturePanel() { }
+
         public TexturePanel(EditorWindow window)
+        {
+            this.window = window;
+        }
+
+        public void BindEditor(EditorWindow window)
         {
             this.window = window;
         }
@@ -90,29 +97,53 @@ namespace ModEditor
             }
         }
 
-        public void Draw(float width)
+        public void Draw(float width, bool withRGBA = true)
         {
             EditorGUILayout.BeginVertical();
-            int viewPass = PassView ? (int)ViewPass + 1 : 0;
-            int pre = viewPass;
-            if (width > 230)
+            int viewPass, pre;
+            if (withRGBA)
             {
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.Space(width - 220);
-                viewPass = GUILayout.Toolbar(viewPass, new string[] { "RGBA", "R", "G", "B", "A", "Gray" }, "sv_iconselector_back", GUILayout.Width(220));
-                EditorGUILayout.EndHorizontal();
+                viewPass = PassView ? (int)ViewPass + 1 : 0;
+                pre = viewPass;
+                if (width > 230)
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    GUILayout.Space(width - 220);
+                    viewPass = GUILayout.Toolbar(viewPass, new string[] { "RGBA", "R", "G", "B", "A", "Gray" }, "sv_iconselector_back", GUILayout.Width(220));
+                    EditorGUILayout.EndHorizontal();
+                }
+                else if (width > 40)
+                {
+                    viewPass = EditorGUILayout.Popup(viewPass, new string[] { "RGBA", "R", "G", "B", "A", "Gray" }, "IN MinMaxStateDropDown", GUILayout.Width(width));
+                }
+                if (viewPass == 0)
+                    PassView = false;
+                else
+                {
+                    PassView = true;
+                    ViewPass = (TexViewPass)(viewPass - 1);
+                }
             }
-            else if(width > 40)
-            {
-                viewPass = EditorGUILayout.Popup(viewPass, new string[] { "RGBA", "R", "G", "B", "A", "Gray" }, "IN MinMaxStateDropDown", GUILayout.Width(width));
-            }
-            if (viewPass == 0)
-                PassView = false;
             else
             {
-                PassView = true;
-                ViewPass = (TexViewPass)(viewPass - 1);
+                viewPass = (int)ViewPass;
+                pre = viewPass;
+
+                if (width > 180)
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    GUILayout.Space(width - 180);
+                    viewPass = GUILayout.Toolbar(viewPass, new string[] { "R", "G", "B", "A", "Gray" }, "sv_iconselector_back", GUILayout.Width(180));
+                    EditorGUILayout.EndHorizontal();
+                }
+                else if (width > 40)
+                {
+                    viewPass = EditorGUILayout.Popup(viewPass, new string[] { "R", "G", "B", "A", "Gray" }, "IN MinMaxStateDropDown", GUILayout.Width(width));
+                }
+                passView = true;
+                ViewPass = (TexViewPass)viewPass;
             }
+            
             if (pre != viewPass)
                 RefreshView();
 

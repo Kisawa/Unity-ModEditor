@@ -14,6 +14,8 @@ namespace ModEditor
 
         public virtual bool IsAvailable { get; } = true;
 
+        public virtual bool OnlyCustom { get; } = false;
+
         public TextureUtilBase() { }
 
         public virtual void OnFocus()

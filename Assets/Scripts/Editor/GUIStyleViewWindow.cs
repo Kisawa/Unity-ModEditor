@@ -40,7 +40,7 @@ public class GUIStyleViewer : EditorWindow
             //EditorGUILayout.EndVertical();
 
             EditorGUILayout.BeginVertical();
-            EditorGUILayout.Popup(0, new string[] { "none", "first" }, style, GUILayout.Width(50));
+            GUILayout.Label("SubMesh", style, GUILayout.Width(100));
             if (GUILayout.Button("Game Camera Follow"))
             {
                 GUIUtility.systemCopyBuffer = style.name;

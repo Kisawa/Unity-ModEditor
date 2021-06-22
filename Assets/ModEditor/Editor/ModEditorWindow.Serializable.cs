@@ -9,10 +9,12 @@ namespace ModEditor
     {
         void enable_serializableData()
         {
-            if(TextureBrushTabuUtilCustomViewTexPanel == null)
-                TextureBrushTabuUtilCustomViewTexPanel = new TexturePanel(this);
-            if (BlendTexPanel == null)
-                BlendTexPanel = new TexturePanel(this);
+            TextureBrushTabuUtilCustomViewTexPanel.BindEditor(this);
+            BlendTexPanel.BindEditor(this);
+            TexPassMergePanel1.BindEditor(this);
+            TexPassMergePanel2.BindEditor(this);
+            TexPassMergePanel3.BindEditor(this);
+            TexPassMergePanel4.BindEditor(this);
         }
         
         void targetChanged_serializableData()
@@ -28,7 +30,7 @@ namespace ModEditor
 
         #region DrawUtil
         public List<Transform> DrawUtilTransCache = new List<Transform>();
-        public List<DrawUtil.Cache> DrawUtilCache = new List<DrawUtil.Cache>();
+        public List<DrawUtil.CacheGroup> DrawUtilCache = new List<DrawUtil.CacheGroup>();
         #endregion
 
         #region TextureBrushTab
@@ -57,6 +59,20 @@ namespace ModEditor
                     return;
                 Undo.RecordObject(this, "TextureBrushTab CurrentDrawBoard Changed");
                 textureBrushTabCurrentDrawBoard = value;
+            }
+        }
+
+        [SerializeField]
+        int textureBrushTabCurrentDrawBoardSubNum;
+        public int TextureBrushTabCurrentDrawBoardSubNum
+        {
+            get => textureBrushTabCurrentDrawBoardSubNum;
+            set
+            {
+                if (value == textureBrushTabCurrentDrawBoardSubNum)
+                    return;
+                Undo.RecordObject(this, "TextureBrushTab CurrentDrawBoardSubNum Changed");
+                textureBrushTabCurrentDrawBoardSubNum = value;
             }
         }
 
@@ -129,7 +145,7 @@ namespace ModEditor
             }
         }
 
-        public TexturePanel TextureBrushTabuUtilCustomViewTexPanel;
+        public TexturePanel TextureBrushTabuUtilCustomViewTexPanel = new TexturePanel();
         #endregion
 
         #region Copy
@@ -331,19 +347,7 @@ namespace ModEditor
             }
         }
 
-        [SerializeField]
-        TexturePanel blendTexPanel;
-        public TexturePanel BlendTexPanel
-        {
-            get => blendTexPanel;
-            set
-            {
-                if (blendTexPanel == value)
-                    return;
-                Undo.RecordObject(this, "Blend TexPanel Changed");
-                blendTexPanel = value;
-            }
-        }
+        public TexturePanel BlendTexPanel = new TexturePanel();
 
         [SerializeField]
         BlendType blendBlendType;
@@ -386,6 +390,72 @@ namespace ModEditor
                 blendOriginTexFactor = value;
             }
         }
+        #endregion
+
+        #region TexPassMerge
+        [SerializeField]
+        Texture texPassMergeTex1;
+        public Texture TexPassMergeTex1
+        {
+            get => texPassMergeTex1;
+            set
+            {
+                if (texPassMergeTex1 == value)
+                    return;
+                Undo.RecordObject(this, "TexPassMerge Tex1 Changed");
+                texPassMergeTex1 = value;
+            }
+        }
+
+        public TexturePanel TexPassMergePanel1 = new TexturePanel();
+
+        [SerializeField]
+        Texture texPassMergeTex2;
+        public Texture TexPassMergeTex2
+        {
+            get => texPassMergeTex2;
+            set
+            {
+                if (texPassMergeTex2 == value)
+                    return;
+                Undo.RecordObject(this, "TexPassMerge Tex2 Changed");
+                texPassMergeTex2 = value;
+            }
+        }
+
+        public TexturePanel TexPassMergePanel2 = new TexturePanel();
+
+        [SerializeField]
+        Texture texPassMergeTex3;
+        public Texture TexPassMergeTex3
+        {
+            get => texPassMergeTex3;
+            set
+            {
+                if (texPassMergeTex3 == value)
+                    return;
+                Undo.RecordObject(this, "TexPassMerge Tex3 Changed");
+                texPassMergeTex3 = value;
+            }
+        }
+
+        public TexturePanel TexPassMergePanel3 = new TexturePanel();
+
+        [SerializeField]
+        Texture texPassMergeTex4;
+        public Texture TexPassMergeTex4
+        {
+            get => texPassMergeTex4;
+            set
+            {
+                if (texPassMergeTex4 == value)
+                    return;
+                Undo.RecordObject(this, "TexPassMerge Tex4 Changed");
+                texPassMergeTex4 = value;
+            }
+        }
+
+        public TexturePanel TexPassMergePanel4 = new TexturePanel();
         #endregion
     }
 }

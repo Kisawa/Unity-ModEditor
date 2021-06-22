@@ -10,15 +10,18 @@ namespace ModEditor
         public event Action onCurrentDrawBoardChanged;
 
         List<Transform> drawBoards;
+        List<int> drawBoardSubCount;
+        List<bool> drawBoardSubUnfold;
         Transform currentDrawBoard
         {
             get => window.TextureBrushTabCurrentDrawBoard;
             set
             {
                 TextureManager.Clear();
+                collider = null;
                 if (value != null)
                 {
-                    TextureManager.Init(value, window.Manager.TextureBaseColor);
+                    TextureManager.Init(value, subNum, window.Manager.TextureBaseColor);
                     collider = value.GetComponent<MeshCollider>();
                 }
                 onCurrentDrawBoardChanged?.Invoke();
@@ -26,6 +29,17 @@ namespace ModEditor
             }
         }
         MeshCollider collider;
+        int subNum 
+        {
+            get => window.TextureBrushTabCurrentDrawBoardSubNum;
+            set
+            {
+                if (window.TextureBrushTabCurrentDrawBoardSubNum == value)
+                    return;
+                window.TextureBrushTabCurrentDrawBoardSubNum = value;
+                onCurrentDrawBoardChanged?.Invoke();
+            }
+        }
 
         Texture baseTex { get => window.TextureBrushTabBaseTex; set => window.TextureBrushTabBaseTex = value; }
 
@@ -42,6 +56,8 @@ namespace ModEditor
 
         public Vector3 CursorNormal { get; private set; }
 
+        public float CursorDistance { get; private set; }
+
         public float BrushRotation { get => window.TextureBrushTabBrushRotation; set => window.TextureBrushTabBrushRotation = value; }
 
         void refreshDrawBoards()
@@ -50,6 +66,14 @@ namespace ModEditor
                 drawBoards = new List<Transform>();
             else
                 drawBoards.Clear();
+            if (drawBoardSubCount == null)
+                drawBoardSubCount = new List<int>();
+            else
+                drawBoardSubCount.Clear();
+            if (drawBoardSubUnfold == null)
+                drawBoardSubUnfold = new List<bool>();
+            else
+                drawBoardSubUnfold.Clear();
             for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
             {
                 GameObject obj = window.Manager.TargetChildren[i];
@@ -62,9 +86,14 @@ namespace ModEditor
                 if (collider == null || !collider.enabled || collider.sharedMesh == null)
                     continue;
                 drawBoards.Add(obj.transform);
+                drawBoardSubCount.Add(collider.sharedMesh.subMeshCount);
+                drawBoardSubUnfold.Add(true);
             }
             if (!drawBoards.Contains(currentDrawBoard))
+            {
+                subNum = 0;
                 currentDrawBoard = null;
+            }
         }
 
         TargetTextureType utilTargetTextureType { get => window.TextureBrushTabTargetTextureType; set => window.TextureBrushTabTargetTextureType = value; }
@@ -145,15 +174,30 @@ namespace ModEditor
                 CursorOn = false;
                 return;
             }
-            CursorOn = collider.Raycast(EditorEvent.Camera.ViewportPointToRay(Mouse.ScreenTexcoord), out RaycastHit hit, float.MaxValue);
-            if (CursorOn)
+            bool hitRes = collider.Raycast(EditorEvent.Camera.ViewportPointToRay(Mouse.ScreenTexcoord), out RaycastHit hit, float.MaxValue);
+            if (hitRes)
             {
-                CursorTexcoord = hit.textureCoord;
-                CursorPos = hit.point;
-                CursorNormal = hit.normal;
+                var subMesh = collider.sharedMesh.GetSubMesh(subNum);
+                int index = (hit.triangleIndex + 1) * 3;
+                if (index >= subMesh.indexStart && index <= subMesh.indexStart + subMesh.indexCount)
+                {
+                    CursorOn = true;
+                    CursorTexcoord = hit.textureCoord;
+                    CursorPos = hit.point;
+                    CursorNormal = hit.normal;
+                    CursorDistance = hit.distance;
+                    return;
+                }
             }
+            CursorOn = false;
         }
 
+        private void OnScrollWheel_Move(float obj)
+        {
+            OnMouse_Move();
+        }
+
+        bool startDraw;
         private void OnMouse_DrawStart()
         {
             if (window.OnSceneGUI)
@@ -162,6 +206,7 @@ namespace ModEditor
             if (!CursorOn)
                 return;
             TextureManager.DrawStart(window.Manager.TextureBrushColor, CursorTexcoord, window.Manager.TexBrushRange, BrushRotation, window.Manager.ColorMask);
+            startDraw = true;
             Repaint();
         }
 
@@ -170,13 +215,20 @@ namespace ModEditor
             OnMouse_Move();
             if (!CursorOn)
                 return;
-            TextureManager.Draw(window.Manager.TextureBrushColor, CursorTexcoord, window.Manager.TexBrushRange, BrushRotation, window.Manager.ColorMask);
+            if (startDraw)
+                TextureManager.Draw(window.Manager.TextureBrushColor, CursorTexcoord, window.Manager.TexBrushRange, BrushRotation, window.Manager.ColorMask);
+            else
+            {
+                TextureManager.DrawStart(window.Manager.TextureBrushColor, CursorTexcoord, window.Manager.TexBrushRange, BrushRotation, window.Manager.ColorMask);
+                startDraw = true;
+            }
             Repaint();
         }
 
         private void OnMouse_DrawEnd()
         {
             TextureManager.DrawEnd();
+            startDraw = false;
         }
 
         private void Control_OnMouse_DragLeft()

@@ -53,6 +53,7 @@ namespace ModEditor
             EditorEvent.Alt.OnMouse.Move += OnMouse_Move;
             EditorEvent.Alt.OnMouse.DragLeft += OnMouse_Move;
             EditorEvent.Alt.OnMouse.DragRight += OnMouse_Move;
+            EditorEvent.OnScrollWheel.Roll += OnScrollWheel_Move;
             
             EditorEvent.Use.Control.OnMouse.DragLeft += Control_OnMouse_DragLeft;
             EditorEvent.Use.Control.OnMouse.DragRight += Control_OnMouse_DragRight;
@@ -83,6 +84,8 @@ namespace ModEditor
             EditorEvent.Alt.OnMouse.Move -= OnMouse_Move;
             EditorEvent.Alt.OnMouse.DragLeft -= OnMouse_Move;
             EditorEvent.Alt.OnMouse.DragRight -= OnMouse_Move;
+            EditorEvent.OnScrollWheel.Roll -= OnScrollWheel_Move;
+
             EditorEvent.Use.Control.OnMouse.DragLeft -= Control_OnMouse_DragLeft;
             EditorEvent.Use.Control.OnMouse.DragRight -= Control_OnMouse_DragRight;
             EditorEvent.Use.Control.OnScrollWheel.Roll -= OnScrollWheel_Roll;
@@ -124,18 +127,70 @@ namespace ModEditor
                 {
                     Transform trans = drawBoards[i];
                     EditorGUILayout.BeginHorizontal();
-                    bool isCurrentDrawBoard = trans == currentDrawBoard;
-                    if (GUILayout.Button(isCurrentDrawBoard ? window.toggleOnContent : window.toggleContent, "ObjectPickerTab"))
+                    int subCount = drawBoardSubCount[i];
+                    bool unfold = drawBoardSubUnfold[i];
+                    if (subCount == 1)
                     {
-                        if (isCurrentDrawBoard)
-                            currentDrawBoard = null;
-                        else
-                            currentDrawBoard = trans;
+                        bool isCurrentDrawBoard = trans == currentDrawBoard;
+                        if (GUILayout.Button(isCurrentDrawBoard ? window.toggleOnContent : window.toggleContent, "ObjectPickerTab"))
+                        {
+                            subNum = 0;
+                            if (isCurrentDrawBoard)
+                                currentDrawBoard = null;
+                            else
+                                currentDrawBoard = trans;
+                        }
+                    }
+                    else
+                    {
+                        GUILayout.Space(5);
+                        if (GUILayout.Button(unfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(20)))
+                            unfold = !unfold;
+                        drawBoardSubUnfold[i] = unfold;
                     }
                     EditorGUI.BeginDisabledGroup(true);
                     EditorGUILayout.ObjectField(trans, typeof(GameObject), true);
                     EditorGUI.EndDisabledGroup();
                     EditorGUILayout.EndHorizontal();
+                    if (subCount > 1)
+                    {
+                        if (unfold)
+                        {
+                            for (int j = 0; j < subCount; j++)
+                            {
+                                EditorGUILayout.BeginHorizontal();
+                                GUILayout.Space(20);
+                                bool isCurrentDrawBoardSubNum = trans == currentDrawBoard && subNum == j;
+                                if (GUILayout.Button(isCurrentDrawBoardSubNum ? window.toggleOnContent : window.toggleContent, "ObjectPickerTab"))
+                                {
+                                    if (isCurrentDrawBoardSubNum)
+                                    {
+                                        subNum = 0;
+                                        currentDrawBoard = null;
+                                    }
+                                    else
+                                    {
+                                        subNum = j;
+                                        currentDrawBoard = trans;
+                                    }
+                                }
+                                EditorGUILayout.LabelField($"Sub - {j}", labelStyle);
+                                EditorGUILayout.EndHorizontal();
+                            }
+                        }
+                        else if(trans == currentDrawBoard && subNum >= 0)
+                        {
+                            EditorGUILayout.BeginHorizontal();
+                            GUILayout.Space(20);
+                            if (GUILayout.Button(window.toggleOnContent, "ObjectPickerTab"))
+                            {
+                                subNum = 0;
+                                currentDrawBoard = null;
+                            }
+                            EditorGUILayout.LabelField($"Sub - {subNum}", labelStyle);
+                            EditorGUILayout.EndHorizontal();
+                        }
+                    }
                 }
             }
             EditorGUILayout.EndVertical();
@@ -185,7 +240,10 @@ namespace ModEditor
                     EditorGUILayout.EndHorizontal();
                 }
                 if (GUILayout.Button("Save"))
-                    TextureManager.Save(window.Manager.Target.name);
+                {
+                    string name = drawBoardSubCount[drawBoards.IndexOf(currentDrawBoard)] > 1 ? $"{currentDrawBoard.name}-Sub{subNum}" : currentDrawBoard.name;
+                    TextureManager.Save(name);
+                }
             }
             
             EditorGUILayout.EndScrollView();
@@ -304,9 +362,15 @@ namespace ModEditor
                 EditorGUILayout.LabelField(utilTipContents[window.Manager.TexUtilIndex], GUI.skin.GetStyle("MiniLabel"), GUILayout.Width(window.position.width - 70));
                 EditorGUILayout.EndHorizontal();
 
+                TextureUtilBase util = utilInstances[window.Manager.TexUtilIndex];
+                if (util.OnlyCustom)
+                    utilTargetTextureType = TargetTextureType.Custom;
+
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Texture Select:", labelStyle, GUILayout.Width(125));
+                EditorGUI.BeginDisabledGroup(util.OnlyCustom);
                 utilTargetTextureType = (TargetTextureType)EditorGUILayout.EnumPopup(utilTargetTextureType, GUILayout.Width(140));
+                EditorGUI.EndDisabledGroup();
                 EditorGUILayout.EndHorizontal();
 
                 if (utilTargetTextureType == TargetTextureType.Custom)
@@ -326,7 +390,7 @@ namespace ModEditor
                         EditorGUILayout.BeginHorizontal();
                         GUILayout.Space(32);
                         if (GUILayout.Button($"Save", "EditModeSingleButton", GUILayout.Width((window.position.width - 90) / 2)))
-                            DrawUtil.Self.Save(utilCustomResultTex, utilCustomOriginTex.name);
+                            DrawUtil.Self.Save(utilCustomResultTex, utilCustomOriginTex == null ? $"{util.Name}-Editor" : utilCustomOriginTex.name);
                         GUILayout.Space(3);
                         if (GUILayout.Button($"Clear", "EditModeSingleButton", GUILayout.Width((window.position.width - 90) / 2)))
                         {
@@ -340,7 +404,6 @@ namespace ModEditor
                     EditorGUILayout.EndVertical();
                 }
 
-                TextureUtilBase util = utilInstances[window.Manager.TexUtilIndex];
                 util.Draw(labelStyle, window.position.width - 45);
                 GUILayout.Space(5);
                 EditorGUI.BeginDisabledGroup((utilTargetTextureType != TargetTextureType.Custom && !TextureManager.IsAvailable) || !util.IsAvailable);

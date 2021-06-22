@@ -13,6 +13,7 @@ RWTexture2D<float4> RW_ForegroundTexture;
 RWTexture2D<float4> RW_Texture;
 int _ViewType;
 RWTexture2D<float4> RW_ViewTexture;
+float4 _ColorMask;
 
 float pow2(float res)
 {
@@ -225,7 +226,7 @@ float4 blend(float4 src, float4 dst, int blendType, int srcFactorType, int dstFa
 			dstFactor = 1 - dst.a;
 			break;
 	}
-	float4 res;
+	float4 res = 0;
 	switch(blendType)
 	{
 		case 0:
@@ -330,7 +331,7 @@ void BlendTex(uint3 id : SV_DispatchThreadID)
 {
 	float4 src = RW_ForegroundTexture[id.xy];
 	float4 dst = RW_Texture[id.xy];
-	RW_Texture[id.xy] = blend(src, dst, _BlendType, _SrcFactor, _DstFactor);
+	RW_Texture[id.xy] = lerp(dst, blend(src, dst, _BlendType, _SrcFactor, _DstFactor), _ColorMask);
 }
 
 void refreshView(uint3 id, float4 col)
@@ -423,7 +424,6 @@ int GetRange(uint3 id, out float res)
 }
 
 float4 _BrushColor;
-float4 _ColorMask;
 [numthreads(32,32,1)]
 void Draw(uint3 id : SV_DispatchThreadID)
 {

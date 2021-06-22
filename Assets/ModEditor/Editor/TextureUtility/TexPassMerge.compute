@@ -1,0 +1,96 @@
+﻿#pragma kernel Merge
+
+RWTexture2D<float4> RW_Texture;
+RWTexture2D<float4> RW_Origin1;
+RWTexture2D<float4> RW_Origin2;
+RWTexture2D<float4> RW_Origin3;
+RWTexture2D<float4> RW_Origin4;
+int _Pass1;
+int _Pass2;
+int _Pass3;
+int _Pass4;
+float4 _ColorMask;
+
+[numthreads(32,32,1)]
+void Merge (uint3 id : SV_DispatchThreadID)
+{
+	float4 col = 0;
+    switch(_Pass1)
+	{
+		case 0:
+			col.r = RW_Origin1[id.xy].r;
+			break;
+		case 1:
+			col.r = RW_Origin1[id.xy].g;
+			break;
+		case 2:
+			col.r = RW_Origin1[id.xy].b;
+			break;
+		case 3:
+			col.r = RW_Origin1[id.xy].a;
+			break;
+		case 4:
+			float4 origin1 = RW_Origin1[id.xy];
+			col.r = dot(origin1.rgb, float3(0.299, 0.587, 0.114));
+			break;
+	}
+	switch(_Pass2)
+	{
+		case 0:
+			col.g = RW_Origin2[id.xy].r;
+			break;
+		case 1:
+			col.g = RW_Origin2[id.xy].g;
+			break;
+		case 2:
+			col.g = RW_Origin2[id.xy].b;
+			break;
+		case 3:
+			col.g = RW_Origin2[id.xy].a;
+			break;
+		case 4:
+			float4 origin2 = RW_Origin2[id.xy];
+			col.g = dot(origin2.rgb, float3(0.299, 0.587, 0.114));
+			break;
+	}
+	switch(_Pass3)
+	{
+		case 0:
+			col.b = RW_Origin3[id.xy].r;
+			break;
+		case 1:
+			col.b = RW_Origin3[id.xy].g;
+			break;
+		case 2:
+			col.b = RW_Origin3[id.xy].b;
+			break;
+		case 3:
+			col.b = RW_Origin3[id.xy].a;
+			break;
+		case 4:
+			float4 origin3 = RW_Origin3[id.xy];
+			col.b = dot(origin3.rgb, float3(0.299, 0.587, 0.114));
+			break;
+	}
+	switch(_Pass4)
+	{
+		case 0:
+			col.a = RW_Origin4[id.xy].r;
+			break;
+		case 1:
+			col.a = RW_Origin4[id.xy].g;
+			break;
+		case 2:
+			col.a = RW_Origin4[id.xy].b;
+			break;
+		case 3:
+			col.a = RW_Origin4[id.xy].a;
+			break;
+		case 4:
+			float4 origin4 = RW_Origin4[id.xy];
+			col.a = dot(origin4.rgb, float3(0.299, 0.587, 0.114));
+			break;
+	}
+	float4 _col = RW_Texture[id.xy];
+	RW_Texture[id.xy] = lerp(_col, col, _ColorMask);
+}

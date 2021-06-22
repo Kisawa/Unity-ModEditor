@@ -179,7 +179,7 @@ namespace ModEditor
                 {
                     EditorGUILayout.LabelField("", GUI.skin.GetStyle("CN EntryWarnIconSmall"), GUILayout.Width(20));
                     EditorGUILayout.LabelField("No raw mesh was recorded.", labelStyle, GUILayout.Width(maxWidth - 75));
-                    if (GUILayout.Button("Record", GUILayout.Width(55)))
+                    if (GUILayout.Button("Record", "EditModeSingleButton", GUILayout.Width(55)))
                         recordMesh();
                 }
             }
@@ -190,8 +190,8 @@ namespace ModEditor
             {
                 EditorGUILayout.BeginVertical("FrameBox");
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("Coord World Pos:", labelStyle, GUILayout.Width(130));
-                if (GUILayout.Button("LookAt", GUILayout.Width(60)))
+                EditorGUILayout.LabelField("Coord World Pos:", labelStyle, GUILayout.Width(120));
+                if (GUILayout.Button("LookAt", "EditModeSingleButton", GUILayout.Width(60)))
                     SceneView.lastActiveSceneView.LookAt(coord[i]);
                 EditorGUILayout.EndHorizontal();
                 EditorGUI.BeginDisabledGroup(true);
@@ -203,10 +203,10 @@ namespace ModEditor
                 window.LocalRemapCoordSet(i, targetTrans.TransformPoint(EditorGUILayout.Vector3Field("", targetTrans.InverseTransformPoint(coord[i]), GUILayout.Width(maxWidth))));
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.Space(30);
-                if (GUILayout.Button("Reset rotation", GUILayout.Width(maxWidth - 95)))
+                if (GUILayout.Button("Reset rotation", "EditModeSingleButton" ,GUILayout.Width(maxWidth - 95)))
                     window.LocalRemapRotationSet(i, targetTrans.rotation);
                 EditorGUI.BeginDisabledGroup(i == 0);
-                if (GUILayout.Button("Remove", GUILayout.Width(60)))
+                if (GUILayout.Button("Remove", "EditModeSingleButton", GUILayout.Width(60)))
                 {
                     window.LocalRemapCoordRemove(i);
                     window.LocalRemapRotationRemove(i);
@@ -217,7 +217,7 @@ namespace ModEditor
             }
             EditorGUILayout.BeginHorizontal();
             GUILayout.Space(40);
-            if (GUILayout.Button("Add Coord", GUILayout.Width(maxWidth - 40)))
+            if (GUILayout.Button("Add Coord", "EditModeSingleButton", GUILayout.Width(maxWidth - 40)))
             {
                 window.LocalRemapCoordSet(coord.Count, targetTrans.position);
                 window.LocalRemapRotationSet(rotation.Count, targetTrans.rotation);

@@ -46,7 +46,7 @@ namespace ModEditor
             kernel_Draw = DrawShader.FindKernel("Draw");
         }
 
-        public Cache GetCache(Transform trans, Color baseColor, int viewPass = -1)
+        public Cache GetCache(Transform trans, int subNum, Color baseColor, int viewPass = -1)
         {
             if (ModEditor == null)
                 return null;
@@ -55,11 +55,15 @@ namespace ModEditor
             if (index == -1)
             {
                 ModEditor.DrawUtilTransCache.Add(trans);
-                cache = new Cache();
-                ModEditor.DrawUtilCache.Add(cache);
+                CacheGroup group = new CacheGroup();
+                ModEditor.DrawUtilCache.Add(group);
+                cache = group.GetCache(subNum);
             }
             else
-                cache = ModEditor.DrawUtilCache[index];
+            {
+                CacheGroup group = ModEditor.DrawUtilCache[index];
+                cache = group.GetCache(subNum);
+            }
             if (!cache.IsAvailable)
                 Init(baseColor, cache, viewPass);
             return cache;
@@ -70,17 +74,7 @@ namespace ModEditor
             if (ModEditor == null)
                 return;
             for (int i = 0; i < ModEditor.DrawUtilCache.Count; i++)
-            {
-                Cache cache = ModEditor.DrawUtilCache[i];
-                if (cache.BaseTexture != null)
-                    Object.DestroyImmediate(cache.BaseTexture);
-                if (cache.DrawTexture != null)
-                    Object.DestroyImmediate(cache.DrawTexture);
-                if (cache.Texture != null)
-                    Object.DestroyImmediate(cache.Texture);
-                if (cache.ViewTexture != null)
-                    Object.DestroyImmediate(cache.ViewTexture);
-            }
+                ModEditor.DrawUtilCache[i].Clear();
             ModEditor.DrawUtilTransCache.Clear();
             ModEditor.DrawUtilCache.Clear();
         }
@@ -203,7 +197,7 @@ namespace ModEditor
             RenderTexture.ReleaseTemporary(tex);
         }
 
-        public void Blend(RenderTexture originTex, Texture blendTex, BlendType blendType, BlendFactor originTexFactor, BlendFactor blendTexFactor)
+        public void Blend(RenderTexture originTex, Texture blendTex, BlendType blendType, BlendFactor originTexFactor, BlendFactor blendTexFactor, Color colorMask)
         {
             if (originTex == null || blendTex == null)
                 return;
@@ -217,6 +211,7 @@ namespace ModEditor
             DrawShader.SetInt("_BlendType", (int)blendType);
             DrawShader.SetInt("_SrcFactor", (int)blendTexFactor);
             DrawShader.SetInt("_DstFactor", (int)originTexFactor);
+            DrawShader.SetVector("_ColorMask", colorMask);
             DrawShader.SetTexture(kernel_BlendTex, "RW_Texture", originTex);
             DrawShader.SetTexture(kernel_BlendTex, "RW_ForegroundTexture", tex);
             DrawShader.Dispatch(kernel_BlendTex, Mathf.CeilToInt(originTex.width / 32f), Mathf.CeilToInt(originTex.height / 32f), 1);
@@ -433,6 +428,39 @@ namespace ModEditor
             Object.DestroyImmediate(tex);
             RenderTexture.active = pre;
             AssetDatabase.ImportAsset(path);
+        }
+
+        [System.Serializable]
+        public class CacheGroup
+        {
+            [SerializeField]
+            List<Cache> Caches = new List<Cache>();
+
+            public Cache GetCache(int num)
+            {
+                if (Caches.Count > num)
+                    return Caches[num];
+                int remaind = num - Caches.Count + 1;
+                for (int i = 0; i < remaind; i++)
+                    Caches.Add(new Cache());
+                return Caches[num];
+            }
+
+            public void Clear()
+            {
+                for (int j = 0; j < Caches.Count; j++)
+                {
+                    Cache cache = Caches[j];
+                    if (cache.BaseTexture != null)
+                        Object.DestroyImmediate(cache.BaseTexture);
+                    if (cache.DrawTexture != null)
+                        Object.DestroyImmediate(cache.DrawTexture);
+                    if (cache.Texture != null)
+                        Object.DestroyImmediate(cache.Texture);
+                    if (cache.ViewTexture != null)
+                        Object.DestroyImmediate(cache.ViewTexture);
+                }
+            }
         }
 
         [System.Serializable]

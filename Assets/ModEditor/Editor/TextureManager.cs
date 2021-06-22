@@ -24,13 +24,13 @@ namespace ModEditor
             }
         }
 
-        public void Init(Transform trans, Color baseColor)
+        public void Init(Transform trans, int subNum, Color baseColor)
         {
             this.trans = trans;
             renderer = trans.GetComponent<Renderer>();
             if (renderer == null)
                 return;
-            Cache = DrawUtil.Self.GetCache(trans, baseColor, viewTexPass);
+            Cache = DrawUtil.Self.GetCache(trans, subNum, baseColor, viewTexPass);
             Undo.undoRedoPerformed += Merge;
         }
 

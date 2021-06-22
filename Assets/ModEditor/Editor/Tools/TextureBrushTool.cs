@@ -81,6 +81,17 @@ namespace ModEditor
             }
         }
 
+        float cursorDistance;
+        float CursorDistance
+        {
+            get
+            {
+                if (ModEditor != null)
+                    cursorDistance = ModEditor.Tab_TextureBrush.CursorDistance;
+                return cursorDistance;
+            }
+        }
+
         Vector3 texBrushRange;
         Vector3 TexBrushRange
         {
@@ -124,7 +135,7 @@ namespace ModEditor
             if (CursorOn)
             {
                 Handles.color = TexBrushRangeViewColor;
-                float size = (TexBrushRange.x > TexBrushRange.y ? TexBrushRange.x : TexBrushRange.y) * 3;
+                float size = CursorDistance * 0.1f;
                 Handles.DrawLine(CursorPos, CursorPos + CursorNormal * size);
             }
         }
