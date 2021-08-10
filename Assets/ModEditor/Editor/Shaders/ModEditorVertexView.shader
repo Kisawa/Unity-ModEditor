@@ -60,7 +60,7 @@
 			struct v2g
 			{
 				float4 worldPos: SV_POSITION;
-				float3 select: TEXCOORD0;
+				float2 select: TEXCOORD0;
 			};
 
             struct g2f
