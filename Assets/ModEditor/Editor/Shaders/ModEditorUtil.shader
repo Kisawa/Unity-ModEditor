@@ -196,7 +196,8 @@
 
 		fixed4 frag_NormalMapView(g2f i) : SV_Target
         {
-            return fixed4(i.normal.xyz, 1);
+			float3 normal = mul(UNITY_MATRIX_V, float4(i.normal.xyz, 0));
+            return fixed4(normal * 0.5 + 0.5, 1);
         }
 
 		float _FromStep;
