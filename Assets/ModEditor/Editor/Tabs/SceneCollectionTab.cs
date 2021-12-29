@@ -404,6 +404,46 @@ namespace ModEditor
                 buffer.DrawMesh(screenMesh, Matrix4x4.identity, window.Mat_Util, 0, 8);
             if (window.Manager.Target == null || window.Manager.TargetChildren.Count == 0)
                 return;
+            if (window.ToolType == ModEditorToolType.VertexBrush)
+            {
+                for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
+                {
+                    GameObject target = window.Manager.TargetChildren[i];
+                    if (target == null)
+                        continue;
+                    if (!window.Manager.ActionableDic[target])
+                        continue;
+                    Renderer renderer = target.GetComponent<Renderer>();
+                    if (renderer == null)
+                        continue;
+                    int subCount = 1;
+                    MeshFilter meshFilter = target.GetComponent<MeshFilter>();
+                    if (meshFilter != null && meshFilter.sharedMesh != null)
+                        subCount = meshFilter.sharedMesh.subMeshCount;
+                    SkinnedMeshRenderer skinnedMesh = renderer as SkinnedMeshRenderer;
+                    if (skinnedMesh != null && skinnedMesh.sharedMesh != null)
+                        subCount = skinnedMesh.sharedMesh.subMeshCount;
+                    CalcManager data = window.Tab_VertexBrush.AddCalcShaderRender(renderer, meshFilter);
+                    if (data == null)
+                        data = window.Tab_VertexBrush.AddCalcShaderRender(skinnedMesh);
+                    if (data != null)
+                    {
+                        for (int j = 0; j < subCount; j++)
+                            buffer.DrawRenderer(data.renderer, data.Material, j);
+                    }
+                }
+            }
+            Command(buffer);
+        }
+
+        public void Command(CommandBuffer cmd)
+        {
+            if (buffer == null)
+                return;
+            if (window.ToolType == ModEditorToolType.VertexBrush)
+                cmd.DrawMesh(screenMesh, Matrix4x4.identity, window.Mat_Util, 0, 8);
+            if (window.Manager.Target == null || window.Manager.TargetChildren.Count == 0)
+                return;
             for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
             {
                 GameObject target = window.Manager.TargetChildren[i];
@@ -424,39 +464,37 @@ namespace ModEditor
                 for (int j = 0; j < subCount; j++)
                 {
                     if (window.Manager.GridView || window.Manager.UVView || window.Manager.VertexColorView || window.ToolType != ModEditorToolType.None)
-                        buffer.DrawRenderer(renderer, window.Mat_Util, j, 0);
+                        cmd.DrawRenderer(renderer, window.Mat_Util, j, 0);
                     if (window.Manager.NormalView)
-                        buffer.DrawRenderer(renderer, window.Mat_Util, j, 1);
+                        cmd.DrawRenderer(renderer, window.Mat_Util, j, 1);
                     if (window.Manager.TangentView)
-                        buffer.DrawRenderer(renderer, window.Mat_Util, j, 2);
+                        cmd.DrawRenderer(renderer, window.Mat_Util, j, 2);
                     if (window.Manager.GridView)
-                        buffer.DrawRenderer(renderer, window.Mat_Util, j, 3);
+                        cmd.DrawRenderer(renderer, window.Mat_Util, j, 3);
                     if (window.Manager.UVView)
-                        buffer.DrawRenderer(renderer, window.Mat_Util, j, 4);
+                        cmd.DrawRenderer(renderer, window.Mat_Util, j, 4);
                     if (window.Manager.VertexColorView)
-                        buffer.DrawRenderer(renderer, window.Mat_Util, j, 5);
+                        cmd.DrawRenderer(renderer, window.Mat_Util, j, 5);
                     if (window.Manager.DepthMapView)
-                        buffer.DrawRenderer(renderer, window.Mat_Util, j, 6);
+                        cmd.DrawRenderer(renderer, window.Mat_Util, j, 6);
                     if (window.Manager.NormalMapView)
-                        buffer.DrawRenderer(renderer, window.Mat_Util, j, 7);
+                        cmd.DrawRenderer(renderer, window.Mat_Util, j, 7);
                 }
-                if (window.ToolType == ModEditorToolType.VertexBrush)
+                if (window.ToolType == ModEditorToolType.VertexBrush && i < window.Tab_VertexBrush.CalcShaderDatas.Count)
                 {
-                    CalcManager data = window.Tab_VertexBrush.AddCalcShaderRender(renderer, meshFilter);
-                    if (data == null)
-                        data = window.Tab_VertexBrush.AddCalcShaderRender(skinnedMesh);
-                    if (data != null)
+                    CalcManager data = window.Tab_VertexBrush.CalcShaderDatas[i];
+                    if (data != null && data.trans == target.transform)
                     {
                         for (int j = 0; j < subCount; j++)
-                            buffer.DrawRenderer(data.renderer, data.Material, j);
+                            cmd.DrawRenderer(data.renderer, data.Material, j);
                     }
                 }
                 else if (window.ToolType == ModEditorToolType.TextureBrush)
                 {
                     if (window.Tab_TextureBrush.TextureManager.IsAvailable && window.Tab_TextureBrush.TextureManager.trans == target.transform)
                     {
-                        buffer.DrawRenderer(renderer, window.Mat_Util, window.TextureBrushTabCurrentDrawBoardSubNum, 9);
-                        buffer.DrawRenderer(renderer, window.Mat_Util, window.TextureBrushTabCurrentDrawBoardSubNum, 10);
+                        cmd.DrawRenderer(renderer, window.Mat_Util, window.TextureBrushTabCurrentDrawBoardSubNum, 9);
+                        cmd.DrawRenderer(renderer, window.Mat_Util, window.TextureBrushTabCurrentDrawBoardSubNum, 10);
                     }
                 }
             }
