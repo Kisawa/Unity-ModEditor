@@ -636,6 +636,50 @@ namespace ModEditor
                 vertexBrushDepth = value;
             }
         }
+
+        [SerializeField]
+        bool vertexBrushClamp = false;
+        public bool VertexBrushClamp
+        {
+            get => vertexBrushClamp;
+            set
+            {
+                if (value == vertexBrushClamp)
+                    return;
+                Undo.RecordObject(this, "ModEditor VertexBrushClamp");
+                vertexBrushClamp = value;
+            }
+        }
+
+        public float vertexBrushClampMin = 0;
+        public float VertexBrushClampMin
+        {
+            get => vertexBrushClampMin;
+            set
+            {
+                if (value == vertexBrushClampMin)
+                    return;
+                if (value > vertexBrushClampMax)
+                    value = vertexBrushClampMax;
+                Undo.RecordObject(this, "ModEditor VertexBrushClampMin");
+                vertexBrushClampMin = value;
+            }
+        }
+
+        public float vertexBrushClampMax = 1;
+        public float VertexBrushClampMax
+        {
+            get => vertexBrushClampMax;
+            set
+            {
+                if (value == vertexBrushClampMax)
+                    return;
+                if (value < vertexBrushClampMin)
+                    value = vertexBrushClampMin;
+                Undo.RecordObject(this, "ModEditor VertexBrushClampMax");
+                vertexBrushClampMax = value;
+            }
+        }
         #endregion
 
         #region Write

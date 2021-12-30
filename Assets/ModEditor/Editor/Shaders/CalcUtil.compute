@@ -158,7 +158,9 @@ void CalcWithSpread(uint3 id: SV_DispatchThreadID)
 }
 
 int _WriteType;
-bool _Saturate;
+bool _Clamp;
+float _ClampMin;
+float _ClampMax;
 int _OriginPass;
 [numthreads(1024,1,1)]
 void Result1(uint3 id: SV_DispatchThreadID)
@@ -199,8 +201,8 @@ void Result1(uint3 id: SV_DispatchThreadID)
 		res = lerp(pre, res, select);
 		break;
 	}
-	if(_Saturate)
-		res = clamp(res, 0, 1);
+	if(_Clamp)
+		res = clamp(res, _ClampMin, _ClampMax);
 	RW_Result1[id.x] = res;
 }
 
@@ -227,8 +229,8 @@ void Result2(uint3 id: SV_DispatchThreadID)
 		res = lerp(pre, res, select);
 		break;
 	}
-	if(_Saturate)
-		res = clamp(res, 0, 1);
+	if(_Clamp)
+		res = clamp(res, _ClampMin, _ClampMax);
 	RW_Result2[id.x] = res;
 }
 
@@ -255,8 +257,8 @@ void Result3(uint3 id: SV_DispatchThreadID)
 		res = lerp(pre, res, select);
 		break;
 	}
-	if(_Saturate)
-		res = clamp(res, 0, 1);
+	if(_Clamp)
+		res = clamp(res, _ClampMin, _ClampMax);
 	RW_Result3[id.x] = res;
 }
 
@@ -283,8 +285,8 @@ void Result4(uint3 id: SV_DispatchThreadID)
 		res = lerp(pre, res, select);
 		break;
 	}
-	if(_Saturate)
-		res = clamp(res, 0, 1);
+	if(_Clamp)
+		res = clamp(res, _ClampMin, _ClampMax);
 	RW_Result4[id.x] = res;
 }
 

@@ -10,7 +10,7 @@ namespace ModEditor
         static CalcUtil self;
         public static CalcUtil Self
         {
-            get 
+            get
             {
                 if (self == null)
                     self = new CalcUtil();
@@ -130,7 +130,7 @@ namespace ModEditor
             {
                 _Select = new ComputeBuffer(count, sizeof(float));
                 _Select.SetData(Enumerable.Repeat(-1f, count).ToArray());
-                clearSelect =  true;
+                clearSelect = true;
             }
             else
                 clearSelect = false;
@@ -561,50 +561,53 @@ namespace ModEditor
             _buffer1.Dispose();
         }
 
-        public Color[] GetResultColor(WriteType type, Color[] origin, float[] values, ComputeBuffer _Select = null)
+        public Color[] GetResultColor(WriteType type, Color[] origin, float[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values, TargetPassType.X);
-            Color[] res = GetResultColor(type, origin, _values, _Select);
+            Color[] res = GetResultColor(type, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Color[] GetResultColor(WriteType type, Color[] origin, Vector2[] values, ComputeBuffer _Select = null)
+        public Color[] GetResultColor(WriteType type, Color[] origin, Vector2[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Color[] res = GetResultColor(type, origin, _values, _Select);
+            Color[] res = GetResultColor(type, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Color[] GetResultColor(WriteType type, Color[] origin, Vector3[] values, ComputeBuffer _Select = null)
+        public Color[] GetResultColor(WriteType type, Color[] origin, Vector3[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Color[] res = GetResultColor(type, origin, _values, _Select);
+            Color[] res = GetResultColor(type, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Color[] GetResultColor(WriteType type, Color[] origin, Vector4[] values, ComputeBuffer _Select = null)
+        public Color[] GetResultColor(WriteType type, Color[] origin, Vector4[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Color[] res = GetResultColor(type, origin, _values, _Select);
+            Color[] res = GetResultColor(type, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Color[] GetResultColor(WriteType type, Color[] origin, Color[] values, ComputeBuffer _Select = null)
+        public Color[] GetResultColor(WriteType type, Color[] origin, Color[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Color[] res = GetResultColor(type, origin, _values, _Select);
+            Color[] res = GetResultColor(type, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Color[] GetResultColor(WriteType type, Color[] origin, ComputeBuffer values, ComputeBuffer _Select = null)
+        public Color[] GetResultColor(WriteType type, Color[] origin, ComputeBuffer values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             CalcShader.SetInt("_WriteType", (int)type);
-            CalcShader.SetInt("_Saturate", 1);
+            CalcShader.SetInt("_Clamp", clamp ? 1 : 0);
+            CalcShader.SetFloat("_ClampMin", min);
+            CalcShader.SetFloat("_ClampMax", max);
+            //CalcShader.SetInt("_Saturate", 1);
             _Select = check_Select(_Select, origin.Length, out bool clearSelect);
             CalcShader.SetBuffer(kernel_Result4, "RW_Selects", _Select);
             CalcShader.SetBuffer(kernel_Result4, "_Origin4", values);
@@ -619,50 +622,53 @@ namespace ModEditor
             return origin;
         }
 
-        public Vector3[] GetResult(WriteType type, Vector3[] origin, float[] values, ComputeBuffer _Select = null)
+        public Vector3[] GetResult(WriteType type, Vector3[] origin, float[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values, TargetPassType.X);
-            Vector3[] res = GetResult(type, origin, _values, _Select);
+            Vector3[] res = GetResult(type, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Vector3[] GetResult(WriteType type, Vector3[] origin, Vector2[] values, ComputeBuffer _Select = null)
+        public Vector3[] GetResult(WriteType type, Vector3[] origin, Vector2[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Vector3[] res = GetResult(type, origin, _values, _Select);
+            Vector3[] res = GetResult(type, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Vector3[] GetResult(WriteType type, Vector3[] origin, Vector3[] values, ComputeBuffer _Select = null)
+        public Vector3[] GetResult(WriteType type, Vector3[] origin, Vector3[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Vector3[] res = GetResult(type, origin, _values, _Select);
+            Vector3[] res = GetResult(type, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Vector3[] GetResult(WriteType type, Vector3[] origin, Vector4[] values, ComputeBuffer _Select = null)
+        public Vector3[] GetResult(WriteType type, Vector3[] origin, Vector4[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Vector3[] res = GetResult(type, origin, _values, _Select);
+            Vector3[] res = GetResult(type, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Vector3[] GetResult(WriteType type, Vector3[] origin, Color[] values, ComputeBuffer _Select = null)
+        public Vector3[] GetResult(WriteType type, Vector3[] origin, Color[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Vector3[] res = GetResult(type, origin, _values, _Select);
+            Vector3[] res = GetResult(type, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Vector3[] GetResult(WriteType type, Vector3[] origin, ComputeBuffer values, ComputeBuffer _Select = null)
+        public Vector3[] GetResult(WriteType type, Vector3[] origin, ComputeBuffer values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             CalcShader.SetInt("_WriteType", (int)type);
-            CalcShader.SetInt("_Saturate", 0);
+            CalcShader.SetInt("_Clamp", clamp ? 1 : 0);
+            CalcShader.SetFloat("_ClampMin", min);
+            CalcShader.SetFloat("_ClampMax", max);
+            //CalcShader.SetInt("_Saturate", 0);
             _Select = check_Select(_Select, origin.Length, out bool clearSelect);
             CalcShader.SetBuffer(kernel_Result3, "RW_Selects", _Select);
             CalcShader.SetBuffer(kernel_Result3, "_Origin4", values);
@@ -677,50 +683,53 @@ namespace ModEditor
             return origin;
         }
 
-        public Vector4[] GetResult(WriteType type, Vector4[] origin, float[] values, ComputeBuffer _Select = null)
+        public Vector4[] GetResult(WriteType type, Vector4[] origin, float[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values, TargetPassType.X);
-            Vector4[] res = GetResult(type, origin, _values, _Select);
+            Vector4[] res = GetResult(type, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Vector4[] GetResult(WriteType type, Vector4[] origin, Vector2[] values, ComputeBuffer _Select = null)
+        public Vector4[] GetResult(WriteType type, Vector4[] origin, Vector2[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Vector4[] res = GetResult(type, origin, _values, _Select);
+            Vector4[] res = GetResult(type, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Vector4[] GetResult(WriteType type, Vector4[] origin, Vector3[] values, ComputeBuffer _Select = null)
+        public Vector4[] GetResult(WriteType type, Vector4[] origin, Vector3[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Vector4[] res = GetResult(type, origin, _values, _Select);
+            Vector4[] res = GetResult(type, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Vector4[] GetResult(WriteType type, Vector4[] origin, Vector4[] values, ComputeBuffer _Select = null)
+        public Vector4[] GetResult(WriteType type, Vector4[] origin, Vector4[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Vector4[] res = GetResult(type, origin, _values, _Select);
+            Vector4[] res = GetResult(type, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Vector4[] GetResult(WriteType type, Vector4[] origin, Color[] values, ComputeBuffer _Select = null)
+        public Vector4[] GetResult(WriteType type, Vector4[] origin, Color[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Vector4[] res = GetResult(type, origin, _values, _Select);
+            Vector4[] res = GetResult(type, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Vector4[] GetResult(WriteType type, Vector4[] origin, ComputeBuffer values, ComputeBuffer _Select = null)
+        public Vector4[] GetResult(WriteType type, Vector4[] origin, ComputeBuffer values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             CalcShader.SetInt("_WriteType", (int)type);
-            CalcShader.SetInt("_Saturate", 0);
+            CalcShader.SetInt("_Clamp", clamp ? 1 : 0);
+            CalcShader.SetFloat("_ClampMin", min);
+            CalcShader.SetFloat("_ClampMax", max);
+            //CalcShader.SetInt("_Saturate", 0);
             _Select = check_Select(_Select, origin.Length, out bool clearSelect);
             CalcShader.SetBuffer(kernel_Result4, "RW_Selects", _Select);
             CalcShader.SetBuffer(kernel_Result4, "_Origin4", values);
@@ -735,52 +744,55 @@ namespace ModEditor
             return origin;
         }
 
-        public Color[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Color[] origin, float[] values, ComputeBuffer _Select = null)
+        public Color[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Color[] origin, float[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values, TargetPassType.X);
-            Color[] res = GetResultCustom(type, outType, inPass, origin, _values, _Select);
+            Color[] res = GetResultCustom(type, outType, inPass, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Color[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Color[] origin, Vector2[] values, ComputeBuffer _Select = null)
+        public Color[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Color[] origin, Vector2[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Color[] res = GetResultCustom(type, outType, inPass, origin, _values, _Select);
+            Color[] res = GetResultCustom(type, outType, inPass, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Color[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Color[] origin, Vector3[] values, ComputeBuffer _Select = null)
+        public Color[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Color[] origin, Vector3[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Color[] res = GetResultCustom(type, outType, inPass, origin, _values, _Select);
+            Color[] res = GetResultCustom(type, outType, inPass, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Color[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Color[] origin, Vector4[] values, ComputeBuffer _Select = null)
+        public Color[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Color[] origin, Vector4[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Color[] res = GetResultCustom(type, outType, inPass, origin, _values, _Select);
+            Color[] res = GetResultCustom(type, outType, inPass, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Color[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Color[] origin, Color[] values, ComputeBuffer _Select = null)
+        public Color[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Color[] origin, Color[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Color[] res = GetResultCustom(type, outType, inPass, origin, _values, _Select);
+            Color[] res = GetResultCustom(type, outType, inPass, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Color[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Color[] origin, ComputeBuffer values, ComputeBuffer _Select = null)
+        public Color[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Color[] origin, ComputeBuffer values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _buffer4 = GetBuffer4(origin);
             ComputeBuffer _buffer1 = GetBuffer1_from4(_buffer4, outType);
             CalcShader.SetInt("_WriteType", (int)type);
-            CalcShader.SetInt("_Saturate", 0);
+            CalcShader.SetInt("_Clamp", clamp ? 1 : 0);
+            CalcShader.SetFloat("_ClampMin", min);
+            CalcShader.SetFloat("_ClampMax", max);
+            //CalcShader.SetInt("_Saturate", 0);
             CalcShader.SetInt("_OriginPass", (int)inPass);
             _Select = check_Select(_Select, origin.Length, out bool clearSelect);
             CalcShader.SetBuffer(kernel_Result1, "RW_Selects", _Select);
@@ -796,52 +808,55 @@ namespace ModEditor
             return origin;
         }
 
-        public Vector3[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector3[] origin, float[] values, ComputeBuffer _Select = null)
+        public Vector3[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector3[] origin, float[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values, TargetPassType.X);
-            Vector3[] res = GetResultCustom(type, inPass, outType, origin, _values, _Select);
+            Vector3[] res = GetResultCustom(type, inPass, outType, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Vector3[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector3[] origin, Vector2[] values, ComputeBuffer _Select = null)
+        public Vector3[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector3[] origin, Vector2[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Vector3[] res = GetResultCustom(type, inPass, outType, origin, _values, _Select);
+            Vector3[] res = GetResultCustom(type, inPass, outType, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Vector3[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector3[] origin, Vector3[] values, ComputeBuffer _Select = null)
+        public Vector3[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector3[] origin, Vector3[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Vector3[] res = GetResultCustom(type, inPass, outType, origin, _values, _Select);
+            Vector3[] res = GetResultCustom(type, inPass, outType, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Vector3[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector3[] origin, Vector4[] values, ComputeBuffer _Select = null)
+        public Vector3[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector3[] origin, Vector4[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Vector3[] res = GetResultCustom(type, inPass, outType, origin, _values, _Select);
+            Vector3[] res = GetResultCustom(type, inPass, outType, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Vector3[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector3[] origin, Color[] values, ComputeBuffer _Select = null)
+        public Vector3[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector3[] origin, Color[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Vector3[] res = GetResultCustom(type, inPass, outType, origin, _values, _Select);
+            Vector3[] res = GetResultCustom(type, inPass, outType, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Vector3[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector3[] origin, ComputeBuffer values, ComputeBuffer _Select = null)
+        public Vector3[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector3[] origin, ComputeBuffer values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _buffer3 = GetBuffer3(origin);
             ComputeBuffer _buffer1 = GetBuffer1_from3(_buffer3, outType);
             CalcShader.SetInt("_WriteType", (int)type);
-            CalcShader.SetInt("_Saturate", 0);
+            CalcShader.SetInt("_Clamp", clamp ? 1 : 0);
+            CalcShader.SetFloat("_ClampMin", min);
+            CalcShader.SetFloat("_ClampMax", max);
+            //CalcShader.SetInt("_Saturate", 0);
             CalcShader.SetInt("_OriginPass", (int)inPass);
             _Select = check_Select(_Select, origin.Length, out bool clearSelect);
             CalcShader.SetBuffer(kernel_Result1, "RW_Selects", _Select);
@@ -857,52 +872,55 @@ namespace ModEditor
             return origin;
         }
 
-        public Vector4[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector4[] origin, float[] values, ComputeBuffer _Select = null)
+        public Vector4[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector4[] origin, float[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values, TargetPassType.X);
-            Vector4[] res = GetResultCustom(type, inPass, outType, origin, _values, _Select);
+            Vector4[] res = GetResultCustom(type, inPass, outType, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Vector4[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector4[] origin, Vector2[] values, ComputeBuffer _Select = null)
+        public Vector4[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector4[] origin, Vector2[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Vector4[] res = GetResultCustom(type, inPass, outType, origin, _values, _Select);
+            Vector4[] res = GetResultCustom(type, inPass, outType, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Vector4[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector4[] origin, Vector3[] values, ComputeBuffer _Select = null)
+        public Vector4[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector4[] origin, Vector3[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Vector4[] res = GetResultCustom(type, inPass, outType, origin, _values, _Select);
+            Vector4[] res = GetResultCustom(type, inPass, outType, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Vector4[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector4[] origin, Vector4[] values, ComputeBuffer _Select = null)
+        public Vector4[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector4[] origin, Vector4[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Vector4[] res = GetResultCustom(type, inPass, outType, origin, _values, _Select);
+            Vector4[] res = GetResultCustom(type, inPass, outType, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Vector4[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector4[] origin, Color[] values, ComputeBuffer _Select = null)
+        public Vector4[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector4[] origin, Color[] values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _values = GetBuffer4(values);
-            Vector4[] res = GetResultCustom(type, inPass, outType, origin, _values, _Select);
+            Vector4[] res = GetResultCustom(type, inPass, outType, origin, _values, clamp, min, max, _Select);
             _values.Dispose();
             return res;
         }
 
-        public Vector4[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector4[] origin, ComputeBuffer values, ComputeBuffer _Select = null)
+        public Vector4[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outType, Vector4[] origin, ComputeBuffer values, bool clamp = false, float min = 0, float max = 1, ComputeBuffer _Select = null)
         {
             ComputeBuffer _buffer4 = GetBuffer4(origin);
             ComputeBuffer _buffer1 = GetBuffer1_from4(_buffer4, outType);
             CalcShader.SetInt("_WriteType", (int)type);
-            CalcShader.SetInt("_Saturate", 0);
+            CalcShader.SetInt("_Clamp", clamp ? 1 : 0);
+            CalcShader.SetFloat("_ClampMin", min);
+            CalcShader.SetFloat("_ClampMax", max);
+            //CalcShader.SetInt("_Saturate", 0);
             CalcShader.SetInt("_OriginPass", (int)inPass);
             _Select = check_Select(_Select, origin.Length, out bool clearSelect);
             CalcShader.SetBuffer(kernel_Result1, "RW_Selects", _Select);

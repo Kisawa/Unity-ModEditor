@@ -177,34 +177,34 @@ namespace ModEditor
             CalcUtil.Self.CalcShader.Dispatch(CalcUtil.Self.kernel_SubZone, Mathf.CeilToInt((float)_Triangles.count / 1024), 1, 1);
         }
 
-        public Color[] GetResultColor(WriteType type, Color[] origin)
+        public Color[] GetResultColor(WriteType type, Color[] origin, bool clamp = false, float min = 0, float max = 1)
         {
-            return CalcUtil.Self.GetResultColor(type, origin, Cache.RW_BrushResult, Cache.RW_Selects);
+            return CalcUtil.Self.GetResultColor(type, origin, Cache.RW_BrushResult, clamp, min, max, Cache.RW_Selects);
         }
 
-        public Vector3[] GetResult(WriteType type, Vector3[] origin)
+        public Vector3[] GetResult(WriteType type, Vector3[] origin, bool clamp = false, float min = 0, float max = 1)
         {
-            return CalcUtil.Self.GetResult(type, origin, Cache.RW_BrushResult, Cache.RW_Selects);
+            return CalcUtil.Self.GetResult(type, origin, Cache.RW_BrushResult, clamp, min, max, Cache.RW_Selects);
         }
 
-        public Vector4[] GetResult(WriteType type, Vector4[] origin)
+        public Vector4[] GetResult(WriteType type, Vector4[] origin, bool clamp = false, float min = 0, float max = 1)
         {
-            return CalcUtil.Self.GetResult(type, origin, Cache.RW_BrushResult, Cache.RW_Selects);
+            return CalcUtil.Self.GetResult(type, origin, Cache.RW_BrushResult, clamp, min, max, Cache.RW_Selects);
         }
 
-        public Color[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outPass, Color[] origin)
+        public Color[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outPass, Color[] origin, bool clamp = false, float min = 0, float max = 1)
         {
-            return CalcUtil.Self.GetResultCustom(type, inPass, outPass, origin, Cache.RW_BrushResult, Cache.RW_Selects);
+            return CalcUtil.Self.GetResultCustom(type, inPass, outPass, origin, Cache.RW_BrushResult, clamp, min, max, Cache.RW_Selects);
         }
 
-        public Vector3[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outPass, Vector3[] origin)
+        public Vector3[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outPass, Vector3[] origin, bool clamp = false, float min = 0, float max = 1)
         {
-            return CalcUtil.Self.GetResultCustom(type, inPass, outPass, origin, Cache.RW_BrushResult, Cache.RW_Selects);
+            return CalcUtil.Self.GetResultCustom(type, inPass, outPass, origin, Cache.RW_BrushResult, clamp, min, max, Cache.RW_Selects);
         }
 
-        public Vector4[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outPass, Vector4[] origin)
+        public Vector4[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outPass, Vector4[] origin, bool clamp = false, float min = 0, float max = 1)
         {
-            return CalcUtil.Self.GetResultCustom(type, inPass, outPass, origin, Cache.RW_BrushResult, Cache.RW_Selects);
+            return CalcUtil.Self.GetResultCustom(type, inPass, outPass, origin, Cache.RW_BrushResult, clamp, min, max, Cache.RW_Selects);
         }
 
         public void Cala(Color col, float strength)

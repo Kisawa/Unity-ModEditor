@@ -500,6 +500,14 @@ namespace ModEditor
             }
         }
 
+        public void GameViewCommand(CommandBuffer cmd)
+        {
+            if (buffer == null)
+                return;
+            if (window.ToolType == ModEditorToolType.VertexBrush)
+                cmd.DrawMesh(screenMesh, Matrix4x4.identity, window.Mat_Util, 0, 8);
+        }
+
         void updateMaterial()
         {
             window.Mat_Util.SetColor("_NormalColor", window.Manager.NormalColor);

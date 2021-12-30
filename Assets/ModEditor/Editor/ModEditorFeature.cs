@@ -1,4 +1,5 @@
 /*
+using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using ModEditor;
@@ -13,10 +14,13 @@ public class ModEditorFeature : ScriptableRendererFeature
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
-            if (window == null || !renderingData.cameraData.isSceneViewCamera)
+            if (window == null)
                 return;
             CommandBuffer cmd = CommandBufferPool.Get(RenderTag);
-            window.Tab_SceneCollection.Command(cmd);
+            if (renderingData.cameraData.isSceneViewCamera)
+                window.Tab_SceneCollection.Command(cmd);
+            else
+                window.Tab_SceneCollection.GameViewCommand(cmd);
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
         }
@@ -34,7 +38,7 @@ public class ModEditorFeature : ScriptableRendererFeature
 
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
-        if (window == null || !renderingData.cameraData.isSceneViewCamera)
+        if (window == null)
             return;
         renderer.EnqueuePass(m_ScriptablePass);
     }

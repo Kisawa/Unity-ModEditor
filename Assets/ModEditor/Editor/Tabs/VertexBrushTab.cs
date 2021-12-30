@@ -416,6 +416,25 @@ namespace ModEditor
             {
                 EditorGUI.indentLevel = 2;
                 EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Clamp:", labelStyle, GUILayout.Width(100));
+                if (GUILayout.Button(window.Manager.VertexBrushClamp ? window.toggleOnContent : window.toggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(20)))
+                    window.Manager.VertexBrushClamp = !window.Manager.VertexBrushClamp;
+                EditorGUILayout.EndHorizontal();
+                if (window.Manager.VertexBrushClamp)
+                {
+                    EditorGUI.indentLevel++;
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.LabelField("Min:", labelStyle, GUILayout.Width(75));
+                    window.Manager.VertexBrushClampMin = EditorGUILayout.FloatField(window.Manager.VertexBrushClampMin, GUILayout.Width(100));
+                    EditorGUILayout.EndHorizontal();
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.LabelField("Max:", labelStyle, GUILayout.Width(75));
+                    window.Manager.VertexBrushClampMax = EditorGUILayout.FloatField(window.Manager.VertexBrushClampMax, GUILayout.Width(100));
+                    EditorGUILayout.EndHorizontal();
+                    EditorGUI.indentLevel--;
+                }
+                GUILayout.Space(5);
+                EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Type:", labelStyle, GUILayout.Width(100));
                 WriteType preWriteType = window.Manager.WriteType;
                 window.Manager.WriteType = (WriteType)EditorGUILayout.EnumPopup(window.Manager.WriteType, GUILayout.Width(140));
@@ -457,6 +476,12 @@ namespace ModEditor
                 EditorGUILayout.LabelField("Target Type:", labelStyle, GUILayout.Width(100));
                 EditorGUI.BeginDisabledGroup(presetTargetType);
                 window.Manager.WriteTargetType = (WriteTargetType)EditorGUILayout.EnumPopup(window.Manager.WriteTargetType, GUILayout.Width(140));
+                if (window.Manager.WriteTargetType == WriteTargetType.VertexColor)
+                {
+                    window.Manager.VertexBrushClamp = true;
+                    window.Manager.vertexBrushClampMin = 0;
+                    window.Manager.vertexBrushClampMax = 1;
+                }
                 EditorGUI.EndDisabledGroup();
                 EditorGUILayout.EndHorizontal();
                 if (window.Manager.WriteTargetType == WriteTargetType.Custom)
