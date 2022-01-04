@@ -480,10 +480,10 @@ namespace ModEditor
                     if (window.Manager.NormalMapView)
                         cmd.DrawRenderer(renderer, window.Mat_Util, j, 7);
                 }
-                if (window.ToolType == ModEditorToolType.VertexBrush && i < window.Tab_VertexBrush.CalcShaderDatas.Count)
+                if (window.ToolType == ModEditorToolType.VertexBrush)
                 {
-                    CalcManager data = window.Tab_VertexBrush.CalcShaderDatas[i];
-                    if (data != null && data.trans == target.transform)
+                    CalcManager data = window.Tab_VertexBrush.CalcShaderDatas.FirstOrDefault(x => x != null && x.trans == target.transform);
+                    if (data != null)
                     {
                         for (int j = 0; j < subCount; j++)
                             cmd.DrawRenderer(data.renderer, data.Material, j);
