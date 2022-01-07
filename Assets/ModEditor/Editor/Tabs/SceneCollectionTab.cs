@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -394,7 +395,7 @@ namespace ModEditor
 
         public void refreshBuffer()
         {
-            if(buffer != null)
+            if (buffer != null)
                 buffer.Clear();
             window.Tab_VertexBrush.ClearCalcShaderData();
             if (window.camera == null)

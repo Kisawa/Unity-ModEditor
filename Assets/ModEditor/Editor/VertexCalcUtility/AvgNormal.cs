@@ -4,6 +4,7 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 using UnityEditor;
+using System;
 
 namespace ModEditor
 {
@@ -15,8 +16,12 @@ namespace ModEditor
 
         public override PassCount PassCount => PassCount.Three;
 
+        static float ApproximateRefer;
+        float approximateRefer { get => window.ApproximateRefer; set => window.ApproximateRefer = value; }
+
         public override Vector3[] ExecuteThree(Mesh mesh)
         {
+            ApproximateRefer = approximateRefer;
             Vector3[] result;
             AvgNormalJob job = new AvgNormalJob()
             {
@@ -29,6 +34,15 @@ namespace ModEditor
             result = job.output.ToArray();
             job.output.Dispose();
             return result;
+        }
+
+        public override void Draw(GUIStyle labelStyle, float maxWidth)
+        {
+            base.Draw(labelStyle, maxWidth);
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Approximate Refer:", labelStyle, GUILayout.Width(120));
+            approximateRefer = EditorGUILayout.Slider(approximateRefer, 0, .1f, GUILayout.Width(maxWidth - 160));
+            EditorGUILayout.EndHorizontal();
         }
 
         struct AvgNormalJob : IJob
@@ -45,17 +59,52 @@ namespace ModEditor
 
             public void Execute()
             {
-                Dictionary<Vector3, Vector3> avgNormalDic = new Dictionary<Vector3, Vector3>();
+                Dictionary<ApproximateVector3, Vector3> avgNormalDic = new Dictionary<ApproximateVector3, Vector3>();
                 for (var i = 0; i < vertexs.Length; i++)
                 {
-                    Vector3 vertex = vertexs[i];
+                    ApproximateVector3 vertex = new ApproximateVector3(vertexs[i]);
                     if (avgNormalDic.TryGetValue(vertex, out Vector3 avgNormal))
                         avgNormalDic[vertex] = (avgNormal + normals[i]).normalized;
                     else
                         avgNormalDic.Add(vertex, normals[i]);
                 }
                 for (int i = 0; i < vertexs.Length; i++)
-                    output[i] = avgNormalDic[vertexs[i]];
+                    output[i] = avgNormalDic[new ApproximateVector3(vertexs[i])];
+            }
+        }
+
+        struct ApproximateVector3 : IEquatable<ApproximateVector3>
+        {
+            public Vector3 vec;
+
+            public ApproximateVector3(Vector3 vec)
+            {
+                this.vec = vec;
+            }
+
+            public static bool operator ==(ApproximateVector3 vec0, ApproximateVector3 vec1)
+            {
+                return Vector3.Distance(vec0.vec, vec1.vec) <= ApproximateRefer;
+            }
+
+            public static bool operator !=(ApproximateVector3 vec0, ApproximateVector3 vec1)
+            {
+                return !(vec0 == vec1);
+            }
+
+            public override bool Equals(object obj)
+            {
+                return this == (ApproximateVector3)obj;
+            }
+
+            public override int GetHashCode()
+            {
+                return ApproximateRefer <= 0 ? vec.GetHashCode() : ((int)(Vector3.Distance(Vector3.zero, vec) / ApproximateRefer)).GetHashCode();
+            }
+
+            public bool Equals(ApproximateVector3 other)
+            {
+                return this == other;
             }
         }
     }

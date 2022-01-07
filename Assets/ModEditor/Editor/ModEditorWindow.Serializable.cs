@@ -16,7 +16,7 @@ namespace ModEditor
             TexPassMergePanel3.BindEditor(this);
             TexPassMergePanel4.BindEditor(this);
         }
-        
+
         void targetChanged_serializableData()
         {
             LocalRemapCoordClear();
@@ -148,6 +148,22 @@ namespace ModEditor
         public TexturePanel TextureBrushTabuUtilCustomViewTexPanel = new TexturePanel();
         #endregion
 
+        #region AvgNormal
+        [SerializeField]
+        float approximateRefer = .001f;
+        public float ApproximateRefer
+        {
+            get => approximateRefer;
+            set
+            {
+                if (value == approximateRefer)
+                    return;
+                Undo.RecordObject(this, "AvgNormal ApproximateRefer Changed");
+                approximateRefer = value;
+            }
+        }
+        #endregion
+
         #region Copy
         [SerializeField]
         Copy.DataType copyCurrentData = Copy.DataType.VertexColor;
@@ -238,7 +254,7 @@ namespace ModEditor
         {
             Undo.RecordObject(this, "LocalRemap Coord Changed");
             LocalRemapCoord.RemoveAt(index);
-            if(LocalRemapCoord.Count == 0)
+            if (LocalRemapCoord.Count == 0)
                 LocalRemapCoord.Add(Vector3.zero);
         }
 
