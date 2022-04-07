@@ -11,4 +11,10 @@
 ****
 ## Vertex Brush: 
 Use this to write vertex information  
+
 Write Type:  
+* Vertex Color
+* Vertex
+* Normal
+* Tangent
+* Custom Pass
