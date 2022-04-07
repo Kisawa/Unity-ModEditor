@@ -34,3 +34,6 @@ Command:
   * /shift + MouseClickLeft :  Add selected locked vertices (Only used in vertex lock state)
   * /shift + MouseClickRight :  Sub selected locked vertices (Only used in vertex lock state)
 * /Alt + /Lock :  Lock selection (After locking selection you can adjust the write parameters in the control panel and write again)
+
+|/Tab|Draw vertices with ZTest|
+|/V|Write preview|
