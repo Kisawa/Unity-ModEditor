@@ -4,4 +4,4 @@
 2. add ModEditor renderer feature in the pipeline  
 ****
 ![panel](https://user-images.githubusercontent.com/71002504/162159160-3834f553-f211-49c9-b34e-16d23f6d56df.png)  
-![image](https://user-images.githubusercontent.com/71002504/162159126-56e942c2-b317-4401-8f69-76896eda2d8f.png)  
+![view](https://user-images.githubusercontent.com/71002504/162159353-00d388fb-0efb-4b56-9435-b9662ffd6419.png)
