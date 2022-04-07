@@ -35,6 +35,21 @@ Command:
   * /shift + MouseClickRight :  Sub selected locked vertices (Only used in vertex lock state)
 * /Alt + /Lock :  Lock selection (After locking selection you can adjust the write parameters in the control panel and write again)
 
+| Command | Detail |
 | /Tab | Draw vertices with ZTest |
 | ------ | ------ |
 | /V | Write preview |
+| ------ | ------ |
+| /Ctrl + Mouse-ScrollWheel | Adjust the BrushDepth |
+| ------ | ------ |
+| /Space | Adjust the BrushDepth to the vertex with the smallest depth within the mouse range |
+| ------ | ------ |
+| /Alt + Mouse-ScrollWheel | Expand the mouse range of vertices |
+| ------ | ------ |
+| /Lock | Lock selected vertices (Once you lock the vertices you can manipulate only those vertices) |
+| ------ | ------ |
+| /shift + MouseClickLeft | Add selected locked vertices (Only used in vertex lock state) |
+| ------ | ------ |
+| /shift + MouseClickRight | Sub selected locked vertices (Only used in vertex lock state) |
+| ------ | ------ |
+| /Alt + /Lock | Lock selection (After locking selection you can adjust the write parameters in the control panel and write again) |
