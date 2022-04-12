@@ -99,3 +99,7 @@ To use it, you also need to set the scene EditorTool to ModEditorTool mode like 
 * The mesh you need to draw must be equipped with a __"Collider"__ component  
 * Select the meshs you want to draw in the TextureBrush panel  
 * Create a new RenderTexture with __Color__ or __Texture__
+
+![企业微信截图_16493238225221](https://user-images.githubusercontent.com/71002504/162949715-2a2e33c1-7eba-4d7d-9e19-411d9622abaf.png)  
+![GIF](https://user-images.githubusercontent.com/71002504/162949766-46fab533-4e6a-4baf-ade9-4573f9c135ee.gif)  
+![企业微信截图_16493247367740](https://user-images.githubusercontent.com/71002504/162949807-a11d0f38-fd29-4099-ba10-ac34d474b1a4.png)  
