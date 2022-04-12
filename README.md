@@ -46,8 +46,7 @@ __Operating command:__
 ![vert_expand](https://user-images.githubusercontent.com/71002504/162924886-1a364f7f-d937-4730-b46a-f7f9eec4c935.gif)  
 * 5  
 ![vert_lock](https://user-images.githubusercontent.com/71002504/162925111-42b56e2c-5642-4447-a990-707330ff64f0.gif)  
-* 8  
-* ![GIF](https://user-images.githubusercontent.com/71002504/162939184-d7012b81-fc15-4a2b-9ca6-ac693fb64963.gif)  
+* 8  After locking the vertex selection, click the button to open the modification mode and modify the parameters to adjust the writing information  
 ![image](https://user-images.githubusercontent.com/71002504/162939106-8cac9be1-a393-4e48-8b0d-9b552f3f901b.png)  
 
 ## Calc Utility:  
