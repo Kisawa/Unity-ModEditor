@@ -77,10 +77,11 @@ It will cause your brush to carry special data, the original data of the brush w
 
 * LocalRemap example  
 (this example is used as a spherical normal mapping):  
-__Special data:__ the vertex local position relative to the object  
+__Carry data:__ the vertex local position relative to the object  
 
 ![GIFa](https://user-images.githubusercontent.com/71002504/162935694-2c527721-da5a-48f4-a263-07bd565ff954.gif)  
 
-You can extend this module  
+You can extend this module, in the main method __"BrushWrite"__, write special data to the buffer __"CalcManager.Cache.RW_BrushResult"__   
 Here is an example that carries __direction data of the mesh itself__, which you can find in this repository:  
 ![image](https://user-images.githubusercontent.com/71002504/162943008-6ced6808-e64c-41f1-bb06-5c3e3510b5f2.png)  
+![image](https://user-images.githubusercontent.com/71002504/162943681-fb1fde6b-aea2-4874-8e28-8ed67756e2bf.png)  
