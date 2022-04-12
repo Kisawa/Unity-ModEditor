@@ -51,9 +51,11 @@ __Calc Util:__
 Here are some mesh computing utilities:  
 
 ![image](https://user-images.githubusercontent.com/71002504/162929013-a9cf7ae5-d07b-47b0-9323-2f13d74b96e9.png)  
+
 Avg Normals example:  
 
 ![avgNormal](https://user-images.githubusercontent.com/71002504/162929198-23f4caed-77b4-4dc4-b68d-7de991159e33.png)  
+
 Of course you can modify only the vertices selected in the scene:  
 
 ![image](https://user-images.githubusercontent.com/71002504/162929493-3d8e4658-4c56-4c2e-9e1d-006d6125f17d.png)  
