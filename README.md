@@ -69,7 +69,8 @@ Of course you can modify only the vertices selected in the scene (select this op
 
 ![image](https://user-images.githubusercontent.com/71002504/162929493-3d8e4658-4c56-4c2e-9e1d-006d6125f17d.png)  
 
-You can extend this module, its data source is the original mesh  
+__You can extend this module__  
+Its data source is the original mesh  
 Here is an example of copy data, which you can find in this repository:  
 
 ![image](https://user-images.githubusercontent.com/71002504/162931620-3250f33b-6f36-4d36-8756-4750bebb6c92.png)  
@@ -90,7 +91,7 @@ __Carry data:__ the vertex local position relative to the object
 ![企业微信截图_16493259079374](https://user-images.githubusercontent.com/71002504/162946225-3699d1f1-59bd-49e3-af74-1efd51e783c5.png)
 ![企业微信截图_16493264148764](https://user-images.githubusercontent.com/71002504/162946238-a75c1b9e-5d27-47ec-952e-8570c1d29202.png)  
 
-You can extend this module  
+__You can extend this module__  
 In the main method __"BrushWrite()"__, write special data to the buffer __"CalcManager.Cache.RW_BrushResult"__   
 Here is an example that carries __direction data of the mesh itself__, which you can find in this repository:  
 
@@ -147,7 +148,7 @@ Use this utility to blur a texture (Gaussian blur)
 ![image](https://user-images.githubusercontent.com/71002504/162970066-704e9fe8-ae68-43dc-b131-22edafa3d554.png)
 ![image](https://user-images.githubusercontent.com/71002504/162970256-cc67c95d-c4c0-4b7e-b8aa-f9625312ffcb.png)  
 
-You can extend this module  
+__You can extend this module__  
 Just write the RenderTexture of the passed parameter with ComputerShader or Graphics (any way you like)  
 Here is the example of blur texture, which you can find in this repository:  
 ![image](https://user-images.githubusercontent.com/71002504/162971702-df73414c-278f-4290-af10-dda3a22093d0.png)  
