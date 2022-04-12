@@ -38,5 +38,6 @@ __Operating command:__
 | 7 | /shift + MouseClickRight | Sub selected locked vertices (Only used in vertex lock state) |
 | 8 | /Alt + /Lock | Lock selection (After locking selection you can adjust the write parameters in the control panel and write again) |
 
+* 0 ![brushVIew](https://user-images.githubusercontent.com/71002504/162924532-840da4ab-b6d9-4480-b2c2-a98b71e46ffe.png)
 * 1 ![brushVIew](https://user-images.githubusercontent.com/71002504/162924335-8092bba7-a10f-42b7-a5e1-4636d99bcadc.png)  
 
