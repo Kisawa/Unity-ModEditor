@@ -100,6 +100,9 @@ To use it, you also need to set the scene EditorTool to ModEditorTool mode like 
 __Shader variables:__  
  By declaring a sampler called ___EditorTex__ you will be able to sample the RenderTexture being drawn
  
+__SavePath:__  
+.../ModEditor/Textures  
+ 
 __Operating command:__  
 
 | Command | Detail |
