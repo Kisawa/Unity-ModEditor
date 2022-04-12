@@ -31,22 +31,23 @@ __Operating command:__
 | 0 | /Tab | Draw vertices with ZTest |
 | 1 | /V | Write preview |
 |  | /Ctrl + Mouse-ScrollWheel | Adjust the BrushDepth |
+|  | /Ctrl + MouseDragLeft | Adjust the BrushRange |
 |  | /Space | Adjust the BrushDepth to the vertex with the smallest depth within the mouse range |
-| 4 | /Alt + Mouse-ScrollWheel | Extend the vertices selection |
-| 5 | /Lock | Lock selected vertices (Once you lock the vertices you can manipulate only those vertices) |
+| 5 | /Alt + Mouse-ScrollWheel | Extend the vertices selection |
+| 6 | /Lock | Lock selected vertices (Once you lock the vertices you can manipulate only those vertices) |
 |  | /shift + MouseClickLeft | Add selected locked vertices (Only used in vertex lock state) |
 |  | /shift + MouseClickRight | Sub selected locked vertices (Only used in vertex lock state) |
-| 8 | /Alt + /Lock | Lock selection (After locking selection you can adjust the write parameters in the control panel and write again) |
+| 9 | /Alt + /Lock | Lock selection (After locking selection you can adjust the write parameters in the control panel and write again) |
 
 * 0:  
 ![vert_noDepth](https://user-images.githubusercontent.com/71002504/162924636-b5a97b44-b3c6-477f-a1a1-0cea19f11445.png)  
 * 1:  
 ![brushVIew](https://user-images.githubusercontent.com/71002504/162924335-8092bba7-a10f-42b7-a5e1-4636d99bcadc.png)  
-* 4: compute grid information extension selected vertices  
+* 5: compute grid information extension selected vertices  
 ![vert_expand](https://user-images.githubusercontent.com/71002504/162924886-1a364f7f-d937-4730-b46a-f7f9eec4c935.gif)  
-* 5: after locking selected vertices, you can only operate in the selection  
+* 6: after locking selected vertices, you can only operate in the selection  
 ![vert_lock](https://user-images.githubusercontent.com/71002504/162925111-42b56e2c-5642-4447-a990-707330ff64f0.gif)  
-* 8: after locking the vertex selection, click the button __"Brush Command Switch"__ to open the modification mode and modify the parameters to adjust the writing information  
+* 9: after locking the vertex selection, click the button __"Brush Command Switch"__ to open the modification mode and modify the parameters to adjust the writing information  
 ![image](https://user-images.githubusercontent.com/71002504/162939106-8cac9be1-a393-4e48-8b0d-9b552f3f901b.png)  
 
 ## Calc Utility:  
@@ -98,6 +99,15 @@ To use it, you also need to set the scene EditorTool to ModEditorTool mode like 
 
 __Shader variables:__  
  By declaring a sampler called ___EditorTex__ you will be able to sample the texture being drawn.
+ 
+__Operating command:__  
+
+| Command | Detail |
+| ------ | ------ |
+| /V | Drawn preview |
+| /Ctrl + MouseDragLeft | Adjust the BrushRange |
+| /Ctrl + MouseDragRight | Adjust the BrushHardness |
+| /Ctrl + Mouse-ScrollWheel | Rotate the Brush |
 
 __Start your drawing:__  
 * The mesh you need to draw must be equipped with a __"Collider"__ component  
