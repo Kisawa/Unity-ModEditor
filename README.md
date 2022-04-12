@@ -49,7 +49,7 @@ __Operating command:__
 ![vert_noDepth](https://user-images.githubusercontent.com/71002504/162924636-b5a97b44-b3c6-477f-a1a1-0cea19f11445.png)  
 * 1:  
 ![brushVIew](https://user-images.githubusercontent.com/71002504/162924335-8092bba7-a10f-42b7-a5e1-4636d99bcadc.png)  
-* 5: compute grid information extension selected vertices  
+* 5: extends the selected vertices based on grid information  
 ![vert_expand](https://user-images.githubusercontent.com/71002504/162924886-1a364f7f-d937-4730-b46a-f7f9eec4c935.gif)  
 * 6: after locking selected vertices, you can only operate in the selection  
 ![vert_lock](https://user-images.githubusercontent.com/71002504/162925111-42b56e2c-5642-4447-a990-707330ff64f0.gif)  
@@ -77,7 +77,7 @@ Here is an example of copy data, which you can find in this repository:
 
 ## Brush Write - Other Utility:
 Here are some mesh brush utilities  
-It will cause your brush to carry special data, the original data of the brush will be used as interpolation coefficients  
+It will cause your brush to carry special data, __the original data of the brush will be used as interpolation coefficients__  
 
 ![image](https://user-images.githubusercontent.com/71002504/162934193-db592567-cfdc-4990-86ab-454de3b17b52.png)
 ![image](https://user-images.githubusercontent.com/71002504/162934269-8ed76750-11c5-4c23-9443-f11ede1c2a5a.png)  
