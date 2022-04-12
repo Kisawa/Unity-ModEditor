@@ -95,3 +95,7 @@ Use this to create a texture paint.
 To use it, you also need to set the scene EditorTool to ModEditorTool mode like using VertexBrush:  
 
 ![tool](https://user-images.githubusercontent.com/71002504/162179217-235e57fd-da0e-4c19-82a9-540de246d79a.png)  
+
+* The mesh you need to draw must be equipped with a __"Collider"__ component  
+* Select the meshs you want to draw in the TextureBrush panel  
+* Create a new RenderTexture with __Color__ or __Texture__
