@@ -47,7 +47,7 @@ __Operating command:__
 * 5  
 ![vert_lock](https://user-images.githubusercontent.com/71002504/162925111-42b56e2c-5642-4447-a990-707330ff64f0.gif)
 
-## Calc Util:  
+## Calc Utility:  
 Here are some mesh computing utilities:  
 
 ![image](https://user-images.githubusercontent.com/71002504/162929013-a9cf7ae5-d07b-47b0-9323-2f13d74b96e9.png)  
@@ -64,3 +64,6 @@ You can extend this module, its data source is the original mesh (here is an exa
 
 ![image](https://user-images.githubusercontent.com/71002504/162931620-3250f33b-6f36-4d36-8756-4750bebb6c92.png)  
 ![image](https://user-images.githubusercontent.com/71002504/162931780-57f8ff83-b214-4ca1-a829-3c062ce99fdd.png)  
+
+## Write Other Utility:
+Here are some mesh brush utilities:  
