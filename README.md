@@ -129,5 +129,8 @@ Here are some texture manipulation utilities
 * TexturePassMerge example  
 Use this utility to split the color channel of a Texture and output it to a new RenderTexture
 
-![企业微信截图_16493249079656](https://user-images.githubusercontent.com/71002504/162968016-92fc2160-a8af-4222-b525-bccc924511ae.png)  
+![企业微信截图_16493249079656](https://user-images.githubusercontent.com/71002504/162968016-92fc2160-a8af-4222-b525-bccc924511ae.png)
 ![GIFs (2)](https://user-images.githubusercontent.com/71002504/162968050-f4a8cebd-8790-4c7d-ab56-b3b8f836d5d9.gif)  
+
+* Blur example  
+Use this utility to blur a texture (Gaussian blur)
