@@ -91,3 +91,7 @@ Here is an example that carries __direction data of the mesh itself__, which you
 ![image](https://user-images.githubusercontent.com/71002504/162943681-fb1fde6b-aea2-4874-8e28-8ed67756e2bf.png)  
 ****
 ## Texture Brush: 
+Use this to create a texture paint.  
+To use it, you also need to set the scene EditorTool to ModEditorTool mode like using VertexBrush:  
+
+![tool](https://user-images.githubusercontent.com/71002504/162179217-235e57fd-da0e-4c19-82a9-540de246d79a.png)  
