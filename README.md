@@ -109,9 +109,9 @@ __Operating command:__
 | /Ctrl + MouseDragRight | Adjust the BrushHardness |
 | /Ctrl + Mouse-ScrollWheel | Rotate the Brush |
 
-__Color Mask:__
+__Color Mask:__  
 Here you can turn on and off writable color channels  
-
+![image](https://user-images.githubusercontent.com/71002504/162965861-f94fd939-1e86-41dd-a6ae-9a6f17142f85.png)  
 
 __Start your drawing:__  
 * The mesh you need to draw must be equipped with a __"Collider"__ component  
