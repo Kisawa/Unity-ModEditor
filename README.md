@@ -56,7 +56,7 @@ Avg Normals example:
 
 ![avgNormal](https://user-images.githubusercontent.com/71002504/162929198-23f4caed-77b4-4dc4-b68d-7de991159e33.png)  
 
-Of course you can modify only the vertices selected in the scene (select this option and use shortcut key "Enter" in the scene):  
+Of course you can modify only the vertices selected in the scene (select this option and use shortcut key __"Enter"__ in the scene):  
 
 ![image](https://user-images.githubusercontent.com/71002504/162929493-3d8e4658-4c56-4c2e-9e1d-006d6125f17d.png)  
 
