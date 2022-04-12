@@ -66,6 +66,8 @@ You can extend this module, its data source is the original mesh (here is an exa
 ![image](https://user-images.githubusercontent.com/71002504/162931780-57f8ff83-b214-4ca1-a829-3c062ce99fdd.png)  
 
 ## Write Other Utility:
-Here are some mesh brush utilities:  
+Here are some mesh brush utilities  
+It will cause your brush to carry special data, the original data of the brush will be used as interpolation coefficients  
+
 ![image](https://user-images.githubusercontent.com/71002504/162934193-db592567-cfdc-4990-86ab-454de3b17b52.png)
 ![image](https://user-images.githubusercontent.com/71002504/162934269-8ed76750-11c5-4c23-9443-f11ede1c2a5a.png)  
