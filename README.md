@@ -135,5 +135,5 @@ Use this utility to split the color channel of a Texture and output it to a new 
 * Blur example  
 Use this utility to blur a texture (Gaussian blur)  
 
-![image](https://user-images.githubusercontent.com/71002504/162969809-6fcede98-eedf-4641-92a3-9d3b1a229ab3.png)
-![image](https://user-images.githubusercontent.com/71002504/162969753-10d66b1e-d96a-4461-b7a5-c40cc902d53b.png)  
+![image](https://user-images.githubusercontent.com/71002504/162970066-704e9fe8-ae68-43dc-b131-22edafa3d554.png)
+![image](https://user-images.githubusercontent.com/71002504/162970256-cc67c95d-c4c0-4b7e-b8aa-f9625312ffcb.png)  
