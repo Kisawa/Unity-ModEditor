@@ -67,3 +67,5 @@ You can extend this module, its data source is the original mesh (here is an exa
 
 ## Write Other Utility:
 Here are some mesh brush utilities:  
+![image](https://user-images.githubusercontent.com/71002504/162934193-db592567-cfdc-4990-86ab-454de3b17b52.png)
+![image](https://user-images.githubusercontent.com/71002504/162934269-8ed76750-11c5-4c23-9443-f11ede1c2a5a.png)  
