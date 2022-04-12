@@ -38,15 +38,15 @@ __Operating command:__
 |  | /shift + MouseClickRight | Sub selected locked vertices (Only used in vertex lock state) |
 | 8 | /Alt + /Lock | Lock selection (After locking selection you can adjust the write parameters in the control panel and write again) |
 
-* 0  
+* 0:  
 ![vert_noDepth](https://user-images.githubusercontent.com/71002504/162924636-b5a97b44-b3c6-477f-a1a1-0cea19f11445.png)  
-* 1  
+* 1:  
 ![brushVIew](https://user-images.githubusercontent.com/71002504/162924335-8092bba7-a10f-42b7-a5e1-4636d99bcadc.png)  
-* 4  
+* 4: compute grid information extension selected vertices  
 ![vert_expand](https://user-images.githubusercontent.com/71002504/162924886-1a364f7f-d937-4730-b46a-f7f9eec4c935.gif)  
-* 5  
+* 5: after locking selected vertices, you can only operate in the selection  
 ![vert_lock](https://user-images.githubusercontent.com/71002504/162925111-42b56e2c-5642-4447-a990-707330ff64f0.gif)  
-* 8  After locking the vertex selection, click the button to open the modification mode and modify the parameters to adjust the writing information  
+* 8: after locking the vertex selection, click the button to open the modification mode and modify the parameters to adjust the writing information  
 ![image](https://user-images.githubusercontent.com/71002504/162939106-8cac9be1-a393-4e48-8b0d-9b552f3f901b.png)  
 
 ## Calc Utility:  
