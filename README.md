@@ -30,13 +30,13 @@ __Operating command:__
 | ------ | ------ | ------ |
 | 0 | /Tab | Draw vertices with ZTest |
 | 1 | /V | Write preview |
-| 2 | /Ctrl + Mouse-ScrollWheel | Adjust the BrushDepth |
-| 3 | /Space | Adjust the BrushDepth to the vertex with the smallest depth within the mouse range |
+|  | /Ctrl + Mouse-ScrollWheel | Adjust the BrushDepth |
+|  | /Space | Adjust the BrushDepth to the vertex with the smallest depth within the mouse range |
 | 4 | /Alt + Mouse-ScrollWheel | Extend the vertices selection |
 | 5 | /Lock | Lock selected vertices (Once you lock the vertices you can manipulate only those vertices) |
-| 6 | /shift + MouseClickLeft | Add selected locked vertices (Only used in vertex lock state) |
-| 7 | /shift + MouseClickRight | Sub selected locked vertices (Only used in vertex lock state) |
-| 8 | /Alt + /Lock | Lock selection (After locking selection you can adjust the write parameters in the control panel and write again) |
+|  | /shift + MouseClickLeft | Add selected locked vertices (Only used in vertex lock state) |
+|  | /shift + MouseClickRight | Sub selected locked vertices (Only used in vertex lock state) |
+|  | /Alt + /Lock | Lock selection (After locking selection you can adjust the write parameters in the control panel and write again) |
 
 * 0  
 ![vert_noDepth](https://user-images.githubusercontent.com/71002504/162924636-b5a97b44-b3c6-477f-a1a1-0cea19f11445.png)  
