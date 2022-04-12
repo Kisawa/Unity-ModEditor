@@ -126,7 +126,8 @@ __Start your drawing:__
 Here are some texture manipulation utilities  
 ![image](https://user-images.githubusercontent.com/71002504/162966899-d0df4e6e-c431-4c9e-ad7b-10500cdd47dc.png)  
 
-* TexturePassMerge example
+* TexturePassMerge example  
 Use this utility to split the color channel of a Texture and output it to the RenderTexture being drawn  
+
 ![企业微信截图_16493249079656](https://user-images.githubusercontent.com/71002504/162968016-92fc2160-a8af-4222-b525-bccc924511ae.png)  
 ![GIFs (2)](https://user-images.githubusercontent.com/71002504/162968050-f4a8cebd-8790-4c7d-ab56-b3b8f836d5d9.gif)  
