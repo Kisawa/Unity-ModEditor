@@ -97,7 +97,7 @@ To use it, you also need to set the scene EditorTool to ModEditorTool mode like 
 ![tool](https://user-images.githubusercontent.com/71002504/162179217-235e57fd-da0e-4c19-82a9-540de246d79a.png)  
 
 __Shader variables:__  
- By declaring a sampler called __"_EditorTex"__ you will be able to sample the texture being drawn.
+ By declaring a sampler called ___EditorTex__ you will be able to sample the texture being drawn.
 
 * The mesh you need to draw must be equipped with a __"Collider"__ component  
 * Select the meshs you want to draw in the TextureBrush panel  
