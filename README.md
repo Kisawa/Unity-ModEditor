@@ -47,11 +47,12 @@ __Operating command:__
 * 5  
 ![vert_lock](https://user-images.githubusercontent.com/71002504/162925111-42b56e2c-5642-4447-a990-707330ff64f0.gif)
 
-__Calc Util:__  
-Here are some mesh computing utilities  
+__Calc Util__  
+Here are some mesh computing utilities:  
 
 ![image](https://user-images.githubusercontent.com/71002504/162929013-a9cf7ae5-d07b-47b0-9323-2f13d74b96e9.png)  
 Avg Normals example:  
+
 ![avgNormal](https://user-images.githubusercontent.com/71002504/162929198-23f4caed-77b4-4dc4-b68d-7de991159e33.png)  
 Of course you can modify only the vertices selected in the scene:  
 
