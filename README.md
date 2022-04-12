@@ -36,7 +36,7 @@ __Operating command:__
 | 5 | /Lock | Lock selected vertices (Once you lock the vertices you can manipulate only those vertices) |
 |  | /shift + MouseClickLeft | Add selected locked vertices (Only used in vertex lock state) |
 |  | /shift + MouseClickRight | Sub selected locked vertices (Only used in vertex lock state) |
-|  | /Alt + /Lock | Lock selection (After locking selection you can adjust the write parameters in the control panel and write again) |
+| 8 | /Alt + /Lock | Lock selection (After locking selection you can adjust the write parameters in the control panel and write again) |
 
 * 0  
 ![vert_noDepth](https://user-images.githubusercontent.com/71002504/162924636-b5a97b44-b3c6-477f-a1a1-0cea19f11445.png)  
@@ -45,7 +45,10 @@ __Operating command:__
 * 4  
 ![vert_expand](https://user-images.githubusercontent.com/71002504/162924886-1a364f7f-d937-4730-b46a-f7f9eec4c935.gif)  
 * 5  
-![vert_lock](https://user-images.githubusercontent.com/71002504/162925111-42b56e2c-5642-4447-a990-707330ff64f0.gif)
+![vert_lock](https://user-images.githubusercontent.com/71002504/162925111-42b56e2c-5642-4447-a990-707330ff64f0.gif)  
+* 8  
+* ![GIF](https://user-images.githubusercontent.com/71002504/162939184-d7012b81-fc15-4a2b-9ca6-ac693fb64963.gif)  
+![image](https://user-images.githubusercontent.com/71002504/162939106-8cac9be1-a393-4e48-8b0d-9b552f3f901b.png)  
 
 ## Calc Utility:  
 Here are some mesh computing utilities:  
