@@ -60,7 +60,7 @@ Of course you can modify only the vertices selected in the scene (select this op
 
 ![image](https://user-images.githubusercontent.com/71002504/162929493-3d8e4658-4c56-4c2e-9e1d-006d6125f17d.png)  
 
-You can extend this module, its data source is the original mesh (here is an example of copy data):  
+You can extend this module, its data source is the original mesh (here is an example of copy data, which you can find in this repository):  
 
 ![image](https://user-images.githubusercontent.com/71002504/162931620-3250f33b-6f36-4d36-8756-4750bebb6c92.png)  
 ![image](https://user-images.githubusercontent.com/71002504/162931780-57f8ff83-b214-4ca1-a829-3c062ce99fdd.png)  
