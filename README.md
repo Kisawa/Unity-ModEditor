@@ -10,7 +10,7 @@
 ![view](https://user-images.githubusercontent.com/71002504/162159353-00d388fb-0efb-4b56-9435-b9662ffd6419.png)
 ****
 ## Vertex Brush: 
-Use this to write vertex information.  
+Use this to write mesh information.  
 To use it, you need to set the scene EditorTool to ModEditorTool mode:  
 
 ![tool](https://user-images.githubusercontent.com/71002504/162179217-235e57fd-da0e-4c19-82a9-540de246d79a.png)  
