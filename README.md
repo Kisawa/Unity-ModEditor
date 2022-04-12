@@ -52,7 +52,7 @@ Here are some mesh computing utilities:
 
 ![image](https://user-images.githubusercontent.com/71002504/162929013-a9cf7ae5-d07b-47b0-9323-2f13d74b96e9.png)  
 
-Avg Normals example:  
+AvgNormals example:  
 
 ![avgNormal](https://user-images.githubusercontent.com/71002504/162929198-23f4caed-77b4-4dc4-b68d-7de991159e33.png)  
 
@@ -72,6 +72,7 @@ It will cause your brush to carry special data, the original data of the brush w
 ![image](https://user-images.githubusercontent.com/71002504/162934193-db592567-cfdc-4990-86ab-454de3b17b52.png)
 ![image](https://user-images.githubusercontent.com/71002504/162934269-8ed76750-11c5-4c23-9443-f11ede1c2a5a.png)  
 
-An example of LocalRemap is shown here:  
+LocalRemap example (this example is used as a spherical normal mapping):  
+__Special data:__ the vertex local position relative to the object  
 
 ![GIFa](https://user-images.githubusercontent.com/71002504/162935694-2c527721-da5a-48f4-a263-07bd565ff954.gif)  
