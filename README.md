@@ -141,6 +141,7 @@ Use this utility to blur a texture (Gaussian blur)
 ![image](https://user-images.githubusercontent.com/71002504/162970066-704e9fe8-ae68-43dc-b131-22edafa3d554.png)
 ![image](https://user-images.githubusercontent.com/71002504/162970256-cc67c95d-c4c0-4b7e-b8aa-f9625312ffcb.png)  
 
-You can extend this module, just write the RenderTexture with ComputerShader or Graphics, any way you like  
+You can extend this module  
+Just write the RenderTexture of the passed parameter with ComputerShader or Graphics (any way you like)  
 Here is the example of blur texture, which you can find in this repository:  
 ![image](https://user-images.githubusercontent.com/71002504/162971702-df73414c-278f-4290-af10-dda3a22093d0.png)  
