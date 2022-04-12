@@ -91,7 +91,7 @@ __Carry data:__ the vertex local position relative to the object
 ![企业微信截图_16493264148764](https://user-images.githubusercontent.com/71002504/162946238-a75c1b9e-5d27-47ec-952e-8570c1d29202.png)  
 
 You can extend this module  
-In the main method __"BrushWrite"__, write special data to the buffer __"CalcManager.Cache.RW_BrushResult"__   
+In the main method __"BrushWrite()"__, write special data to the buffer __"CalcManager.Cache.RW_BrushResult"__   
 Here is an example that carries __direction data of the mesh itself__, which you can find in this repository:  
 
 ![image](https://user-images.githubusercontent.com/71002504/162943008-6ced6808-e64c-41f1-bb06-5c3e3510b5f2.png)  
