@@ -15,7 +15,7 @@ To use it, you need to set the scene EditorTool to ModEditorTool mode:
 
 ![tool](https://user-images.githubusercontent.com/71002504/162179217-235e57fd-da0e-4c19-82a9-540de246d79a.png)  
 
-Write Type:  
+__Write Type__:  
 * Vertex Color
 * Vertex
 * Normal
@@ -23,6 +23,8 @@ Write Type:
 * Custom Pass
 
 ![企业微信截图_16493235207385](https://user-images.githubusercontent.com/71002504/162178908-d29dca7c-d3bd-40ec-845b-06541fcd224c.png)  
+
+__Operating command__:  
 
 | Example id | Command | Detail |
 | ------ | ------ | ------ |
