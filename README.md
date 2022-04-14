@@ -28,7 +28,7 @@ __Write Type:__
 * Tangent
 * Custom Pass
 
-![企业微信截图_16493235207385](https://user-images.githubusercontent.com/71002504/162178908-d29dca7c-d3bd-40ec-845b-06541fcd224c.png)  
+![image](https://user-images.githubusercontent.com/71002504/162178908-d29dca7c-d3bd-40ec-845b-06541fcd224c.png)  
 
 __Operating command:__  
 
@@ -88,8 +88,8 @@ It will cause your brush to carry special data, __the original data of the brush
 __Carry data:__ the vertex local position relative to the object  
 
 ![GIFa](https://user-images.githubusercontent.com/71002504/162935694-2c527721-da5a-48f4-a263-07bd565ff954.gif)  
-![企业微信截图_16493259079374](https://user-images.githubusercontent.com/71002504/162946225-3699d1f1-59bd-49e3-af74-1efd51e783c5.png)
-![企业微信截图_16493264148764](https://user-images.githubusercontent.com/71002504/162946238-a75c1b9e-5d27-47ec-952e-8570c1d29202.png)  
+![image](https://user-images.githubusercontent.com/71002504/162946225-3699d1f1-59bd-49e3-af74-1efd51e783c5.png)
+![image](https://user-images.githubusercontent.com/71002504/162946238-a75c1b9e-5d27-47ec-952e-8570c1d29202.png)  
 
 __You can extend this module__  
 >In the main method __"BrushWrite()"__, write special data to the buffer __"CalcManager.Cache.RW_BrushResult"__   
@@ -128,9 +128,9 @@ __Start your drawing:__
 * Select the meshs you want to draw in the TextureBrush panel  
 * Create a new RenderTexture with __Color__ or __Texture__
 
-![企业微信截图_16493238225221](https://user-images.githubusercontent.com/71002504/162949715-2a2e33c1-7eba-4d7d-9e19-411d9622abaf.png)  
+![image](https://user-images.githubusercontent.com/71002504/162949715-2a2e33c1-7eba-4d7d-9e19-411d9622abaf.png)  
 ![GIF](https://user-images.githubusercontent.com/71002504/162949766-46fab533-4e6a-4baf-ade9-4573f9c135ee.gif)
-![企业微信截图_16493247367740](https://user-images.githubusercontent.com/71002504/162949807-a11d0f38-fd29-4099-ba10-ac34d474b1a4.png)  
+![image](https://user-images.githubusercontent.com/71002504/162949807-a11d0f38-fd29-4099-ba10-ac34d474b1a4.png)  
 
 ## Texture Utility:
 Here are some texture manipulation utilities  
@@ -139,7 +139,7 @@ Here are some texture manipulation utilities
 * TexturePassMerge example  
 Use this utility to split the color channel of a Texture and output it to a new RenderTexture
 
-![企业微信截图_16493249079656](https://user-images.githubusercontent.com/71002504/162968016-92fc2160-a8af-4222-b525-bccc924511ae.png)
+![image](https://user-images.githubusercontent.com/71002504/162968016-92fc2160-a8af-4222-b525-bccc924511ae.png)
 ![GIFs (2)](https://user-images.githubusercontent.com/71002504/162968050-f4a8cebd-8790-4c7d-ab56-b3b8f836d5d9.gif)  
 
 * Blur example  
