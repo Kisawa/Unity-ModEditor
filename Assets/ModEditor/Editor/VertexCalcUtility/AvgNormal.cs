@@ -18,15 +18,22 @@ namespace ModEditor
 
         static float ApproximateRefer;
         float approximateRefer { get => window.ApproximateRefer; set => window.ApproximateRefer = value; }
+        bool useUnityNormal { get => window.UseUnityNormal; set => window.UseUnityNormal = value; }
 
         public override Vector3[] ExecuteThree(Mesh mesh)
         {
             ApproximateRefer = approximateRefer;
             Vector3[] result;
+            Mesh _mesh = mesh;
+            if (useUnityNormal)
+            {
+                _mesh = UnityEngine.Object.Instantiate(mesh);
+                _mesh.RecalculateNormals();
+            }
             AvgNormalJob job = new AvgNormalJob()
             {
                 vertexs = new NativeArray<Vector3>(mesh.vertices, Allocator.TempJob),
-                normals = new NativeArray<Vector3>(mesh.normals, Allocator.TempJob),
+                normals = new NativeArray<Vector3>(_mesh.normals, Allocator.TempJob),
                 output = new NativeArray<Vector3>(mesh.vertexCount, Allocator.TempJob)
             };
             JobHandle jobHandle = job.Schedule();
@@ -39,6 +46,11 @@ namespace ModEditor
         public override void Draw(GUIStyle labelStyle, float maxWidth)
         {
             base.Draw(labelStyle, maxWidth);
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Use Unity Normal:", labelStyle, GUILayout.Width(130));
+            if (GUILayout.Button(useUnityNormal ? window.toggleOnContent : window.toggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(20)))
+                useUnityNormal = !useUnityNormal;
+            EditorGUILayout.EndHorizontal();
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Approximate Refer:", labelStyle, GUILayout.Width(120));
             approximateRefer = EditorGUILayout.Slider(approximateRefer, 0, .1f, GUILayout.Width(maxWidth - 160));

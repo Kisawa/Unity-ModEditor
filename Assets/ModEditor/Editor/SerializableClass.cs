@@ -242,7 +242,20 @@ namespace ModEditor
                             {
                                 string path = $"{ModEditorWindow.ModEditorPath}/Meshs/{mesh.name}.mesh";
                                 path = path.Replace(':', '-');
-                                AssetDatabase.DeleteAsset(path);
+                                int checkIndex = 1;
+                                while (true)
+                                {
+                                    Mesh _m = AssetDatabase.LoadAssetAtPath(path, typeof(Mesh)) as Mesh;
+                                    if (_m == null)
+                                        break;
+                                    if (_m.vertexCount == mesh.vertexCount)
+                                    {
+                                        AssetDatabase.DeleteAsset(path);
+                                        break;
+                                    }
+                                    path = $"{ModEditorWindow.ModEditorPath}/Meshs/{mesh.name} {checkIndex}.mesh";
+                                    path = path.Replace(':', '-');
+                                }
                                 AssetDatabase.CreateAsset(mesh, path);
                             }
                             valDic.Remove(_key);

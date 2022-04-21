@@ -162,6 +162,20 @@ namespace ModEditor
                 approximateRefer = value;
             }
         }
+
+        [SerializeField]
+        bool useUnityNormal = false;
+        public bool UseUnityNormal
+        {
+            get => useUnityNormal;
+            set
+            {
+                if (value == useUnityNormal)
+                    return;
+                Undo.RecordObject(this, "AvgNormal UseUnityNormal Changed");
+                useUnityNormal = value;
+            }
+        }
         #endregion
 
         #region Copy
