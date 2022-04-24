@@ -37,7 +37,7 @@ namespace ModEditor
             }
         }
 
-        List<(Transform, Mesh)> objInOperation;
+        List<(Transform, Mesh, Mesh)> objInOperation;
 
         public CalcManager AddCalcShaderRender(Renderer renderer, MeshFilter meshFilter)
         {
@@ -72,7 +72,7 @@ namespace ModEditor
         {
             if (window.camera == null || (objInOperation != null && objInOperation.Count != 0))
                 return;
-            List<(Transform, Mesh)> _objInOperation = new List<(Transform, Mesh)>();
+            List<(Transform, Mesh, Mesh)> _objInOperation = new List<(Transform, Mesh, Mesh)>();
             for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
             {
                 GameObject target = window.Manager.TargetChildren[i];
@@ -82,10 +82,14 @@ namespace ModEditor
                     continue;
                 MeshFilter meshFilter = target.GetComponent<MeshFilter>();
                 if (meshFilter != null)
-                    _objInOperation.Add((target.transform, window.SetEditingMesh(target, meshFilter)));
+                    _objInOperation.Add((target.transform, window.SetEditingMesh(target, meshFilter), null));
                 SkinnedMeshRenderer skinnedMeshRenderer = target.GetComponent<SkinnedMeshRenderer>();
                 if (skinnedMeshRenderer != null)
-                    _objInOperation.Add((target.transform, window.SetEditingMesh(target, skinnedMeshRenderer)));
+                {
+                    Mesh bakedMesh = new Mesh();
+                    skinnedMeshRenderer.BakeMesh(bakedMesh);
+                    _objInOperation.Add((target.transform, window.SetEditingMesh(target, skinnedMeshRenderer), bakedMesh));
+                }
             }
             objInOperation = _objInOperation;
         }
@@ -312,7 +316,7 @@ namespace ModEditor
                         util.CustomPass_Y = window.Manager.CustomTargetPass_Y;
                         util.CustomPass_Z = window.Manager.CustomTargetPass_Z;
                         util.CustomPass_W = window.Manager.CustomTargetPass_W;
-                        if (util.BrushWrite(mesh, data))
+                        if (util.BrushWrite(objInOperation[i].Item3 == null ? objInOperation[i].Item2 : objInOperation[i].Item3, data))
                             writeType = WriteType.Replace;
                         else
                             continue;

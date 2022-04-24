@@ -285,7 +285,7 @@ namespace ModEditor
                 EditorGUI.indentLevel = 2;
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Strength:", CommandSyle, GUILayout.Width(80));
-                window.Manager.VertexBrushStrength = EditorGUILayout.Slider(window.Manager.VertexBrushStrength, -10, 10, GUILayout.Width(window.position.width - 125));
+                window.Manager.VertexBrushStrength = EditorGUILayout.Slider(window.Manager.VertexBrushStrength, 0, 1, GUILayout.Width(window.position.width - 125));
                 EditorGUILayout.EndHorizontal();
 
                 EditorGUILayout.BeginHorizontal();
