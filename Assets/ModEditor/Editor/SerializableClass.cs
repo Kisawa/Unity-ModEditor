@@ -253,7 +253,7 @@ namespace ModEditor
                                         AssetDatabase.DeleteAsset(path);
                                         break;
                                     }
-                                    path = $"{ModEditorWindow.ModEditorPath}/Meshs/{mesh.name} {checkIndex}.mesh";
+                                    path = $"{ModEditorWindow.ModEditorPath}/Meshs/{mesh.name} {checkIndex++}.mesh";
                                     path = path.Replace(':', '-');
                                 }
                                 AssetDatabase.CreateAsset(mesh, path);
