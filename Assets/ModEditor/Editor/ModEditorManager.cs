@@ -14,7 +14,8 @@ namespace ModEditor
         public bool LockTarget
         {
             get => lockTarget;
-            set {
+            set
+            {
                 if (value == lockTarget)
                     return;
                 Undo.RecordObject(this, "ModEditor LockTarget");
@@ -364,6 +365,20 @@ namespace ModEditor
         }
 
         [SerializeField]
+        UVType uvViewType;
+        public UVType UVViewType
+        {
+            get => uvViewType;
+            set
+            {
+                if (value == uvViewType)
+                    return;
+                Undo.RecordObject(this, "ModEditor UVViewType");
+                uvViewType = value;
+            }
+        }
+
+        [SerializeField]
         bool uvViewUnfold = true;
         public bool UVViewUnfold
         {
@@ -464,6 +479,78 @@ namespace ModEditor
                     return;
                 Undo.RecordObject(this, "ModEditor NormalMapView");
                 normalMapView = value;
+            }
+        }
+        #endregion
+
+        #region Map Shading
+        [SerializeField]
+        bool mapView;
+        public bool MapView
+        {
+            get => mapView;
+            set
+            {
+                if (value == mapView)
+                    return;
+                Undo.RecordObject(this, "ModEditor MapView");
+                mapView = value;
+            }
+        }
+
+        [SerializeField]
+        bool mapViewUnfold = true;
+        public bool MapViewUnfold
+        {
+            get => mapViewUnfold;
+            set
+            {
+                if (value == mapViewUnfold)
+                    return;
+                Undo.RecordObject(this, "ModEditor MapViewUnfold");
+                mapViewUnfold = value;
+            }
+        }
+
+        [SerializeField]
+        Texture mapViewTex;
+        public Texture MapViewTex
+        {
+            get => mapViewTex;
+            set
+            {
+                if (value == mapViewTex)
+                    return;
+                Undo.RecordObject(this, "ModEditor MapViewTex");
+                mapViewTex = value;
+            }
+        }
+
+        [SerializeField]
+        TexViewPass mapViewPass;
+        public TexViewPass MapViewPass
+        {
+            get => mapViewPass;
+            set
+            {
+                if (value == mapViewPass)
+                    return;
+                Undo.RecordObject(this, "ModEditor MapViewPass");
+                mapViewPass = value;
+            }
+        }
+
+        [SerializeField]
+        Color mapViewColorTint = Color.white;
+        public Color MapViewColorTint
+        {
+            get => mapViewColorTint;
+            set
+            {
+                if (value == mapViewColorTint)
+                    return;
+                Undo.RecordObject(this, "ModEditor MapViewColorTint");
+                mapViewColorTint = value;
             }
         }
         #endregion

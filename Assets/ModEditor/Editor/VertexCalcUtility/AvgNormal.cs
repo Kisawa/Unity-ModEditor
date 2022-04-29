@@ -18,7 +18,10 @@ namespace ModEditor
 
         static float ApproximateRefer;
         float approximateRefer { get => window.ApproximateRefer; set => window.ApproximateRefer = value; }
+
         bool useUnityNormal { get => window.UseUnityNormal; set => window.UseUnityNormal = value; }
+
+        bool mappedTo01 { get => window.MappedTo01; set => window.MappedTo01 = value; }
 
         public override Vector3[] ExecuteThree(Mesh mesh)
         {
@@ -40,6 +43,8 @@ namespace ModEditor
             jobHandle.Complete();
             result = job.output.ToArray();
             job.output.Dispose();
+            if (mappedTo01)
+                result = CalcUtil.Self.MappedTo01(result);
             return result;
         }
 
@@ -50,6 +55,11 @@ namespace ModEditor
             EditorGUILayout.LabelField("Use Unity Normal:", labelStyle, GUILayout.Width(130));
             if (GUILayout.Button(useUnityNormal ? window.toggleOnContent : window.toggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(20)))
                 useUnityNormal = !useUnityNormal;
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Mapped To 01:", labelStyle, GUILayout.Width(130));
+            if (GUILayout.Button(mappedTo01 ? window.toggleOnContent : window.toggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(20)))
+                mappedTo01 = !mappedTo01;
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Approximate Refer:", labelStyle, GUILayout.Width(120));

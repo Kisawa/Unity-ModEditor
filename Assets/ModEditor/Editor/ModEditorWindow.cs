@@ -40,7 +40,7 @@ namespace ModEditor
         public event Action onWindowLostFocus;
         public event Action onRefreshTargetDic;
         public event Action<GameObject> onTargetChanged;
-        
+
         [MenuItem("Tools/Mod Editor %#E")]
         static void Open()
         {
@@ -88,7 +88,7 @@ namespace ModEditor
 
         public SceneCollectionTab Tab_SceneCollection
         {
-            get 
+            get
             {
                 if (tabs == null || tabs.Count < 1)
                     return null;
@@ -337,7 +337,7 @@ namespace ModEditor
             }
             refreshObjDic();
         }
-        
+
         void refreshObjDic()
         {
             if (Manager.Target == null)
@@ -390,7 +390,7 @@ namespace ModEditor
             EditorUtility.SetDirty(target);
             return mesh;
         }
-        
+
         public Mesh SetEditingMesh(GameObject target, SkinnedMeshRenderer skinnedMeshRenderer)
         {
             if (skinnedMeshRenderer.sharedMesh == null)

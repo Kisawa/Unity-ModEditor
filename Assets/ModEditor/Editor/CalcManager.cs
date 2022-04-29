@@ -182,6 +182,11 @@ namespace ModEditor
             return CalcUtil.Self.GetResultColor(type, origin, Cache.RW_BrushResult, clamp, min, max, Cache.RW_Selects);
         }
 
+        public Vector2[] GetResult(WriteType type, Vector2[] origin, bool clamp = false, float min = 0, float max = 1)
+        {
+            return CalcUtil.Self.GetResult(type, origin, Cache.RW_BrushResult, clamp, min, max, Cache.RW_Selects);
+        }
+
         public Vector3[] GetResult(WriteType type, Vector3[] origin, bool clamp = false, float min = 0, float max = 1)
         {
             return CalcUtil.Self.GetResult(type, origin, Cache.RW_BrushResult, clamp, min, max, Cache.RW_Selects);
@@ -193,6 +198,11 @@ namespace ModEditor
         }
 
         public Color[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outPass, Color[] origin, bool clamp = false, float min = 0, float max = 1)
+        {
+            return CalcUtil.Self.GetResultCustom(type, inPass, outPass, origin, Cache.RW_BrushResult, clamp, min, max, Cache.RW_Selects);
+        }
+
+        public Vector2[] GetResultCustom(WriteType type, TargetPassType inPass, TargetPassType outPass, Vector2[] origin, bool clamp = false, float min = 0, float max = 1)
         {
             return CalcUtil.Self.GetResultCustom(type, inPass, outPass, origin, Cache.RW_BrushResult, clamp, min, max, Cache.RW_Selects);
         }

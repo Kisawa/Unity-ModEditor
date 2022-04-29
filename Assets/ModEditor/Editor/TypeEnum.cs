@@ -4,6 +4,13 @@ using UnityEngine;
 
 namespace ModEditor
 {
+    public enum UVType
+    {
+        UV,
+        UV2,
+        UV3
+    }
+
     public enum VertexBrushType
     {
         Color,
@@ -26,6 +33,8 @@ namespace ModEditor
         Vertex,
         Normal,
         Tangent,
+        UV2,
+        UV3,
         Custom
     }
 
@@ -35,7 +44,9 @@ namespace ModEditor
         VertexColor,
         Vertex,
         Normal,
-        Tangent
+        Tangent,
+        UV2,
+        UV3
     }
 
     public enum TargetPassType
@@ -47,7 +58,7 @@ namespace ModEditor
     }
 
     public enum PassCount
-    { 
+    {
         One,
         Two,
         Three,
@@ -57,14 +68,14 @@ namespace ModEditor
     }
 
     public enum TargetTextureType
-    { 
+    {
         Background,
         Foreground,
         Custom
     }
 
     public enum TexViewPass
-    { 
+    {
         R,
         G,
         B,
@@ -82,7 +93,7 @@ namespace ModEditor
     }
 
     public enum BlendFactor
-    { 
+    {
         One,
         Zero,
         BlendTexColor,

@@ -95,7 +95,7 @@ namespace ModEditor
             switch (TargetType)
             {
                 case WriteTargetType.VertexColor:
-                    CalcUtil.Self.GetBuffer4(_mesh.colors, _origin4);
+                    CalcUtil.Self.GetBuffer4(CalcUtil.CheckArrayNotNull(_mesh.colors, _mesh.vertexCount), _origin4);
                     break;
                 case WriteTargetType.Vertex:
                     CalcUtil.Self.GetBuffer4(_mesh.vertices, _origin4);
@@ -105,6 +105,12 @@ namespace ModEditor
                     break;
                 case WriteTargetType.Tangent:
                     CalcUtil.Self.GetBuffer4(_mesh.tangents, _origin4);
+                    break;
+                case WriteTargetType.UV2:
+                    CalcUtil.Self.GetBuffer4(CalcUtil.CheckArrayNotNull(_mesh.uv2, _mesh.vertexCount), _origin4);
+                    break;
+                case WriteTargetType.UV3:
+                    CalcUtil.Self.GetBuffer4(CalcUtil.CheckArrayNotNull(_mesh.uv3, _mesh.vertexCount), _origin4);
                     break;
                 case WriteTargetType.Custom:
                     setCustomBuffer(CustomTarget_X, CustomPass_X, TargetPassType.X, _mesh, _origin4);
@@ -144,10 +150,7 @@ namespace ModEditor
             switch (customType)
             {
                 case CustomTargetType.VertexColor:
-                    Color[] colors = mesh.colors;
-                    if (colors.Length != mesh.vertexCount)
-                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
-                    CalcUtil.Self.GetBuffer4(colors, inPass, outPass, _buffer4);
+                    CalcUtil.Self.GetBuffer4(CalcUtil.CheckArrayNotNull(mesh.colors, mesh.vertexCount), inPass, outPass, _buffer4);
                     break;
                 case CustomTargetType.Vertex:
                     CalcUtil.Self.GetBuffer4(mesh.vertices, inPass, outPass, _buffer4);
@@ -157,6 +160,12 @@ namespace ModEditor
                     break;
                 case CustomTargetType.Tangent:
                     CalcUtil.Self.GetBuffer4(mesh.tangents, inPass, outPass, _buffer4);
+                    break;
+                case CustomTargetType.UV2:
+                    CalcUtil.Self.GetBuffer4(CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), inPass, outPass, _buffer4);
+                    break;
+                case CustomTargetType.UV3:
+                    CalcUtil.Self.GetBuffer4(CalcUtil.CheckArrayNotNull(mesh.uv3, mesh.vertexCount), inPass, outPass, _buffer4);
                     break;
             }
         }
@@ -203,7 +212,7 @@ namespace ModEditor
                 window.LocalRemapCoordSet(i, targetTrans.TransformPoint(EditorGUILayout.Vector3Field("", targetTrans.InverseTransformPoint(coord[i]), GUILayout.Width(maxWidth))));
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.Space(30);
-                if (GUILayout.Button("Reset rotation", "EditModeSingleButton" ,GUILayout.Width(maxWidth - 95)))
+                if (GUILayout.Button("Reset rotation", "EditModeSingleButton", GUILayout.Width(maxWidth - 95)))
                     window.LocalRemapRotationSet(i, targetTrans.rotation);
                 EditorGUI.BeginDisabledGroup(i == 0);
                 if (GUILayout.Button("Remove", "EditModeSingleButton", GUILayout.Width(60)))

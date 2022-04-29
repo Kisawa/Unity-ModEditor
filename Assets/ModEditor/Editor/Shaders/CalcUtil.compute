@@ -6,12 +6,17 @@
 #pragma kernel SubZone
 #pragma kernel CalcWithSize
 #pragma kernel CalcWithSpread
+#pragma kernel MappedTo01
 #pragma kernel Result1
 #pragma kernel Result2
 #pragma kernel Result3
 #pragma kernel Result4
+#pragma kernel Origin2To1
 #pragma kernel Origin3To1
 #pragma kernel Origin4To1
+#pragma kernel Origin4To2
+#pragma kernel Origin4To3
+#pragma kernel Origin1To2
 #pragma kernel Origin1To3
 #pragma kernel Origin1To4
 #pragma kernel Origin2To4
@@ -31,7 +36,7 @@ RWStructuredBuffer<float> RW_Depths;
 RWStructuredBuffer<float> RW_Sizes;
 RWStructuredBuffer<int> RW_Zone;
 
-[numthreads(1024,1,1)]
+[numthreads(1024, 1, 1)]
 void SelectWithScreenScope(uint3 id : SV_DispatchThreadID)
 {
 	float3 viewPos = mul(_MV, float4(_Vertices[id.x], 1.0)).xyz;
@@ -50,14 +55,14 @@ void SelectWithScreenScope(uint3 id : SV_DispatchThreadID)
 	int zone = max(isZone, _OnlyZone);
 	res *= zone;
 	res = lerp(res, 1, isZone * _ZoneInSelect);
-	if(_ClearSpread)
+	if (_ClearSpread)
 		RW_Selects[id.x] = -res;
-	else if(RW_Selects[id.x] * zone <= 0)
+	else if (RW_Selects[id.x] * zone <= 0)
 		RW_Selects[id.x] = -res;
 }
 
 StructuredBuffer<int> _Triangles;
-[numthreads(1024,1,1)]
+[numthreads(1024, 1, 1)]
 void SpreadSelect(uint3 id: SV_DispatchThreadID)
 {
 	int layer = id.x / 3;
@@ -72,7 +77,7 @@ void SpreadSelect(uint3 id: SV_DispatchThreadID)
 	res = max(res, select2);
 	res = max(res, 0) + 1;
 	int write = any(float3(select0, select1, select2));
-	if(write == 1)
+	if (write == 1)
 	{
 		RW_Selects[vertex_id0] = select0 + (1 - any(select0)) * res;
 		RW_Selects[vertex_id1] = select1 + (1 - any(select1)) * res;
@@ -81,7 +86,7 @@ void SpreadSelect(uint3 id: SV_DispatchThreadID)
 }
 
 int _SpreadLevel;
-[numthreads(1024,1,1)]
+[numthreads(1024, 1, 1)]
 void RespreadSelect(uint3 id: SV_DispatchThreadID)
 {
 	int layer = id.x / 3;
@@ -96,14 +101,14 @@ void RespreadSelect(uint3 id: SV_DispatchThreadID)
 	RW_Selects[vertex_id2] = select2 * step(0, _SpreadLevel - select2);
 }
 
-[numthreads(1024,1,1)]
+[numthreads(1024, 1, 1)]
 void LockZone(uint3 id: SV_DispatchThreadID)
 {
 	int res = any(RW_Selects[id.x]);
 	RW_Zone[id.x] = res;
 }
 
-[numthreads(1024,1,1)]
+[numthreads(1024, 1, 1)]
 void AddZone(uint3 id: SV_DispatchThreadID)
 {
 	int res = any(RW_Selects[id.x]);
@@ -111,7 +116,7 @@ void AddZone(uint3 id: SV_DispatchThreadID)
 	RW_Zone[id.x] = res;
 }
 
-[numthreads(1024,1,1)]
+[numthreads(1024, 1, 1)]
 void SubZone(uint3 id: SV_DispatchThreadID)
 {
 	int res = 1 - any(RW_Selects[id.x]);
@@ -137,7 +142,7 @@ float4 _From;
 float4 _To;
 float _FromStep;
 float _ToStep;
-[numthreads(1024,1,1)]
+[numthreads(1024, 1, 1)]
 void CalcWithSize(uint3 id: SV_DispatchThreadID)
 {
 	int select = any(RW_Selects[id.x]);
@@ -146,7 +151,7 @@ void CalcWithSize(uint3 id: SV_DispatchThreadID)
 	RW_Result4[id.x] = lerp(origin, _To, clamp(remap(res, _FromStep, _ToStep, 0, 1), 0, 1));
 }
 
-[numthreads(1024,1,1)]
+[numthreads(1024, 1, 1)]
 void CalcWithSpread(uint3 id: SV_DispatchThreadID)
 {
 	float spread = RW_Selects[id.x];
@@ -157,232 +162,286 @@ void CalcWithSpread(uint3 id: SV_DispatchThreadID)
 	RW_Result4[id.x] = lerp(origin, _To, clamp(remap(res, _FromStep, _ToStep, 0, 1), 0, 1));
 }
 
+[numthreads(1024, 1, 1)]
+void MappedTo01(uint3 id: SV_DispatchThreadID)
+{
+	float4 origin = RW_Result4[id.x];
+	RW_Result4[id.x] = origin * .5 + .5;
+}
+
 int _WriteType;
 bool _Clamp;
 float _ClampMin;
 float _ClampMax;
 int _OriginPass;
-[numthreads(1024,1,1)]
+[numthreads(1024, 1, 1)]
 void Result1(uint3 id: SV_DispatchThreadID)
 {
 	int select = any(RW_Selects[id.x]);
 	float pre = RW_Result1[id.x];
 	float4 origin4 = _Origin4[id.x];
 	float origin = 0;
-	switch(_OriginPass)
+	switch (_OriginPass)
 	{
-		case 1:
+	case 1:
 		origin = origin4.y;
 		break;
-		case 2:
+	case 2:
 		origin = origin4.z;
 		break;
-		case 3:
+	case 3:
 		origin = origin4.w;
 		break;
-		default:
+	default:
 		origin = origin4.x;
 		break;
 	}
 	float res = 0;
-	switch(_WriteType)
+	switch (_WriteType)
 	{
-		case 0:
+	case 0:
 		res = lerp(pre, origin, select);
 		break;
-		case 1:
+	case 1:
 		res = pre + origin * select;
 		break;
-		case 2:
+	case 2:
 		res = pre - origin * select;
 		break;
-		case 3:
+	case 3:
 		res = pre * origin;
 		res = lerp(pre, res, select);
 		break;
 	}
-	if(_Clamp)
+	if (_Clamp)
 		res = clamp(res, _ClampMin, _ClampMax);
 	RW_Result1[id.x] = res;
 }
 
-[numthreads(1024,1,1)]
+[numthreads(1024, 1, 1)]
 void Result2(uint3 id: SV_DispatchThreadID)
 {
 	int select = any(RW_Selects[id.x]);
 	float2 pre = RW_Result2[id.x];
 	float2 origin = _Origin4[id.x].xy;
 	float2 res = 0;
-	switch(_WriteType)
+	switch (_WriteType)
 	{
-		case 0:
+	case 0:
 		res = lerp(pre, origin, select);
 		break;
-		case 1:
+	case 1:
 		res = pre + origin * select;
 		break;
-		case 2:
+	case 2:
 		res = pre - origin * select;
 		break;
-		case 3:
+	case 3:
 		res = pre * origin;
 		res = lerp(pre, res, select);
 		break;
 	}
-	if(_Clamp)
+	if (_Clamp)
 		res = clamp(res, _ClampMin, _ClampMax);
 	RW_Result2[id.x] = res;
 }
 
-[numthreads(1024,1,1)]
+[numthreads(1024, 1, 1)]
 void Result3(uint3 id: SV_DispatchThreadID)
 {
 	int select = any(RW_Selects[id.x]);
 	float3 pre = RW_Result3[id.x];
 	float3 origin = _Origin4[id.x].xyz;
 	float3 res = 0;
-	switch(_WriteType)
+	switch (_WriteType)
 	{
-		case 0:
+	case 0:
 		res = lerp(pre, origin, select);
 		break;
-		case 1:
+	case 1:
 		res = pre + origin * select;
 		break;
-		case 2:
+	case 2:
 		res = pre - origin * select;
 		break;
-		case 3:
+	case 3:
 		res = pre * origin;
 		res = lerp(pre, res, select);
 		break;
 	}
-	if(_Clamp)
+	if (_Clamp)
 		res = clamp(res, _ClampMin, _ClampMax);
 	RW_Result3[id.x] = res;
 }
 
-[numthreads(1024,1,1)]
+[numthreads(1024, 1, 1)]
 void Result4(uint3 id: SV_DispatchThreadID)
 {
 	int select = any(RW_Selects[id.x]);
 	float4 pre = RW_Result4[id.x];
 	float4 origin = _Origin4[id.x];
 	float4 res = 0;
-	switch(_WriteType)
+	switch (_WriteType)
 	{
-		case 0:
+	case 0:
 		res = lerp(pre, origin, select);
 		break;
-		case 1:
+	case 1:
 		res = pre + origin * select;
 		break;
-		case 2:
+	case 2:
 		res = pre - origin * select;
 		break;
-		case 3:
+	case 3:
 		res = pre * origin;
 		res = lerp(pre, res, select);
 		break;
 	}
-	if(_Clamp)
+	if (_Clamp)
 		res = clamp(res, _ClampMin, _ClampMax);
 	RW_Result4[id.x] = res;
 }
 
-[numthreads(1024,1,1)]
+[numthreads(1024, 1, 1)]
+void Origin2To1(uint3 id: SV_DispatchThreadID)
+{
+	float2 origin = _Origin2[id.x];
+	switch (_OriginPass)
+	{
+	case 1:
+		RW_Result1[id.x] = origin.y;
+		break;
+	default:
+		RW_Result1[id.x] = origin.x;
+		break;
+	}
+}
+
+[numthreads(1024, 1, 1)]
 void Origin3To1(uint3 id: SV_DispatchThreadID)
 {
 	float3 origin = _Origin3[id.x];
-	switch(_OriginPass)
+	switch (_OriginPass)
 	{
-		case 1:
+	case 1:
 		RW_Result1[id.x] = origin.y;
 		break;
-		case 2:
+	case 2:
 		RW_Result1[id.x] = origin.z;
 		break;
-		default:
+	default:
 		RW_Result1[id.x] = origin.x;
 		break;
 	}
 }
 
-[numthreads(1024,1,1)]
+[numthreads(1024, 1, 1)]
 void Origin4To1(uint3 id: SV_DispatchThreadID)
 {
 	float4 origin = _Origin4[id.x];
-	switch(_OriginPass)
+	switch (_OriginPass)
 	{
-		case 1:
+	case 1:
 		RW_Result1[id.x] = origin.y;
 		break;
-		case 2:
+	case 2:
 		RW_Result1[id.x] = origin.z;
 		break;
-		case 3:
+	case 3:
 		RW_Result1[id.x] = origin.w;
 		break;
-		default:
+	default:
 		RW_Result1[id.x] = origin.x;
 		break;
 	}
 }
 
+[numthreads(1024, 1, 1)]
+void Origin4To2(uint3 id: SV_DispatchThreadID)
+{
+	float4 origin = _Origin4[id.x];
+	RW_Result2[id.x] = origin.xy;
+}
+
+[numthreads(1024, 1, 1)]
+void Origin4To3(uint3 id: SV_DispatchThreadID)
+{
+	float4 origin = _Origin4[id.x];
+	RW_Result3[id.x] = origin.xyz;
+}
+
 int _ResultPass;
-[numthreads(1024,1,1)]
+[numthreads(1024, 1, 1)]
+void Origin1To2(uint3 id: SV_DispatchThreadID)
+{
+	float origin = _Origin1[id.x];
+	switch (_ResultPass)
+	{
+	case 0:
+		RW_Result2[id.x].x = origin;
+		break;
+	case 1:
+		RW_Result2[id.x].y = origin;
+		break;
+	default:
+		RW_Result2[id.x] = origin;
+		break;
+	}
+}
+
+[numthreads(1024, 1, 1)]
 void Origin1To3(uint3 id: SV_DispatchThreadID)
 {
 	float origin = _Origin1[id.x];
-	switch(_ResultPass)
+	switch (_ResultPass)
 	{
-		case 0:
+	case 0:
 		RW_Result3[id.x].x = origin;
 		break;
-		case 1:
+	case 1:
 		RW_Result3[id.x].y = origin;
 		break;
-		case 2:
+	case 2:
 		RW_Result3[id.x].z = origin;
 		break;
-		default:
+	default:
 		RW_Result3[id.x] = origin;
 		break;
 	}
 }
 
-[numthreads(1024,1,1)]
+[numthreads(1024, 1, 1)]
 void Origin1To4(uint3 id: SV_DispatchThreadID)
 {
 	float origin = _Origin1[id.x];
-	switch(_ResultPass)
+	switch (_ResultPass)
 	{
-		case 0:
+	case 0:
 		RW_Result4[id.x].x = origin;
 		break;
-		case 1:
+	case 1:
 		RW_Result4[id.x].y = origin;
 		break;
-		case 2:
+	case 2:
 		RW_Result4[id.x].z = origin;
 		break;
-		case 3:
+	case 3:
 		RW_Result4[id.x].w = origin;
 		break;
-		default:
+	default:
 		RW_Result4[id.x] = origin;
 		break;
 	}
 }
 
-[numthreads(1024,1,1)]
+[numthreads(1024, 1, 1)]
 void Origin2To4(uint3 id: SV_DispatchThreadID)
 {
 	float2 origin = _Origin2[id.x];
 	RW_Result4[id.x].xy = origin;
 }
 
-[numthreads(1024,1,1)]
+[numthreads(1024, 1, 1)]
 void Origin3To4(uint3 id: SV_DispatchThreadID)
 {
 	float3 origin = _Origin3[id.x];

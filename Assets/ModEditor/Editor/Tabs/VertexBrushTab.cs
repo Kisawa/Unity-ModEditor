@@ -232,7 +232,7 @@ namespace ModEditor
             Mouse.Update -= Mouse_Update;
             ScrollWheel.Update -= ScrollWheel_Update;
             calcUtilInstances[window.Manager.CalcUtilIndex].OnLostFocus();
-            if(window.Manager.WriteType == WriteType.OtherUtil)
+            if (window.Manager.WriteType == WriteType.OtherUtil)
                 brushUtilInstances[window.Manager.BrushUtilIndex].OnLostFocus();
             WriteCommand = false;
         }
@@ -342,7 +342,7 @@ namespace ModEditor
                 EditorGUILayout.EndVertical();
                 EndCheckWriteCommand();
             }
-            
+
             EditorGUILayout.EndVertical();
             EditorGUI.indentLevel = 0;
         }
@@ -415,6 +415,7 @@ namespace ModEditor
             if (window.Manager.WriteUnfold)
             {
                 EditorGUI.indentLevel = 2;
+
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Clamp:", labelStyle, GUILayout.Width(100));
                 if (GUILayout.Button(window.Manager.VertexBrushClamp ? window.toggleOnContent : window.toggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(20)))
@@ -434,6 +435,7 @@ namespace ModEditor
                     EditorGUI.indentLevel--;
                 }
                 GUILayout.Space(5);
+
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Type:", labelStyle, GUILayout.Width(100));
                 WriteType preWriteType = window.Manager.WriteType;
@@ -469,19 +471,19 @@ namespace ModEditor
                         presetTargetType = true;
                     }
                 }
-                else if(preWriteType == WriteType.OtherUtil)
+                else if (preWriteType == WriteType.OtherUtil)
                     brushUtilInstances[window.Manager.BrushUtilIndex].OnLostFocus();
                 GUILayout.Space(5);
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Target Type:", labelStyle, GUILayout.Width(100));
                 EditorGUI.BeginDisabledGroup(presetTargetType);
                 window.Manager.WriteTargetType = (WriteTargetType)EditorGUILayout.EnumPopup(window.Manager.WriteTargetType, GUILayout.Width(140));
-                if (window.Manager.WriteTargetType == WriteTargetType.VertexColor)
-                {
-                    window.Manager.VertexBrushClamp = true;
-                    window.Manager.vertexBrushClampMin = 0;
-                    window.Manager.vertexBrushClampMax = 1;
-                }
+                //if (window.Manager.WriteTargetType == WriteTargetType.VertexColor)
+                //{
+                //    window.Manager.VertexBrushClamp = true;
+                //    window.Manager.vertexBrushClampMin = 0;
+                //    window.Manager.vertexBrushClampMax = 1;
+                //}
                 EditorGUI.EndDisabledGroup();
                 EditorGUILayout.EndHorizontal();
                 if (window.Manager.WriteTargetType == WriteTargetType.Custom)
@@ -505,6 +507,7 @@ namespace ModEditor
                 EditorGUILayout.EndHorizontal();
                 return;
             }
+            string[] pass2Str = new string[] { "X", "Y" };
             string[] pass3Str = new string[] { "X", "Y", "Z" };
             if (passCount > 0)
             {
@@ -513,10 +516,20 @@ namespace ModEditor
                 window.Manager.CustomTargetType_X = (CustomTargetType)EditorGUILayout.EnumPopup(window.Manager.CustomTargetType_X, GUILayout.Width(140));
                 if (window.Manager.CustomTargetType_X != CustomTargetType.None)
                 {
-                    if (window.Manager.CustomTargetType_X == CustomTargetType.Vertex || window.Manager.CustomTargetType_X == CustomTargetType.Normal)
-                        window.Manager.CustomTargetPass_X = (TargetPassType)EditorGUILayout.Popup((int)window.Manager.CustomTargetPass_X, pass3Str, GUILayout.Width(80));
-                    else
-                        window.Manager.CustomTargetPass_X = (TargetPassType)EditorGUILayout.EnumPopup(window.Manager.CustomTargetPass_X, GUILayout.Width(80));
+                    switch (window.Manager.CustomTargetType_X)
+                    {
+                        case CustomTargetType.Vertex:
+                        case CustomTargetType.Normal:
+                            window.Manager.CustomTargetPass_X = (TargetPassType)EditorGUILayout.Popup((int)window.Manager.CustomTargetPass_X, pass3Str, GUILayout.Width(80));
+                            break;
+                        case CustomTargetType.UV2:
+                        case CustomTargetType.UV3:
+                            window.Manager.CustomTargetPass_X = (TargetPassType)EditorGUILayout.Popup((int)window.Manager.CustomTargetPass_X, pass2Str, GUILayout.Width(80));
+                            break;
+                        default:
+                            window.Manager.CustomTargetPass_X = (TargetPassType)EditorGUILayout.EnumPopup(window.Manager.CustomTargetPass_X, GUILayout.Width(80));
+                            break;
+                    }
                 }
                 EditorGUILayout.EndHorizontal();
             }
@@ -527,10 +540,20 @@ namespace ModEditor
                 window.Manager.CustomTargetType_Y = (CustomTargetType)EditorGUILayout.EnumPopup(window.Manager.CustomTargetType_Y, GUILayout.Width(140));
                 if (window.Manager.CustomTargetType_Y != CustomTargetType.None)
                 {
-                    if (window.Manager.CustomTargetType_Y == CustomTargetType.Vertex || window.Manager.CustomTargetType_Y == CustomTargetType.Normal)
-                        window.Manager.CustomTargetPass_Y = (TargetPassType)EditorGUILayout.Popup((int)window.Manager.CustomTargetPass_Y, pass3Str, GUILayout.Width(80));
-                    else
-                        window.Manager.CustomTargetPass_Y = (TargetPassType)EditorGUILayout.EnumPopup(window.Manager.CustomTargetPass_Y, GUILayout.Width(80));
+                    switch (window.Manager.CustomTargetType_Y)
+                    {
+                        case CustomTargetType.Vertex:
+                        case CustomTargetType.Normal:
+                            window.Manager.CustomTargetPass_Y = (TargetPassType)EditorGUILayout.Popup((int)window.Manager.CustomTargetPass_Y, pass3Str, GUILayout.Width(80));
+                            break;
+                        case CustomTargetType.UV2:
+                        case CustomTargetType.UV3:
+                            window.Manager.CustomTargetPass_Y = (TargetPassType)EditorGUILayout.Popup((int)window.Manager.CustomTargetPass_Y, pass2Str, GUILayout.Width(80));
+                            break;
+                        default:
+                            window.Manager.CustomTargetPass_Y = (TargetPassType)EditorGUILayout.EnumPopup(window.Manager.CustomTargetPass_Y, GUILayout.Width(80));
+                            break;
+                    }
                 }
                 EditorGUILayout.EndHorizontal();
             }
@@ -541,10 +564,20 @@ namespace ModEditor
                 window.Manager.CustomTargetType_Z = (CustomTargetType)EditorGUILayout.EnumPopup(window.Manager.CustomTargetType_Z, GUILayout.Width(140));
                 if (window.Manager.CustomTargetType_Z != CustomTargetType.None)
                 {
-                    if (window.Manager.CustomTargetType_Z == CustomTargetType.Vertex || window.Manager.CustomTargetType_Z == CustomTargetType.Normal)
-                        window.Manager.CustomTargetPass_Z = (TargetPassType)EditorGUILayout.Popup((int)window.Manager.CustomTargetPass_Z, pass3Str, GUILayout.Width(80));
-                    else
-                        window.Manager.CustomTargetPass_Z = (TargetPassType)EditorGUILayout.EnumPopup(window.Manager.CustomTargetPass_Z, GUILayout.Width(80));
+                    switch (window.Manager.CustomTargetType_Z)
+                    {
+                        case CustomTargetType.Vertex:
+                        case CustomTargetType.Normal:
+                            window.Manager.CustomTargetPass_Z = (TargetPassType)EditorGUILayout.Popup((int)window.Manager.CustomTargetPass_Z, pass3Str, GUILayout.Width(80));
+                            break;
+                        case CustomTargetType.UV2:
+                        case CustomTargetType.UV3:
+                            window.Manager.CustomTargetPass_Z = (TargetPassType)EditorGUILayout.Popup((int)window.Manager.CustomTargetPass_Z, pass2Str, GUILayout.Width(80));
+                            break;
+                        default:
+                            window.Manager.CustomTargetPass_Z = (TargetPassType)EditorGUILayout.EnumPopup(window.Manager.CustomTargetPass_Z, GUILayout.Width(80));
+                            break;
+                    }
                 }
                 EditorGUILayout.EndHorizontal();
             }
@@ -555,10 +588,20 @@ namespace ModEditor
                 window.Manager.CustomTargetType_W = (CustomTargetType)EditorGUILayout.EnumPopup(window.Manager.CustomTargetType_W, GUILayout.Width(140));
                 if (window.Manager.CustomTargetType_W != CustomTargetType.None)
                 {
-                    if (window.Manager.CustomTargetType_W == CustomTargetType.Vertex || window.Manager.CustomTargetType_W == CustomTargetType.Normal)
-                        window.Manager.CustomTargetPass_W = (TargetPassType)EditorGUILayout.Popup((int)window.Manager.CustomTargetPass_W, pass3Str, GUILayout.Width(80));
-                    else
-                        window.Manager.CustomTargetPass_W = (TargetPassType)EditorGUILayout.EnumPopup(window.Manager.CustomTargetPass_W, GUILayout.Width(80));
+                    switch (window.Manager.CustomTargetType_W)
+                    {
+                        case CustomTargetType.Vertex:
+                        case CustomTargetType.Normal:
+                            window.Manager.CustomTargetPass_W = (TargetPassType)EditorGUILayout.Popup((int)window.Manager.CustomTargetPass_W, pass3Str, GUILayout.Width(80));
+                            break;
+                        case CustomTargetType.UV2:
+                        case CustomTargetType.UV3:
+                            window.Manager.CustomTargetPass_W = (TargetPassType)EditorGUILayout.Popup((int)window.Manager.CustomTargetPass_W, pass2Str, GUILayout.Width(80));
+                            break;
+                        default:
+                            window.Manager.CustomTargetPass_W = (TargetPassType)EditorGUILayout.EnumPopup(window.Manager.CustomTargetPass_W, GUILayout.Width(80));
+                            break;
+                    }
                 }
                 EditorGUILayout.EndHorizontal();
             }

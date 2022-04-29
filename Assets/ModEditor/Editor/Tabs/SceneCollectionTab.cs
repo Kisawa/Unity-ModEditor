@@ -89,6 +89,8 @@ namespace ModEditor
             EditorGUILayout.Space(10);
             drawNormalMapViewUtil();
             EditorGUILayout.Space(10);
+            drawMapViewUtil();
+            EditorGUILayout.Space(10);
             EditorGUILayout.EndScrollView();
         }
 
@@ -310,6 +312,10 @@ namespace ModEditor
                 GUIStyle labelStyle = GUI.skin.GetStyle("LODRenderersText");
                 EditorGUI.BeginDisabledGroup(!window.Manager.UVView);
                 EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("UV Select", labelStyle, GUILayout.Width(120));
+                window.Manager.UVViewType = (UVType)EditorGUILayout.EnumPopup(window.Manager.UVViewType, GUILayout.Width(165));
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Alpha", labelStyle, GUILayout.Width(120));
                 window.Manager.UVAlpha = EditorGUILayout.Slider(window.Manager.UVAlpha, 0, 1, GUILayout.Width(165));
                 EditorGUILayout.EndHorizontal();
@@ -373,6 +379,42 @@ namespace ModEditor
             }
             GUILayout.Label("Normal Map View", "AboutWIndowLicenseLabel");
             EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndVertical();
+            EditorGUI.indentLevel = 0;
+        }
+
+        void drawMapViewUtil()
+        {
+            EditorGUILayout.BeginVertical("AnimationEventTooltip");
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button(window.Manager.MapView ? window.olToggleOnContent : window.olToggleContent, "AboutWIndowLicenseLabel", GUILayout.Width(20)))
+            {
+                window.Manager.MapView = !window.Manager.MapView;
+                refreshBuffer();
+            }
+            if (GUILayout.Button("Map View", "AboutWIndowLicenseLabel", GUILayout.Width(150)) ||
+                GUILayout.Button(window.Manager.MapViewUnfold ? window.dropdownContent : window.dropdownRightContent, "AboutWIndowLicenseLabel", GUILayout.Width(window.position.width - 205)))
+                window.Manager.MapViewUnfold = !window.Manager.MapViewUnfold;
+            EditorGUILayout.EndHorizontal();
+            if (window.Manager.MapViewUnfold)
+            {
+                EditorGUI.indentLevel = 2;
+                GUIStyle labelStyle = GUI.skin.GetStyle("LODRenderersText");
+                EditorGUI.BeginDisabledGroup(!window.Manager.MapView);
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Target Map", labelStyle, GUILayout.Width(120));
+                window.Manager.MapViewTex = EditorGUILayout.ObjectField(window.Manager.MapViewTex, typeof(Texture), false, GUILayout.Width(165)) as Texture;
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("View Pass", labelStyle, GUILayout.Width(120));
+                window.Manager.MapViewPass = (TexViewPass)EditorGUILayout.EnumPopup(window.Manager.MapViewPass, GUILayout.Width(165));
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Color Tint", labelStyle, GUILayout.Width(120));
+                window.Manager.MapViewColorTint = EditorGUILayout.ColorField(window.Manager.MapViewColorTint, GUILayout.Width(165));
+                EditorGUILayout.EndHorizontal();
+                EditorGUI.EndDisabledGroup();
+            }
             EditorGUILayout.EndVertical();
             EditorGUI.indentLevel = 0;
         }
@@ -480,6 +522,8 @@ namespace ModEditor
                         cmd.DrawRenderer(renderer, window.Mat_Util, j, 6);
                     if (window.Manager.NormalMapView)
                         cmd.DrawRenderer(renderer, window.Mat_Util, j, 7);
+                    if (window.Manager.MapView)
+                        cmd.DrawRenderer(renderer, window.Mat_Util, j, 11);
                 }
                 if (window.ToolType == ModEditorToolType.VertexBrush)
                 {
@@ -523,8 +567,13 @@ namespace ModEditor
             window.Mat_Util.SetInt("_GridWithZTest", window.Manager.GridWithZTest ? (int)CompareFunction.LessEqual : (int)CompareFunction.Always);
 
             window.Mat_Util.SetFloat("_UVAlpha", window.Manager.UVAlpha);
+            window.Mat_Util.SetFloat("_UVType", (int)window.Manager.UVViewType);
 
             window.Mat_Util.SetFloat("_DepthCompress", window.Manager.DepthCompress);
+
+            window.Mat_Util.SetTexture("_MapViewTex", window.Manager.MapViewTex);
+            window.Mat_Util.SetInt("_MapViewPass", (int)window.Manager.MapViewPass);
+            window.Mat_Util.SetColor("_MapViewColorTint", window.Manager.MapViewColorTint);
         }
     }
 }

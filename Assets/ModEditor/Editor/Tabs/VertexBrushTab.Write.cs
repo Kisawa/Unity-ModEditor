@@ -324,10 +324,7 @@ namespace ModEditor
                     switch (window.Manager.WriteTargetType)
                     {
                         case WriteTargetType.VertexColor:
-                            Color[] colors = mesh.colors;
-                            if (colors.Length != mesh.vertexCount)
-                                colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
-                            mesh.colors = data.GetResultColor(writeType, colors, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax);
+                            mesh.colors = data.GetResultColor(writeType, CalcUtil.CheckArrayNotNull(mesh.colors, mesh.vertexCount), window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax);
                             break;
                         case WriteTargetType.Vertex:
                             mesh.vertices = data.GetResult(writeType, mesh.vertices, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax);
@@ -338,6 +335,12 @@ namespace ModEditor
                             break;
                         case WriteTargetType.Tangent:
                             mesh.tangents = data.GetResult(writeType, mesh.tangents, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax);
+                            break;
+                        case WriteTargetType.UV2:
+                            mesh.uv2 = data.GetResult(writeType, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax);
+                            break;
+                        case WriteTargetType.UV3:
+                            mesh.uv3 = data.GetResult(writeType, CalcUtil.CheckArrayNotNull(mesh.uv3, mesh.vertexCount), window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax);
                             break;
                         case WriteTargetType.Custom:
                             setCustomData(writeType, window.Manager.CustomTargetType_X, TargetPassType.X, window.Manager.CustomTargetPass_X, mesh, data);
@@ -355,10 +358,7 @@ namespace ModEditor
             switch (customTarget)
             {
                 case CustomTargetType.VertexColor:
-                    Color[] colors = mesh.colors;
-                    if (colors.Length != mesh.vertexCount)
-                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
-                    mesh.colors = data.GetResultCustom(writeType, inPass, outPass, colors, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax);
+                    mesh.colors = data.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.colors, mesh.vertexCount), window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax);
                     break;
                 case CustomTargetType.Vertex:
                     mesh.vertices = data.GetResultCustom(writeType, inPass, outPass, mesh.vertices, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax);
@@ -369,6 +369,12 @@ namespace ModEditor
                     break;
                 case CustomTargetType.Tangent:
                     mesh.tangents = data.GetResultCustom(writeType, inPass, outPass, mesh.tangents, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax);
+                    break;
+                case CustomTargetType.UV2:
+                    mesh.uv2 = data.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax);
+                    break;
+                case CustomTargetType.UV3:
+                    mesh.uv3 = data.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.uv3, mesh.vertexCount), window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax);
                     break;
             }
         }
@@ -452,10 +458,7 @@ namespace ModEditor
             switch (window.Manager.WriteTargetType)
             {
                 case WriteTargetType.VertexColor:
-                    Color[] colors = mesh.colors;
-                    if (colors.Length != mesh.vertexCount)
-                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
-                    mesh.colors = CalcUtil.Self.GetResultColor(window.Manager.WriteType, colors, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    mesh.colors = CalcUtil.Self.GetResultColor(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.colors, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case WriteTargetType.Vertex:
                     mesh.vertices = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.vertices, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
@@ -465,6 +468,12 @@ namespace ModEditor
                     break;
                 case WriteTargetType.Tangent:
                     mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.tangents, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    break;
+                case WriteTargetType.UV2:
+                    mesh.uv2 = CalcUtil.Self.GetResult(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    break;
+                case WriteTargetType.UV3:
+                    mesh.uv3 = CalcUtil.Self.GetResult(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.uv3, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case WriteTargetType.Custom:
                     setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_X, window.Manager.CustomTargetPass_X, mesh, result);
@@ -477,10 +486,7 @@ namespace ModEditor
             switch (window.Manager.WriteTargetType)
             {
                 case WriteTargetType.VertexColor:
-                    Color[] colors = mesh.colors;
-                    if (colors.Length != mesh.vertexCount)
-                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
-                    mesh.colors = CalcUtil.Self.GetResultColor(window.Manager.WriteType, colors, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    mesh.colors = CalcUtil.Self.GetResultColor(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.colors, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case WriteTargetType.Vertex:
                     mesh.vertices = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.vertices, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
@@ -490,6 +496,12 @@ namespace ModEditor
                     break;
                 case WriteTargetType.Tangent:
                     mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.tangents, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    break;
+                case WriteTargetType.UV2:
+                    mesh.uv2 = CalcUtil.Self.GetResult(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    break;
+                case WriteTargetType.UV3:
+                    mesh.uv3 = CalcUtil.Self.GetResult(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.uv3, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case WriteTargetType.Custom:
                     setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_X, TargetPassType.X, window.Manager.CustomTargetPass_X, mesh, result);
@@ -503,10 +515,7 @@ namespace ModEditor
             switch (window.Manager.WriteTargetType)
             {
                 case WriteTargetType.VertexColor:
-                    Color[] colors = mesh.colors;
-                    if (colors.Length != mesh.vertexCount)
-                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
-                    mesh.colors = CalcUtil.Self.GetResultColor(window.Manager.WriteType, colors, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    mesh.colors = CalcUtil.Self.GetResultColor(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.colors, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case WriteTargetType.Vertex:
                     mesh.vertices = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.vertices, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
@@ -516,6 +525,12 @@ namespace ModEditor
                     break;
                 case WriteTargetType.Tangent:
                     mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.tangents, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    break;
+                case WriteTargetType.UV2:
+                    mesh.uv2 = CalcUtil.Self.GetResult(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    break;
+                case WriteTargetType.UV3:
+                    mesh.uv3 = CalcUtil.Self.GetResult(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.uv3, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case WriteTargetType.Custom:
                     setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_X, TargetPassType.X, window.Manager.CustomTargetPass_X, mesh, result);
@@ -530,10 +545,7 @@ namespace ModEditor
             switch (window.Manager.WriteTargetType)
             {
                 case WriteTargetType.VertexColor:
-                    Color[] colors = mesh.colors;
-                    if (colors.Length != mesh.vertexCount)
-                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
-                    mesh.colors = CalcUtil.Self.GetResultColor(window.Manager.WriteType, colors, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    mesh.colors = CalcUtil.Self.GetResultColor(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.colors, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case WriteTargetType.Vertex:
                     mesh.vertices = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.vertices, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
@@ -543,6 +555,12 @@ namespace ModEditor
                     break;
                 case WriteTargetType.Tangent:
                     mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.tangents, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    break;
+                case WriteTargetType.UV2:
+                    mesh.uv2 = CalcUtil.Self.GetResult(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    break;
+                case WriteTargetType.UV3:
+                    mesh.uv3 = CalcUtil.Self.GetResult(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.uv3, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case WriteTargetType.Custom:
                     setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_X, TargetPassType.X, window.Manager.CustomTargetPass_X, mesh, result);
@@ -558,10 +576,7 @@ namespace ModEditor
             switch (window.Manager.WriteTargetType)
             {
                 case WriteTargetType.VertexColor:
-                    Color[] colors = mesh.colors;
-                    if (colors.Length != mesh.vertexCount)
-                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
-                    mesh.colors = CalcUtil.Self.GetResultColor(window.Manager.WriteType, colors, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    mesh.colors = CalcUtil.Self.GetResultColor(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.colors, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case WriteTargetType.Vertex:
                     mesh.vertices = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.vertices, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
@@ -571,6 +586,12 @@ namespace ModEditor
                     break;
                 case WriteTargetType.Tangent:
                     mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.tangents, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    break;
+                case WriteTargetType.UV2:
+                    mesh.uv2 = CalcUtil.Self.GetResult(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    break;
+                case WriteTargetType.UV3:
+                    mesh.uv3 = CalcUtil.Self.GetResult(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.uv3, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case WriteTargetType.Custom:
                     setCustomData(window.Manager.WriteType, window.Manager.CustomTargetType_X, TargetPassType.X, window.Manager.CustomTargetPass_X, mesh, result);
@@ -586,10 +607,7 @@ namespace ModEditor
             switch (customTarget)
             {
                 case CustomTargetType.VertexColor:
-                    Color[] colors = mesh.colors;
-                    if (colors.Length != mesh.vertexCount)
-                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
-                    mesh.colors = CalcUtil.Self.GetResultCustom(writeType, TargetPassType.X, outPass, colors, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    mesh.colors = CalcUtil.Self.GetResultCustom(writeType, TargetPassType.X, outPass, CalcUtil.CheckArrayNotNull(mesh.colors, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case CustomTargetType.Vertex:
                     mesh.vertices = CalcUtil.Self.GetResultCustom(writeType, TargetPassType.X, outPass, mesh.vertices, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
@@ -599,6 +617,12 @@ namespace ModEditor
                     break;
                 case CustomTargetType.Tangent:
                     mesh.tangents = CalcUtil.Self.GetResultCustom(writeType, TargetPassType.X, outPass, mesh.tangents, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    break;
+                case CustomTargetType.UV2:
+                    mesh.uv2 = CalcUtil.Self.GetResultCustom(writeType, TargetPassType.X, outPass, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    break;
+                case CustomTargetType.UV3:
+                    mesh.uv3 = CalcUtil.Self.GetResultCustom(writeType, TargetPassType.X, outPass, CalcUtil.CheckArrayNotNull(mesh.uv3, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
             }
         }
@@ -613,10 +637,7 @@ namespace ModEditor
             switch (customTarget)
             {
                 case CustomTargetType.VertexColor:
-                    Color[] colors = mesh.colors;
-                    if (colors.Length != mesh.vertexCount)
-                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
-                    mesh.colors = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, colors, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    mesh.colors = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.colors, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case CustomTargetType.Vertex:
                     mesh.vertices = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.vertices, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
@@ -626,6 +647,12 @@ namespace ModEditor
                     break;
                 case CustomTargetType.Tangent:
                     mesh.tangents = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.tangents, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    break;
+                case CustomTargetType.UV2:
+                    mesh.uv2 = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    break;
+                case CustomTargetType.UV3:
+                    mesh.uv3 = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.uv3, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
             }
         }
@@ -640,10 +667,7 @@ namespace ModEditor
             switch (customTarget)
             {
                 case CustomTargetType.VertexColor:
-                    Color[] colors = mesh.colors;
-                    if (colors.Length != mesh.vertexCount)
-                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
-                    mesh.colors = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, colors, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    mesh.colors = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.colors, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case CustomTargetType.Vertex:
                     mesh.vertices = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.vertices, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
@@ -653,6 +677,12 @@ namespace ModEditor
                     break;
                 case CustomTargetType.Tangent:
                     mesh.tangents = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.tangents, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    break;
+                case CustomTargetType.UV2:
+                    mesh.uv2 = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    break;
+                case CustomTargetType.UV3:
+                    mesh.uv3 = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.uv3, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
             }
         }
@@ -662,10 +692,7 @@ namespace ModEditor
             switch (customTarget)
             {
                 case CustomTargetType.VertexColor:
-                    Color[] colors = mesh.colors;
-                    if (colors.Length != mesh.vertexCount)
-                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
-                    mesh.colors = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, colors, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    mesh.colors = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.colors, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case CustomTargetType.Vertex:
                     mesh.vertices = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.vertices, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
@@ -675,6 +702,12 @@ namespace ModEditor
                     break;
                 case CustomTargetType.Tangent:
                     mesh.tangents = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.tangents, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    break;
+                case CustomTargetType.UV2:
+                    mesh.uv2 = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    break;
+                case CustomTargetType.UV3:
+                    mesh.uv3 = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.uv3, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
             }
         }
@@ -684,10 +717,7 @@ namespace ModEditor
             switch (customTarget)
             {
                 case CustomTargetType.VertexColor:
-                    Color[] colors = mesh.colors;
-                    if (colors.Length != mesh.vertexCount)
-                        colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
-                    mesh.colors = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, colors, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    mesh.colors = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.colors, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case CustomTargetType.Vertex:
                     mesh.vertices = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.vertices, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
@@ -697,6 +727,12 @@ namespace ModEditor
                     break;
                 case CustomTargetType.Tangent:
                     mesh.tangents = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.tangents, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    break;
+                case CustomTargetType.UV2:
+                    mesh.uv2 = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    break;
+                case CustomTargetType.UV3:
+                    mesh.uv3 = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.uv3, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
             }
         }
