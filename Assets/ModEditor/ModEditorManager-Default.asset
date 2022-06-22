@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 452e47ba08746704e8fda6167da66445, type: 3}
+  m_Name: ModEditorManager-Default
+  m_EditorClassIdentifier: 
+  lockTarget: 1
+  target:
+    exposedName: '#UNKNOWN:1'
+    defaultValue: {fileID: 0}
+  gameCameraFollow: 1
+  actionableDic:
+    parent: {fileID: 11400000}
+    keyList:
+    - '#UNKNOWN:1'
+    - '#UNKNOWN:2'
+    - '#UNKNOWN:3'
+    valList: 010101
+  meshDic:
+    keyList:
+    - '#UNKNOWN:2'
+    originList:
+    - {fileID: 4300000, guid: d28c0611936373f4182e082ef8eb38f0, type: 2}
+  sceneCollectionView: 1
+  unselectedVertexColor: {r: 1, g: 1, b: 1, a: 1}
+  selectedVertexColor: {r: 0, g: 0, b: 0, a: 1}
+  vertexScale: 1
+  vertexWithZTest: 1
+  hideUnselectedVertex: 0
+  normalView: 0
+  normalViewUnfold: 1
+  normalColor: {r: 1, g: 0, b: 0, a: 1}
+  normalLength: 0.04
+  tangentView: 0
+  tangentViewUnfold: 1
+  tangentColor: {r: 0, g: 1, b: 0, a: 1}
+  tangentLength: 0.08
+  arrowLength: 0.2
+  arrowSize: 0.1
+  gridView: 0
+  gridViewUnfold: 1
+  gridColor: {r: 1, g: 1, b: 1, a: 1}
+  gridWithZTest: 0
+  uvView: 0
+  uvViewUnfold: 1
+  uvAlpha: 1
+  vertexColorView: 1
+  depthMapView: 0
+  depthMapViewUnfold: 1
+  depthCompress: 0.1
+  normalMapView: 0
+  vertexBrushUnfold: 1
+  vertexBrushType: 1
+  vertexBrushStrength: 1
+  vertexBrushColor: {r: 1, g: 1, b: 1, a: 1}
+  vertexBrushColorFrom: {r: 0.61072856, g: 0.2, b: 0.98039216, a: 1}
+  vertexBrushColorFromStep: 0
+  vertexBrushColorTo: {r: 0.1431756, g: 0, b: 1, a: 1}
+  vertexBrushColorToStep: 1
+  vertexBrushViewColor: {r: 0, g: 0, b: 0, a: 0.3}
+  vertexBrushSize: 0.16999997
+  vertexBrushDepth: 20
+  vertexBrushClamp: 1
+  vertexBrushClampMin: 0
+  vertexBrushClampMax: 1
+  writeUnfold: 1
+  writeType: 4
+  writeTargetType: 2
+  customTargetType_X: 0
+  customTargetPass_X: 0
+  customTargetType_Y: 0
+  customTargetPass_Y: 1
+  customTargetType_Z: 0
+  customTargetPass_Z: 2
+  customTargetType_W: 0
+  customTargetPass_W: 3
+  calcUtilUnfold: 1
+  calcUtilIndex: 2
+  brushUtilIndex: 0
+  texBrushTexelSize: {x: 1024, y: 1024}
+  texBrushUnfold: 0
+  texBrushForegroundUnfold: 0
+  texBrushRangeViewColor: {r: 0, g: 1, b: 0, a: 1}
+  textureBaseColor: {r: 1, g: 1, b: 1, a: 1}
+  textureBrushColor: {r: 1, g: 0, b: 0, a: 1}
+  texBrushRange: {x: 0.104999945, y: 0.10499995, z: 0}
+  texUtilUnfold: 0
+  texUtilIndex: 1
+  colorMaskUnfold: 1
+  colorMask: {r: 1, g: 1, b: 1, a: 1}
+  texturePassView: 0
+  textureViewPass: 0

@@ -365,7 +365,8 @@ namespace ModEditor
             CalcUtil.Self.CalcShader.SetVector("_MouseTexcoord", mouseTexcoord);
             CalcUtil.Self.CalcShader.SetFloat("_Size", brushSize);
             CalcUtil.Self.CalcShader.SetFloat("_Depth", brushDepth);
-            CalcUtil.Self.CalcShader.SetMatrix("_MV", camera.worldToCameraMatrix * trans.localToWorldMatrix);
+            Matrix4x4 TRS = Matrix4x4.TRS(trans.position, trans.rotation, Vector3.one);
+            CalcUtil.Self.CalcShader.SetMatrix("_MV", camera.worldToCameraMatrix * TRS);
             CalcUtil.Self.CalcShader.SetMatrix("_P", GL.GetGPUProjectionMatrix(camera.projectionMatrix, false));
             CalcUtil.Self.CalcShader.SetInt("_ClearSpread", clearSpread ? 1 : 0);
             CalcUtil.Self.CalcShader.SetInt("_OnlyZone", Key.Shift ? 1 : 0);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.Linq;
+using UnityEngine.ProBuilder.MeshOperations;
 
 namespace ModEditor
 {
@@ -27,6 +28,10 @@ namespace ModEditor
                         return PassCount.Three;
                     case DataType.Tangent:
                         return PassCount.Four;
+                    case DataType.UV:
+                    case DataType.UV2:
+                    case DataType.UV3:
+                        return PassCount.Two;
                 }
                 return PassCount.Four;
             }
@@ -34,30 +39,54 @@ namespace ModEditor
 
         DataType currentData { get => window.CopyCurrentData; set => window.CopyCurrentData = value; }
 
+        Mesh originMesh { get => window.CopyOriginMesh; set => window.CopyOriginMesh = value; }
+
         public override Vector3[] ExecuteThree(Mesh mesh)
         {
+            if (originMesh != null && originMesh.vertexCount != mesh.vertexCount)
+                return null;
             switch (currentData)
             {
                 case DataType.Vertex:
-                    return mesh.vertices;
+                    return originMesh == null ? mesh.vertices : originMesh.vertices;
                 case DataType.Normal:
-                    return mesh.normals;
+                    return originMesh == null ? mesh.normals : originMesh.normals;
             }
             return null;
         }
 
         public override Vector4[] ExecuteFour(Mesh mesh)
         {
+            if (originMesh != null && originMesh.vertexCount != mesh.vertexCount)
+                return null;
             if (currentData == DataType.Tangent)
-                return mesh.tangents;
+                return originMesh == null ? mesh.tangents : originMesh.tangents;
+            return null;
+        }
+
+        public override Vector2[] ExecuteTwo(Mesh mesh)
+        {
+            if (originMesh != null && originMesh.vertexCount != mesh.vertexCount)
+                return null;
+            switch (currentData)
+            {
+                case DataType.UV:
+                    return originMesh == null ? mesh.uv : originMesh.uv;
+                case DataType.UV2:
+                    return originMesh == null ? mesh.uv2 : originMesh.uv2;
+                case DataType.UV3:
+                    return originMesh == null ? mesh.uv3 : originMesh.uv3;
+            }
             return null;
         }
 
         public override Color[] ExecuteColor(Mesh mesh)
         {
+            if (originMesh != null && originMesh.vertexCount != mesh.vertexCount)
+                return null;
             if (currentData == DataType.VertexColor)
             {
-                Color[] colors = mesh.colors;
+                Color[] colors = originMesh == null ? mesh.colors : originMesh.colors;
                 if (colors.Length != mesh.vertexCount)
                     colors = Enumerable.Repeat(Color.white, mesh.vertexCount).ToArray();
                 return colors;
@@ -69,6 +98,10 @@ namespace ModEditor
         {
             base.Draw(labelStyle, maxWidth);
             EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Origin Mesh:", labelStyle, GUILayout.Width(100));
+            originMesh = (Mesh)EditorGUILayout.ObjectField(originMesh, typeof(Mesh), false, GUILayout.Width(maxWidth - 100));
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Data Select:", labelStyle, GUILayout.Width(100));
             currentData = (DataType)EditorGUILayout.EnumPopup(currentData, GUILayout.Width(140));
             EditorGUILayout.EndHorizontal();
@@ -79,7 +112,10 @@ namespace ModEditor
             VertexColor,
             Vertex,
             Normal,
-            Tangent
+            Tangent,
+            UV,
+            UV2,
+            UV3
         }
     }
 }
