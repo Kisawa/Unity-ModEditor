@@ -128,7 +128,7 @@ namespace ModEditor
             ComputeBuffer _vertexBuffer3 = CalcUtil.Self.GetBuffer3(mesh.vertices);
             for (int i = 0; i < coord.Count; i++)
             {
-                calcShader.SetMatrix("_WorldToLocal", data.trans.worldToLocalMatrix);
+                calcShader.SetMatrix("_WorldToLocal", data.TRS.inverse);
                 calcShader.SetVector("_RelativeWorldPos", coord[i]);
                 calcShader.SetBuffer(kernel_LocalMix, "_Vertex", _vertexBuffer3);
                 calcShader.SetBuffer(kernel_LocalMix, "RW_Mix", _mix3);

@@ -48,6 +48,8 @@ namespace ModEditor
             }
         }
 
+        public virtual Matrix4x4 TRS { get; }
+
         public CalcManager(Renderer renderer, Mesh originMesh)
         {
             trans = renderer.transform;
@@ -298,6 +300,8 @@ namespace ModEditor
             }
         }
 
+        public override Matrix4x4 TRS => trans.localToWorldMatrix;
+
         public CalcManager_Mesh(Renderer renderer, MeshFilter meshFilter) : base(renderer, meshFilter.sharedMesh)
         {
             this.meshFilter = meshFilter;
@@ -315,7 +319,7 @@ namespace ModEditor
             CalcUtil.Self.CalcShader.SetVector("_MouseTexcoord", mouseTexcoord);
             CalcUtil.Self.CalcShader.SetFloat("_Size", brushSize);
             CalcUtil.Self.CalcShader.SetFloat("_Depth", brushDepth);
-            CalcUtil.Self.CalcShader.SetMatrix("_MV", camera.worldToCameraMatrix * trans.localToWorldMatrix);
+            CalcUtil.Self.CalcShader.SetMatrix("_MV", camera.worldToCameraMatrix * TRS);
             CalcUtil.Self.CalcShader.SetMatrix("_P", GL.GetGPUProjectionMatrix(camera.projectionMatrix, false));
             CalcUtil.Self.CalcShader.SetInt("_ClearSpread", clearSpread ? 1 : 0);
             CalcUtil.Self.CalcShader.SetInt("_OnlyZone", Key.Shift ? 1 : 0);
@@ -343,6 +347,8 @@ namespace ModEditor
             }
         }
 
+        public override Matrix4x4 TRS => Matrix4x4.TRS(trans.position, trans.rotation, Vector3.one);
+
         protected Mesh bakedMesh;
 
         public CalcManager_SkinnedMesh(SkinnedMeshRenderer skinnedMesh) : base(skinnedMesh, skinnedMesh.sharedMesh)
@@ -365,7 +371,6 @@ namespace ModEditor
             CalcUtil.Self.CalcShader.SetVector("_MouseTexcoord", mouseTexcoord);
             CalcUtil.Self.CalcShader.SetFloat("_Size", brushSize);
             CalcUtil.Self.CalcShader.SetFloat("_Depth", brushDepth);
-            Matrix4x4 TRS = Matrix4x4.TRS(trans.position, trans.rotation, Vector3.one);
             CalcUtil.Self.CalcShader.SetMatrix("_MV", camera.worldToCameraMatrix * TRS);
             CalcUtil.Self.CalcShader.SetMatrix("_P", GL.GetGPUProjectionMatrix(camera.projectionMatrix, false));
             CalcUtil.Self.CalcShader.SetInt("_ClearSpread", clearSpread ? 1 : 0);
