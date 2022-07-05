@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.Linq;
-using UnityEngine.ProBuilder.MeshOperations;
 
 namespace ModEditor
 {
