@@ -334,7 +334,7 @@ namespace ModEditor
                             mesh.normals = data.GetResult(writeType, mesh.normals, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax);
                             break;
                         case WriteTargetType.Tangent:
-                            mesh.tangents = data.GetResult(writeType, mesh.tangents, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax);
+                            mesh.tangents = data.GetResult(writeType, CalcUtil.CheckArrayNotNull(mesh.tangents, mesh.vertexCount), window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax);
                             break;
                         case WriteTargetType.UV2:
                             mesh.uv2 = data.GetResult(writeType, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax);
@@ -368,7 +368,7 @@ namespace ModEditor
                     mesh.normals = data.GetResultCustom(writeType, inPass, outPass, mesh.normals, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax);
                     break;
                 case CustomTargetType.Tangent:
-                    mesh.tangents = data.GetResultCustom(writeType, inPass, outPass, mesh.tangents, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax);
+                    mesh.tangents = data.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.tangents, mesh.vertexCount), window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax);
                     break;
                 case CustomTargetType.UV2:
                     mesh.uv2 = data.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax);
@@ -467,7 +467,7 @@ namespace ModEditor
                     mesh.normals = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.normals, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case WriteTargetType.Tangent:
-                    mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.tangents, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.tangents, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case WriteTargetType.UV2:
                     mesh.uv2 = CalcUtil.Self.GetResult(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
@@ -495,7 +495,7 @@ namespace ModEditor
                     mesh.normals = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.normals, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case WriteTargetType.Tangent:
-                    mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.tangents, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.tangents, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case WriteTargetType.UV2:
                     mesh.uv2 = CalcUtil.Self.GetResult(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
@@ -524,7 +524,7 @@ namespace ModEditor
                     mesh.normals = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.normals, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case WriteTargetType.Tangent:
-                    mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.tangents, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.tangents, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case WriteTargetType.UV2:
                     mesh.uv2 = CalcUtil.Self.GetResult(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
@@ -554,7 +554,7 @@ namespace ModEditor
                     mesh.normals = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.normals, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case WriteTargetType.Tangent:
-                    mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.tangents, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.tangents, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case WriteTargetType.UV2:
                     mesh.uv2 = CalcUtil.Self.GetResult(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
@@ -585,7 +585,7 @@ namespace ModEditor
                     mesh.normals = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.normals, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case WriteTargetType.Tangent:
-                    mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, mesh.tangents, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    mesh.tangents = CalcUtil.Self.GetResult(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.tangents, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case WriteTargetType.UV2:
                     mesh.uv2 = CalcUtil.Self.GetResult(window.Manager.WriteType, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
@@ -616,7 +616,7 @@ namespace ModEditor
                     mesh.normals = CalcUtil.Self.GetResultCustom(writeType, TargetPassType.X, outPass, mesh.normals, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case CustomTargetType.Tangent:
-                    mesh.tangents = CalcUtil.Self.GetResultCustom(writeType, TargetPassType.X, outPass, mesh.tangents, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    mesh.tangents = CalcUtil.Self.GetResultCustom(writeType, TargetPassType.X, outPass, CalcUtil.CheckArrayNotNull(mesh.tangents, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case CustomTargetType.UV2:
                     mesh.uv2 = CalcUtil.Self.GetResultCustom(writeType, TargetPassType.X, outPass, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
@@ -646,7 +646,7 @@ namespace ModEditor
                     mesh.normals = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.normals, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case CustomTargetType.Tangent:
-                    mesh.tangents = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.tangents, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    mesh.tangents = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.tangents, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case CustomTargetType.UV2:
                     mesh.uv2 = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
@@ -676,7 +676,7 @@ namespace ModEditor
                     mesh.normals = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.normals, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case CustomTargetType.Tangent:
-                    mesh.tangents = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.tangents, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    mesh.tangents = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.tangents, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case CustomTargetType.UV2:
                     mesh.uv2 = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
@@ -701,7 +701,7 @@ namespace ModEditor
                     mesh.normals = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.normals, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case CustomTargetType.Tangent:
-                    mesh.tangents = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.tangents, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    mesh.tangents = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.tangents, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case CustomTargetType.UV2:
                     mesh.uv2 = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
@@ -726,7 +726,7 @@ namespace ModEditor
                     mesh.normals = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.normals, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case CustomTargetType.Tangent:
-                    mesh.tangents = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, mesh.tangents, result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
+                    mesh.tangents = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.tangents, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
                     break;
                 case CustomTargetType.UV2:
                     mesh.uv2 = CalcUtil.Self.GetResultCustom(writeType, inPass, outPass, CalcUtil.CheckArrayNotNull(mesh.uv2, mesh.vertexCount), result, window.Manager.VertexBrushClamp, window.Manager.VertexBrushClampMin, window.Manager.VertexBrushClampMax, _Select);
