@@ -483,10 +483,12 @@ namespace ModEditor
         {
             if (buffer == null)
                 return;
-            if (window.ToolType == ModEditorToolType.VertexBrush)
-                cmd.DrawMesh(screenMesh, Matrix4x4.identity, window.Mat_Util, 0, 8);
             if (window.Manager.Target == null || window.Manager.TargetChildren.Count == 0)
+            {
+                if (window.ToolType == ModEditorToolType.VertexBrush)
+                    cmd.DrawMesh(screenMesh, Matrix4x4.identity, window.Mat_Util, 0, 8);
                 return;
+            }
             for (int i = 0; i < window.Manager.TargetChildren.Count; i++)
             {
                 GameObject target = window.Manager.TargetChildren[i];
@@ -543,6 +545,8 @@ namespace ModEditor
                     }
                 }
             }
+            if (window.ToolType == ModEditorToolType.VertexBrush)
+                cmd.DrawMesh(screenMesh, Matrix4x4.identity, window.Mat_Util, 0, 8);
         }
 
         public void GameViewCommand(CommandBuffer cmd)
