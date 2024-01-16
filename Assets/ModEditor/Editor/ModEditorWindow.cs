@@ -44,13 +44,7 @@ namespace ModEditor
         [MenuItem("Tools/Mod Editor %#E")]
         static void Open()
         {
-            ModEditorManager test = CreateInstance<ModEditorManager>();
-            MonoScript monoScript = MonoScript.FromScriptableObject(test);
-            string path = AssetDatabase.GetAssetPath(monoScript);
-            int index = path.IndexOf("/Editor/ModEditorManager.cs");
-            path = path.Substring(0, index);
-            ModEditorPath = path;
-            DestroyImmediate(test);
+            RefreshModEditorPath();
 
             ModEditorWindow window = GetWindow<ModEditorWindow>("Mod Editor");
             if (!window.Manager.LockTarget)
@@ -59,6 +53,17 @@ namespace ModEditor
                 window.refreshObjDic();
             }
             window.minSize = new Vector2(330, 700);
+        }
+
+        static void RefreshModEditorPath()
+        {
+            ModEditorManager test = CreateInstance<ModEditorManager>();
+            MonoScript monoScript = MonoScript.FromScriptableObject(test);
+            string path = AssetDatabase.GetAssetPath(monoScript);
+            int index = path.IndexOf("/Editor/ModEditorManager.cs");
+            path = path.Substring(0, index);
+            ModEditorPath = path;
+            DestroyImmediate(test);
         }
 
         Scene currentScene;
@@ -150,6 +155,7 @@ namespace ModEditor
 
         private void OnEnable()
         {
+            RefreshModEditorPath();
             Self = this;
             tabs = new List<WindowTabBase>();
             tabs.Add(new SceneCollectionTab(this));
