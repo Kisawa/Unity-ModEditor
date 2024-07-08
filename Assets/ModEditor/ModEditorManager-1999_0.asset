@@ -10,18 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 452e47ba08746704e8fda6167da66445, type: 3}
-  m_Name: ModEditorManager-
+  m_Name: ModEditorManager-1999_0
   m_EditorClassIdentifier: 
   lockTarget: 1
   target:
-    exposedName: '#UNKNOWN:1'
+    exposedName: 
     defaultValue: {fileID: 0}
-  gameCameraFollow: 1
+  gameCameraFollow: 0
   actionableDic:
     parent: {fileID: 11400000}
-    keyList:
-    - '#UNKNOWN:1'
-    valList: 01
+    keyList: []
+    valList: 
   meshDic:
     keyList: []
     originList: []
@@ -87,15 +86,15 @@ MonoBehaviour:
   calcUtilUnfold: 1
   calcUtilIndex: 0
   brushUtilIndex: 0
-  texBrushTexelSize: {x: 1024, y: 1024}
+  texBrushTexelSize: {x: 512, y: 512}
   texBrushUnfold: 1
   texBrushForegroundUnfold: 1
   texBrushRangeViewColor: {r: 0, g: 1, b: 0, a: 1}
   textureBaseColor: {r: 0, g: 0, b: 0, a: 0}
   textureBrushColor: {r: 1, g: 1, b: 1, a: 1}
-  texBrushRange: {x: 0, y: 0, z: 0}
+  texBrushRange: {x: 0.001, y: 0.001, z: 0}
   texUtilUnfold: 1
-  texUtilIndex: 0
+  texUtilIndex: 2
   colorMaskUnfold: 1
   colorMask: {r: 1, g: 1, b: 1, a: 1}
   texturePassView: 0

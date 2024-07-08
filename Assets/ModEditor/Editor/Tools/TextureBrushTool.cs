@@ -208,6 +208,7 @@ namespace ModEditor
             if (ModEditor == null || ModEditor.camera == null || !IsAvailable())
                 return;
             ModEditor.Mat_Util.SetTexture("_EditorTex", ModEditor.Tab_TextureBrush.TextureManager.Cache.Texture);
+            SetTargetEditorTex();
             ModEditor.Mat_Util.SetInt("_TexRender", TexRender ? 1 : 0);
             ModEditor.Mat_Util.SetColor("_TexBrushRangeViewColor", TexBrushRangeViewColor);
             ModEditor.Mat_Util.SetInt("_CursorOn", CursorOn ? 1 : 0);
@@ -215,6 +216,30 @@ namespace ModEditor
             ModEditor.Mat_Util.SetVector("_TexBrushRange", TexBrushRange);
             ModEditor.Mat_Util.SetFloat("_BrushRotate", BrushRotation);
             SceneView.RepaintAll();
+        }
+
+        void SetTargetEditorTex()
+        {
+            if (ModEditor.Manager.Target == null)
+                return;
+            for (int i = 0; i < ModEditor.Manager.TargetChildren.Count; i++)
+            {
+                GameObject target = ModEditor.Manager.TargetChildren[i];
+                if (target == null)
+                    continue;
+                if (!ModEditor.Manager.ActionableDic[target])
+                    continue;
+                Renderer renderer = target.GetComponent<Renderer>();
+                if (renderer == null)
+                    continue;
+                for (int j = 0; j < renderer.sharedMaterials.Length; j++)
+                {
+                    Material material = renderer.sharedMaterials[j];
+                    if (material == null)
+                        continue;
+                    material.SetTexture("_EditorTex", ModEditor.Tab_TextureBrush.TextureManager.Cache.Texture);
+                }
+            }
         }
     }
 }

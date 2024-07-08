@@ -10,12 +10,11 @@ namespace ModEditor
     public class ModEditorManager : ScriptableObject
     {
         [SerializeField]
-        bool lockTarget;
+        bool lockTarget = true;
         public bool LockTarget
         {
             get => lockTarget;
-            set
-            {
+            set {
                 if (value == lockTarget)
                     return;
                 Undo.RecordObject(this, "ModEditor LockTarget");

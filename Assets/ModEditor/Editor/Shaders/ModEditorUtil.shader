@@ -1,17 +1,17 @@
 ﻿Shader "Hidden/ModEditorUtil"
 {
-	SubShader
-	{
-		CGINCLUDE
+    SubShader
+    {
+        CGINCLUDE
 		#include "UnityCG.cginc"
 		struct appdata
-		{
-			float4 vertex: POSITION;
+        {
+            float4 vertex: POSITION;
 			float3 normal: NORMAL;
 			float4 tangent: TANGENT;
 			float2 texcoord: TEXCOORD0;
 			float4 color: COLOR;
-		};
+        };
 
 		struct appdata_UVView
 		{
@@ -42,13 +42,13 @@
 			float4 color: TEXCOORD2;
 		};
 
-		struct g2f
-		{
+        struct g2f
+        {
 			float4 pos: SV_POSITION;
 			float2 uv: TEXCOORD0;
 			float4 color: TEXCOORD1;
 			float4 normal: TEXCOORD2;
-		};
+        };
 
 		fixed4 _NormalColor;
 		fixed _NormalLength;
@@ -86,27 +86,27 @@
 		}
 
 		v2g vertToGeom(appdata v)
-		{
-			v2g o;
+        {
+            v2g o;
 			UNITY_INITIALIZE_OUTPUT(v2g, o);
 			o.worldPos = mul(unity_ObjectToWorld, v.vertex);
 			o.worldNormal = UnityObjectToWorldNormal(v.normal);
 			o.worldTangent.xyz = UnityObjectToWorldDir(v.tangent);
 			o.worldTangent.w = v.tangent.w;
-			return o;
-		}
+            return o;
+        }
 
 		g2f vert(appdata v)
-		{
-			g2f o;
+        {
+            g2f o;
 			UNITY_INITIALIZE_OUTPUT(g2f, o);
-			o.pos = UnityObjectToClipPos(v.vertex);
-			o.uv = v.texcoord;
+            o.pos = UnityObjectToClipPos(v.vertex);
+            o.uv = v.texcoord;
 			o.color = v.color;
 			COMPUTE_EYEDEPTH(o.normal.w);
 			o.normal.xyz = UnityObjectToWorldNormal(v.normal);
-			return o;
-		}
+            return o;
+        }
 
 		v2f_UVView vert_UVView(appdata_UVView v)
 		{
@@ -140,7 +140,7 @@
 		[maxvertexcount(6)]
 		void geom_normalView(triangle v2g input[3], inout LineStream<g2f> tristream)
 		{
-			for (int i = 0; i < 3; i++)
+			for(int i = 0; i < 3; i++)
 			{
 				g2f o1;
 				UNITY_INITIALIZE_OUTPUT(g2f, o1);
@@ -158,7 +158,7 @@
 		[maxvertexcount(12)]
 		void geom_tangentView(triangle v2g input[3], inout LineStream<g2f> tristream)
 		{
-			for (int i = 0; i < 3; i++)
+			for(int i = 0; i < 3; i++)
 			{
 				g2f o1;
 				UNITY_INITIALIZE_OUTPUT(g2f, o1);
@@ -172,12 +172,12 @@
 				float4 arrowOffset = float4(cross(input[i].worldNormal, input[i].worldTangent.xyz) * input[i].worldTangent.w * _TangentLength * _ArrowSize * 0.5, 0);
 				g2f o3;
 				UNITY_INITIALIZE_OUTPUT(g2f, o3);
-				float4 dirPos1 = underlapPos - float4(input[i].worldTangent.xyz, 0) * _TangentLength * _ArrowLength + arrowOffset;
+				float4 dirPos1 =  underlapPos - float4(input[i].worldTangent.xyz, 0) * _TangentLength * _ArrowLength + arrowOffset;
 				o3.pos = mul(UNITY_MATRIX_VP, dirPos1);
 				tristream.Append(o3);
 				g2f o4;
 				UNITY_INITIALIZE_OUTPUT(g2f, o4);
-				float4 dirPos2 = dirPos1 - arrowOffset;
+				float4 dirPos2 =  dirPos1 - arrowOffset;
 				o4.pos = mul(UNITY_MATRIX_VP, dirPos2);
 				tristream.Append(o4);
 				tristream.RestartStrip();
@@ -202,42 +202,42 @@
 			tristream.Append(o1);
 		}
 
-		fixed4 frag_normalView(g2f i) : SV_Target
-		{
-			return _NormalColor;
-		}
+        fixed4 frag_normalView(g2f i) : SV_Target
+        {
+            return _NormalColor;
+        }
 
 		fixed4 frag_tangentView(g2f i) : SV_Target
-		{
-			return _TangentColor;
-		}
+        {
+            return _TangentColor;
+        }
 
 		fixed4 frag_gridView(g2f i) : SV_Target
-		{
-			return _GridColor;
-		}
+        {
+            return _GridColor;
+        }
 
 		fixed4 frag_UVView(g2f i) : SV_Target
-		{
-			return fixed4(i.uv, 0, _UVAlpha);
-		}
+        {
+            return fixed4(i.uv, 0, _UVAlpha);
+        }
 
 		fixed4 frag_VertexColorView(g2f i) : SV_Target
-		{
-			return i.color;
-		}
+        {
+            return i.color;
+        }
 
 		fixed4 frag_DepthMapView(g2f i) : SV_Target
-		{
+        {
 			float depth = i.normal.w * _DepthCompress;
-			return fixed4(depth, depth, depth, 1);
-		}
+            return fixed4(depth, depth, depth, 1);
+        }
 
 		fixed4 frag_NormalMapView(g2f i) : SV_Target
-		{
+        {
 			float3 normal = mul(UNITY_MATRIX_V, float4(i.normal.xyz, 0));
-			return fixed4(normal * 0.5 + 0.5, 1);
-		}
+            return fixed4(normal * 0.5 + 0.5, 1);
+        }
 
 		float _FromStep;
 		float _ToStep;
@@ -277,7 +277,7 @@
 			float res = pow2(dir.x) / pow2(_TexBrushRange.x) + pow2(dir.y) / pow2(_TexBrushRange.y);
 			int inRange = 1 - step(1, res);
 			int inRange1 = 1 - step(0.95, res);
-
+			
 			res = (1 - remap(res, min(_TexBrushRange.z, 0.999), 1, 0, 1)) * inRange;
 			col = lerp(col, _TexBrushRangeViewColor, res);
 
@@ -323,79 +323,79 @@
 			ColorMask 0
 		}
 
-		Pass
-		{
-			CGPROGRAM
+        Pass
+        {
+            CGPROGRAM
 			#pragma vertex vertToGeom
 			#pragma geometry geom_normalView
 			#pragma fragment frag_normalView
 			ENDCG
-		}
+        }
 
 		Pass
-		{
-			CGPROGRAM
+        {
+            CGPROGRAM
 			#pragma vertex vertToGeom
 			#pragma geometry geom_tangentView
 			#pragma fragment frag_tangentView
 			ENDCG
-		}
+        }
 
 		Pass
-		{
-			ZTest[_GridWithZTest]
-			CGPROGRAM
+        {
+			ZTest [_GridWithZTest]
+            CGPROGRAM
 			#pragma vertex vertToGeom
 			#pragma geometry geom_gridView
 			#pragma fragment frag_gridView
 			ENDCG
-		}
+        }
 
 		Pass
-		{
+        {
 			ZWrite Off
 			Blend SrcAlpha OneMinusSrcAlpha
-			CGPROGRAM
+            CGPROGRAM
 			#pragma vertex vert_UVView
 			#pragma fragment frag_UVView
 			ENDCG
-		}
+        }
 
 		Pass
-		{
+        {
 			ZWrite Off
 			Blend SrcAlpha OneMinusSrcAlpha
-			CGPROGRAM
+            CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag_VertexColorView
 			ENDCG
-		}
+        }
 
 		Pass
-		{
-			CGPROGRAM
+        {
+            CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag_DepthMapView
 			ENDCG
-		}
+        }
 
 		Pass
-		{
-			CGPROGRAM
+        {
+            CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag_NormalMapView
 			ENDCG
-		}
+        }
 
 		Pass
-		{
+        {
 			ZTest Off ZWrite Off
 			Blend SrcAlpha OneMinusSrcAlpha
-			CGPROGRAM
+            CGPROGRAM
 			#pragma vertex vert_ScreenMesh
 			#pragma fragment frag_ScreenMesh
 			ENDCG
-		}
+        }
 
 		Pass
 		{
@@ -424,5 +424,5 @@
 			#pragma fragment frag_MapView
 			ENDCG
 		}
-	}
+    }
 }

@@ -16,7 +16,7 @@ namespace ModEditor
             TexPassMergePanel3.BindEditor(this);
             TexPassMergePanel4.BindEditor(this);
         }
-
+        
         void targetChanged_serializableData()
         {
             LocalRemapCoordClear();
@@ -296,7 +296,7 @@ namespace ModEditor
         {
             Undo.RecordObject(this, "LocalRemap Coord Changed");
             LocalRemapCoord.RemoveAt(index);
-            if (LocalRemapCoord.Count == 0)
+            if(LocalRemapCoord.Count == 0)
                 LocalRemapCoord.Add(Vector3.zero);
         }
 

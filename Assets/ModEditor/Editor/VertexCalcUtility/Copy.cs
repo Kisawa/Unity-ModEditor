@@ -27,10 +27,6 @@ namespace ModEditor
                         return PassCount.Three;
                     case DataType.Tangent:
                         return PassCount.Four;
-                    case DataType.UV:
-                    case DataType.UV2:
-                    case DataType.UV3:
-                        return PassCount.Two;
                 }
                 return PassCount.Four;
             }
@@ -49,6 +45,7 @@ namespace ModEditor
                 case DataType.Vertex:
                     return originMesh == null ? mesh.vertices : originMesh.vertices;
                 case DataType.Normal:
+                    Debug.LogError(originMesh.vertexCount);
                     return originMesh == null ? mesh.normals : originMesh.normals;
             }
             return null;
@@ -60,22 +57,6 @@ namespace ModEditor
                 return null;
             if (currentData == DataType.Tangent)
                 return originMesh == null ? mesh.tangents : originMesh.tangents;
-            return null;
-        }
-
-        public override Vector2[] ExecuteTwo(Mesh mesh)
-        {
-            if (originMesh != null && originMesh.vertexCount != mesh.vertexCount)
-                return null;
-            switch (currentData)
-            {
-                case DataType.UV:
-                    return originMesh == null ? mesh.uv : originMesh.uv;
-                case DataType.UV2:
-                    return originMesh == null ? mesh.uv2 : originMesh.uv2;
-                case DataType.UV3:
-                    return originMesh == null ? mesh.uv3 : originMesh.uv3;
-            }
             return null;
         }
 
@@ -111,10 +92,7 @@ namespace ModEditor
             VertexColor,
             Vertex,
             Normal,
-            Tangent,
-            UV,
-            UV2,
-            UV3
+            Tangent
         }
     }
 }

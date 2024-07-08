@@ -10,7 +10,7 @@ namespace ModEditor
         static CalcUtil self;
         public static CalcUtil Self
         {
-            get
+            get 
             {
                 if (self == null)
                     self = new CalcUtil();
@@ -140,7 +140,7 @@ namespace ModEditor
             {
                 _Select = new ComputeBuffer(count, sizeof(float));
                 _Select.SetData(Enumerable.Repeat(-1f, count).ToArray());
-                clearSelect = true;
+                clearSelect =  true;
             }
             else
                 clearSelect = false;

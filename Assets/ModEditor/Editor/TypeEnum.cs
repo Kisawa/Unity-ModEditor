@@ -5,7 +5,7 @@ using UnityEngine;
 namespace ModEditor
 {
     public enum UVType
-    {
+    { 
         UV,
         UV2,
         UV3
@@ -58,7 +58,7 @@ namespace ModEditor
     }
 
     public enum PassCount
-    {
+    { 
         One,
         Two,
         Three,
@@ -68,14 +68,14 @@ namespace ModEditor
     }
 
     public enum TargetTextureType
-    {
+    { 
         Background,
         Foreground,
         Custom
     }
 
     public enum TexViewPass
-    {
+    { 
         R,
         G,
         B,
@@ -93,7 +93,7 @@ namespace ModEditor
     }
 
     public enum BlendFactor
-    {
+    { 
         One,
         Zero,
         BlendTexColor,

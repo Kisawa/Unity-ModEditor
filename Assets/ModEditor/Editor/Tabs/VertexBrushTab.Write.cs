@@ -96,7 +96,7 @@ namespace ModEditor
 
         public void ClearObjInOperation()
         {
-            if (objInOperation != null)
+            if(objInOperation != null)
                 objInOperation.Clear();
         }
 
@@ -432,7 +432,7 @@ namespace ModEditor
                         case PassCount.Four:
                             {
                                 Vector4[] result = util.ExecuteFour(mesh);
-                                if (result != null && result.Length > 0)
+                                if(result != null && result.Length > 0)
                                     write_Data(mesh, result, _Select);
                             }
                             break;

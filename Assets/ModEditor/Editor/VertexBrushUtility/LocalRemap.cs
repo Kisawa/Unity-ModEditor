@@ -212,7 +212,7 @@ namespace ModEditor
                 window.LocalRemapCoordSet(i, targetTrans.TransformPoint(EditorGUILayout.Vector3Field("", targetTrans.InverseTransformPoint(coord[i]), GUILayout.Width(maxWidth))));
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.Space(30);
-                if (GUILayout.Button("Reset rotation", "EditModeSingleButton", GUILayout.Width(maxWidth - 95)))
+                if (GUILayout.Button("Reset rotation", "EditModeSingleButton" ,GUILayout.Width(maxWidth - 95)))
                     window.LocalRemapRotationSet(i, targetTrans.rotation);
                 EditorGUI.BeginDisabledGroup(i == 0);
                 if (GUILayout.Button("Remove", "EditModeSingleButton", GUILayout.Width(60)))

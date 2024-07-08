@@ -10,18 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 452e47ba08746704e8fda6167da66445, type: 3}
-  m_Name: ModEditorManager-
+  m_Name: ModEditorManager-Sample_SpotVolumeLight
   m_EditorClassIdentifier: 
   lockTarget: 1
   target:
-    exposedName: '#UNKNOWN:1'
+    exposedName: 
     defaultValue: {fileID: 0}
   gameCameraFollow: 1
   actionableDic:
     parent: {fileID: 11400000}
-    keyList:
-    - '#UNKNOWN:1'
-    valList: 01
+    keyList: []
+    valList: 
   meshDic:
     keyList: []
     originList: []

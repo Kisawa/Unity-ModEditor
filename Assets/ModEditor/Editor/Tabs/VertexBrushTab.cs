@@ -232,7 +232,7 @@ namespace ModEditor
             Mouse.Update -= Mouse_Update;
             ScrollWheel.Update -= ScrollWheel_Update;
             calcUtilInstances[window.Manager.CalcUtilIndex].OnLostFocus();
-            if (window.Manager.WriteType == WriteType.OtherUtil)
+            if(window.Manager.WriteType == WriteType.OtherUtil)
                 brushUtilInstances[window.Manager.BrushUtilIndex].OnLostFocus();
             WriteCommand = false;
         }
@@ -342,7 +342,7 @@ namespace ModEditor
                 EditorGUILayout.EndVertical();
                 EndCheckWriteCommand();
             }
-
+            
             EditorGUILayout.EndVertical();
             EditorGUI.indentLevel = 0;
         }
@@ -471,7 +471,7 @@ namespace ModEditor
                         presetTargetType = true;
                     }
                 }
-                else if (preWriteType == WriteType.OtherUtil)
+                else if(preWriteType == WriteType.OtherUtil)
                     brushUtilInstances[window.Manager.BrushUtilIndex].OnLostFocus();
                 GUILayout.Space(5);
                 EditorGUILayout.BeginHorizontal();

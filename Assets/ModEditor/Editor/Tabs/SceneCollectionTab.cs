@@ -529,7 +529,7 @@ namespace ModEditor
                 }
                 if (window.ToolType == ModEditorToolType.VertexBrush)
                 {
-                    CalcManager data = window.Tab_VertexBrush.CalcShaderDatas.FirstOrDefault(x => x != null && x.trans == target.transform);
+                    CalcManager data = window.Tab_VertexBrush.CalcShaderDatas.FirstOrDefault(x => x!= null && x.trans == target.transform);
                     if (data != null)
                     {
                         for (int j = 0; j < subCount; j++)
